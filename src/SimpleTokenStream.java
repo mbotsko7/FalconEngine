@@ -8,7 +8,7 @@ lowercase.
 */
 public class SimpleTokenStream implements TokenStream {
    private Scanner mReader;
-
+   private ArrayList<String> buffer = new ArrayList<>();
    /**
    Constructs a SimpleTokenStream to read from the specified file.
    */
@@ -36,12 +36,30 @@ public class SimpleTokenStream implements TokenStream {
    available.
    */
    @Override
-   public String nextToken() {
-      if (!hasNextToken())
+   public String nextToken(){
+      String next = "";
+      if(buffer.isEmpty() == false){
+         next = buffer.remove(0);
+      }
+      else if(!hasNextToken()){
          return null;
-      
-      String next = mReader.next().replaceAll("\\W", "").toLowerCase();
-      return next.length() > 0 ? next : 
-       hasNextToken() ? nextToken() : null;
+      }
+      else {
+         next = mReader.next();
+      }
+      if(next.indexOf("-") != -1){
+         String[] splitted = next.split("-");
+         for(String str : splitted){
+            buffer.add(str);
+         }
+      }
+      next = next.replaceAll("\\W", "").toLowerCase();
+      if(next.length() > 0){
+         return next;
+      }
+      else if(buffer.size() > 0 || hasNextToken()){
+         return nextToken();
+      }
+      return null;
    }
 }
