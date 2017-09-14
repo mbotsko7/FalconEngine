@@ -1,3 +1,6 @@
+import org.tartarus.snowball.SnowballProgram;
+import org.tartarus.snowball.SnowballStemmer;
+
 import java.io.*;
 import java.util.*;
 
@@ -36,7 +39,7 @@ public class SimpleTokenStream implements TokenStream {
    available.
    */
    @Override
-   public String nextToken(){
+   public String nextToken() {
       String next = "";
       if(buffer.isEmpty() == false){
          next = buffer.remove(0);
@@ -54,6 +57,17 @@ public class SimpleTokenStream implements TokenStream {
          }
       }
       next = next.replaceAll("\\W", "").toLowerCase();
+      try {
+         Class stemClass = Class.forName("org.tartarus.snowball.ext.englishStemmer");
+         SnowballStemmer stemmer = (SnowballStemmer) stemClass.newInstance();
+         stemmer.setCurrent(next);
+         stemmer.stem();
+         next = stemmer.getCurrent();
+      }
+      catch (Exception e){
+         System.out.println("Exception while stemming: "+e.getMessage());
+         e.printStackTrace();
+      }
       if(next.length() > 0){
          return next;
       }
