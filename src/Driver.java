@@ -38,6 +38,8 @@ public class Driver {
         System.out.println("end");
     }
 
+
+
     private static void indexFile(String[] fileData, PositionalInvertedIndex index,
                                   int docID){
         try{
@@ -45,6 +47,11 @@ public class Driver {
             SimpleTokenStream stream = new SimpleTokenStream(fileData[1]); //currently not including title in the indexing
             while (stream.hasNextToken()){
                 index.addTerm(stream.nextToken(), docID, i);
+                if(stream.getHyphen() != null){
+                    for(String str : stream.getHyphen()){
+                        index.addTerm(str, docID, i);
+                    }
+                }
                 i++;
             }
         }

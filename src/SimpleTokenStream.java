@@ -11,14 +11,17 @@ lowercase.
 */
 public class SimpleTokenStream implements TokenStream {
    private Scanner mReader;
-   private ArrayList<String> buffer = new ArrayList<>();
+   private String[] hyphen;
    /**
    Constructs a SimpleTokenStream to read from the specified file.
    */
    public SimpleTokenStream(File fileToOpen) throws FileNotFoundException {
       mReader = new Scanner(new FileReader(fileToOpen));
    }
-   
+
+   public String[] getHyphen(){
+      return hyphen;
+   }
    /**
    Constructs a SimpleTokenStream to read from a String of text.
    */
@@ -34,29 +37,8 @@ public class SimpleTokenStream implements TokenStream {
       return mReader.hasNext();
    }
 
-   /**
-   Returns the next token from the stream, or null if there is no token
-   available.
-   */
-   @Override
-   public String nextToken() {
-      String next = "";
-      if(buffer.isEmpty() == false){
-         next = buffer.remove(0);
-      }
-      else if(!hasNextToken()){
-         return null;
-      }
-      else {
-         next = mReader.next();
-      }
-      if(next.indexOf("-") != -1){
-         String[] splitted = next.split("-");
-         for(String str : splitted){
-            buffer.add(str);
-         }
-      }
-      next = next.replaceAll("\\W", "").toLowerCase();
+   public String parseAndStem(String str){
+      String next = str.replaceAll("\\W", "").toLowerCase();
       try {
          Class stemClass = Class.forName("org.tartarus.snowball.ext.englishStemmer");
          SnowballStemmer stemmer = (SnowballStemmer) stemClass.newInstance();
@@ -68,12 +50,41 @@ public class SimpleTokenStream implements TokenStream {
          System.out.println("Exception while stemming: "+e.getMessage());
          e.printStackTrace();
       }
+      return next;
+   }
+
+   /**
+   Returns the next token from the stream, or null if there is no token
+   available.
+   */
+   @Override
+   public String nextToken() {
+      String next = "";
+      if(!hasNextToken()){
+         return null;
+      }
+      else {
+         next = mReader.next();
+      }
+
+      if(next.contains("-")) {
+         hyphen = next.split("-");
+         for(int i = 0; i < hyphen.length; i++){
+            hyphen[i] = parseAndStem(hyphen[i]);
+         }
+      }
+      else
+         hyphen = null;
+
+      next = parseAndStem(next);
       if(next.length() > 0){
          return next;
       }
-      else if(buffer.size() > 0 || hasNextToken()){
+      else if(hasNextToken()){
          return nextToken();
       }
       return null;
    }
+
+
 }
