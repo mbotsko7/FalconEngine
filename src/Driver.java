@@ -18,12 +18,13 @@ public class Driver {
         if(in.hasNextLine()){
             dir = in.nextLine();
             File f = new File(dir);
+
             if(f.exists() && f.isDirectory()){
                 String[] fileList = f.list();
                 Parser parser = new Parser();
                 int i = 1;
                 for(String path : fileList){
-                    String[] file = parser.parseJSON(path);
+                    String[] file = parser.parseJSON(f.getPath()+"/"+path);
                     indexFile(file, index, i);
                     i++;
                 }
@@ -32,14 +33,16 @@ public class Driver {
             else {
                 System.out.println("Error: Directory invalid");
             }
+
         }
+        System.out.println("end");
     }
 
     private static void indexFile(String[] fileData, PositionalInvertedIndex index,
                                   int docID){
         try{
             int  i = 0;
-            SimpleTokenStream stream = new SimpleTokenStream(fileData[2]); //currently not including title in the indexing
+            SimpleTokenStream stream = new SimpleTokenStream(fileData[1]); //currently not including title in the indexing
             while (stream.hasNextToken()){
                 index.addTerm(stream.nextToken(), docID, i);
                 i++;
