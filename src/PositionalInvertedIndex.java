@@ -1,4 +1,3 @@
-
 import java.util.*;
 
 public class PositionalInvertedIndex {
@@ -8,30 +7,28 @@ public class PositionalInvertedIndex {
         mIndex = new HashMap<String, List<PositionalIndex>>();
     }
 
-    public void addTerm(String term, int documentID, int position){
+    public void addTerm(String term, int documentID, int position) {
         //check if the term is in the index already
-        if(mIndex.containsKey(term)){
+        if (mIndex.containsKey(term)) {
             //locate term
             PositionalIndex docIndex = null;
-            for(PositionalIndex temp : getPostings(term)){
-                if(temp.getDocID() == documentID){
+            for (PositionalIndex temp : getPostings(term)) {
+                if (temp.getDocID() == documentID) {
                     docIndex = temp;
                 }
             }
             //if doc exists, add the new position
-            if(docIndex != null){
+            if (docIndex != null) {
                 docIndex.addPosition(position);
-            }
-            else{ //add doc and position to the index
-                ArrayList<PositionalIndex> postings = (ArrayList<PositionalIndex>)getPostings(term);
+            } else { //add doc and position to the index
+                ArrayList<PositionalIndex> postings = (ArrayList<PositionalIndex>) getPostings(term);
                 ArrayList<Integer> posList = new ArrayList<>();
                 posList.add(position);
                 postings.add(new PositionalIndex(documentID, posList));
                 mIndex.put(term, postings);
             }
 
-        }
-        else{ //if new term
+        } else { //if new term
             ArrayList<PositionalIndex> l = new ArrayList<>();
             ArrayList<Integer> posList = new ArrayList<>();
             posList.add(position);
@@ -62,10 +59,10 @@ public class PositionalInvertedIndex {
     public String[] getDictionary() {
         Iterator<String> itr = mIndex.keySet().iterator();
         ArrayList<String> list = new ArrayList<>();
-        while (itr.hasNext()){
+        while (itr.hasNext()) {
             list.add(itr.next());
         }
         Collections.sort(list);
-        return (String[]) list.toArray();
+        return list.toArray(new String[list.size()]);
     }
 }
