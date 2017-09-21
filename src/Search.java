@@ -15,6 +15,8 @@ public class Search {
         // perform an AND intersection on two lists of docIDs
         // return a list of docIDs for documents that contain both terms
 
+        if (listA == null || listB == null) return null; //return null if there's an empty list
+
         ArrayList<Integer> results = new ArrayList<Integer>();
         int i = 0, j = 0;
         while (i < listA.size() && j < listB.size()) {
@@ -32,42 +34,56 @@ public class Search {
     }
 
     public ArrayList<Integer> getDocIDList(String term) {
-        ArrayList<PositionalIndex> postingsList = index.getPostings(term);
+        // get list of documents that contain the given term
+        ArrayList<PositionalIndex> postings = index.getPostings(term);
         ArrayList<Integer> docList = new ArrayList<Integer>(postingsList.size());
-        int i = 0;
-        for (PositionalIndex post: postingsList) {
-            docList.set(i,post.getDocID());
-            i++;
+        for (int i = 0; i < postings.size() i++) {
+            docList.set(i, postings.get(i).getDocID());
         }
         return docList;
     }
 
     public ArrayList<Integer> searchPhraseLiteral(String phrase) {
+        // returns a list of docIDs that contain the entire phrase
+
         ArrayList<Integer> results = new ArrayList<Integer>();
-        // separate phrase into tokens
+
+        // separate phrase into individual tokens
         String[] tokens = Query.getPhraseTokens(phrase);
 
-        // cycle through each token and merge postings lists
-        ArrayList<Integer> merged = getDocIDList(tokens[0]);
+        // get list of documents that contain all the phrase tokens
+        ArrayList<Integer> accum = getDocIDList(tokens[0]);
         for (int i = 1; i < tokens.length; i++) {
             ArrayList<Integer> curr = getDocIDList(tokens[i]);
-            merged = mergeLists(merged, curr);
+            accum = mergeLists(accum, curr);
+            if (accum == null) return null;
         }
 
-        // check positions in each doc that contains all the tokens
-
-        // loop through each doc that matched
-        // loop through tokens[0]'s positions in the doc
-        // loop through the other tokens and see if they're adjacent..
-
+        // loop through each doc that contains all the tokens
         for (Integer docID: merged) {
-            for (Integer position: index.getPostingsByDoc(tokens[0], docID.intValue())) {
+            ArrayList<Integer>[] tokenPositions = new ArrayList<Integer(tokens.length);
+            // get position list of each phrase token in the current document
+            for (int i= 0; i < tokenPositions.size(); i++) {
+                tokenPositions[i] = index.getPostingByDoc(tokens[i], docID.value());
+            }
 
+            // loop through first token's positions and check if other tokens are adjacent
+            boolean matched = true;
+            for (int i = 0; i < tokenPositions[0].size(); i++) {
+                int start = tokenPositions[0].get(i).intValue();
+                for (int j = 1; j < tokenPositions.length; j++) {
+                    if (!tokenPositions[j].contains(new Integer(start + j))) {
+                        matched = false;
+                        break;
+                    }
+                }
+                if (matched) {
+                    results.add(docID);
+                    break;
+                }
             }
         }
-
-
-        return null;
+        return results;
     }
 
     public ArrayList<String> searchQuery(String query) {
