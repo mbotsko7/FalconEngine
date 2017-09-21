@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+
 // utility methods for processing queries
 public class Query {
     // TODO deal with hyphens
