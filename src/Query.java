@@ -13,6 +13,7 @@ public class Query {
     public static ArrayList<String> getQueryLiterals(String str) {
         // breaks down a subquery and returns an ArrayList of query literals
         // (single tokens and phrase literals)
+        str = str.trim();
         ArrayList<String> queryLiterals = new ArrayList<String>();
         int i = str.indexOf('"');
         while (i != -1) {
@@ -25,8 +26,13 @@ public class Query {
             // add phrase literals to list
             i = str.indexOf('"', 1);
             queryLiterals.add(str.substring(0, i+1));
-            str = str.substring(i+2, str.length());
-            i = str.indexOf('"');
+            if (i != str.length()-1) {
+                str = str.substring(i+2, str.length());
+                i = str.indexOf('"');
+            } else {
+                str = "";
+                break;
+            }
         }
         if (str.length() != 0)
             queryLiterals.addAll(Arrays.asList(str.split(" ")));
