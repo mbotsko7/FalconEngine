@@ -1,19 +1,19 @@
 import java.util.*;
 
-// NOT DONE
+// TODO deal with hyphens
 
 public class Search {
-    // don't forget to stem
 
     private PositionalInvertedIndex index = new PositionalInvertedIndex();
     private String query;
+    private SimpleTokenStream stream = new SimpleTokenStream();
 
     public Search(PositionalInvertedIndex index, String query) {
         this.index = index;
         this.query = query;
     }
 
-    private List<Integer> mergeLists(List<Integer> listA, List<Integer> listB) {
+    public List<Integer> mergeLists(List<Integer> listA, List<Integer> listB) {
         // perform an AND intersection on two lists of docIDs
         // return a list of docIDs for documents that contain both terms
         List<Integer> results = new ArrayList<>();
@@ -22,7 +22,6 @@ public class Search {
             while (i < listA.size() && j < listB.size()) {
                 int compare = listA.get(i).compareTo(listB.get(j));
                 if (compare == 0) {
-                    results.add(i);
                     i++;
                     j++;
                 } else if (compare > 0) {
@@ -35,7 +34,7 @@ public class Search {
         return results;
     }
 
-    private List<Integer> getDocIDList(String term) {
+    public List<Integer> getDocIDList(String term) {
         // get list of documents that contain the given term
         List<PositionalIndex> postings = index.getPostings(term);
         List<Integer> docList = new ArrayList<>(postings.size());
@@ -45,13 +44,16 @@ public class Search {
         return docList;
     }
 
-    private List<Integer> searchPhraseLiteral(String phrase) {
+    public List<Integer> searchPhraseLiteral(String phrase) {
         // returns a list of docIDs that contain the entire phrase
 
         List<Integer> results = new ArrayList<>();
 
-        // separate phrase into individual tokens
+        // separate phrase into individual stemmed tokens
         String[] tokens = Query.getPhraseTokens(phrase);
+        for (String token: tokens) {
+            token = stream.parseAndStem(token);
+        }
 
         // get list of documents that contain all the phrase tokens
         List<Integer> accum = getDocIDList(tokens[0]);
@@ -62,7 +64,6 @@ public class Search {
         if (!accum.isEmpty()) {
             // loop through each doc that contains all the tokens
             for (Integer docID : accum) {
-                //            List<Integer>[] tokenPositions = new ArrayList<Integer>(tokens.length);
                 List<List<Integer>> tokenPositions = new ArrayList<List<Integer>>(tokens.length);
                 // get position list of each phrase token in the current document
                 for (int i = 0; i < tokenPositions.size(); i++) {
@@ -107,6 +108,7 @@ public class Search {
                 if (literal.startsWith("\"")) {  // for phrases
                     literalsPostings.add(searchPhraseLiteral(literal));
                 } else { // for single tokens
+                    literal = stream.parseAndStem((literal));
                     literalsPostings.add(getDocIDList(literal));
                 }
             }
@@ -128,6 +130,7 @@ public class Search {
     }
 
     public void printResults(Set<Integer> results ) {
+        System.out.println("RESULTS:");
         for (Integer docID: results) {
             System.out.format("doc%d.json %n", docID);
         }

@@ -12,6 +12,8 @@ lowercase.
 public class SimpleTokenStream implements TokenStream {
    private Scanner mReader;
    private String[] hyphen;
+
+   public SimpleTokenStream() {}
    /**
    Constructs a SimpleTokenStream to read from the specified file.
    */

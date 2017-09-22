@@ -7,7 +7,7 @@ public class Query {
 
     public static String[] getSubqueries(String query) {
         // breaks down query into list of subqueries, separating by +
-        return query.toLowerCase().split(" \\+ ");
+        return query.split(" \\+ ");
     }
 
     public static ArrayList<String> getQueryLiterals(String str) {
@@ -43,7 +43,6 @@ public class Query {
         // break a phrase literal down into individual stemmed tokens
         phrase = phrase.substring(1, phrase.length()-1);
         String[] tokens = phrase.split(" ");
-        /* need to stem */
         return tokens;
     }
 }
