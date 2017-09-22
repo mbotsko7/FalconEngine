@@ -12,28 +12,28 @@ public class KIndex {
     }
 
 
-    public void index(String str){
-        String token = "$" + str + "$";
-        ArrayList<String> splitted = new ArrayList<>();
-        for(int i = 0; i < token.length(); i++){
-            splitted.add(token, )
-        }
-        while (token.length() >= 3){
-            splitted.add(token.substring(0,3));
-            token = token.substring(3);
-        }
-        if(!token.isEmpty())
-            splitted.add(token);
-        for(String val : splitted){
-            ArrayList<String> list = kIndex.get(val);
-            if(list == null){
-                list = new ArrayList<>();
-            }
-            list.add(str);
-            Collections.sort(list);
-            kIndex.put(val, list);
-        }
-    }
+//    public void index(String str){
+//        String token = "$" + str + "$";
+//        ArrayList<String> splitted = new ArrayList<>();
+//        for(int i = 0; i < token.length(); i++){
+//
+//        }
+//        while (token.length() >= 3){
+//            splitted.add(token.substring(0,3));
+//            token = token.substring(3);
+//        }
+//        if(!token.isEmpty())
+//            splitted.add(token);
+//        for(String val : splitted){
+//            ArrayList<String> list = kIndex.get(val);
+//            if(list == null){
+//                list = new ArrayList<>();
+//            }
+//            list.add(str);
+//            Collections.sort(list);
+//            kIndex.put(val, list);
+//        }
+//    }
 
 
 
