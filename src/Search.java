@@ -5,12 +5,10 @@ import java.util.*;
 public class Search {
 
     private PositionalInvertedIndex index = new PositionalInvertedIndex();
-    private String query;
     private SimpleTokenStream stream = new SimpleTokenStream();
 
-    public Search(PositionalInvertedIndex index, String query) {
+    public Search(PositionalInvertedIndex index) {
         this.index = index;
-        this.query = query;
     }
 
     public List<Integer> mergeLists(List<Integer> listA, List<Integer> listB) {
@@ -37,9 +35,11 @@ public class Search {
     public List<Integer> getDocIDList(String term) {
         // get list of documents that contain the given term
         List<PositionalIndex> postings = index.getPostings(term);
-        List<Integer> docList = new ArrayList<>(postings.size());
-        for (int i = 0; i < postings.size(); i++) {
-            docList.set(i, postings.get(i).getDocID());
+        List<Integer> docList = new ArrayList<>();
+        if (postings != null) {
+            for (int i = 0; i < postings.size(); i++) {
+                docList.add(postings.get(i).getDocID());
+            }
         }
         return docList;
     }
@@ -92,7 +92,7 @@ public class Search {
         return results;
     }
 
-    public void searchForQuery() {
+    public void searchForQuery(String query) {
         // search the document for the query
 
         List<List<Integer>> subqueryResults = new ArrayList<List<Integer>>();
@@ -132,9 +132,9 @@ public class Search {
     public void printResults(Set<Integer> results ) {
         System.out.println("RESULTS:");
         for (Integer docID: results) {
-            System.out.format("doc%d.json %n", docID);
+            System.out.format("article%d.json %n", docID);
         }
-        System.out.format("%nTotal documents: %d", results.size());
+        System.out.format("%nTotal documents: %d%n", results.size());
     }
 
 

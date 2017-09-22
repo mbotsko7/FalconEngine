@@ -76,7 +76,8 @@ public class Driver {
                 int vocabTotal = index.getTermCount();
                 System.out.println("\nTotal number of vocabulary terms: " + vocabTotal);
             } else {
-                // normal query ?
+                Search search = new Search(index);
+                search.searchForQuery(query);
             }
         }
 
