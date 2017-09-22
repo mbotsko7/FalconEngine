@@ -20,6 +20,7 @@ public class Search {
             while (i < listA.size() && j < listB.size()) {
                 int compare = listA.get(i).compareTo(listB.get(j));
                 if (compare == 0) {
+                    results.add(listA.get(i));
                     i++;
                     j++;
                 } else if (compare > 0) {
@@ -51,8 +52,8 @@ public class Search {
 
         // separate phrase into individual stemmed tokens
         String[] tokens = Query.getPhraseTokens(phrase);
-        for (String token: tokens) {
-            token = stream.parseAndStem(token);
+        for (int i = 0; i < tokens.length; i++) {
+            tokens[i] = stream.parseAndStem(tokens[i]);
         }
 
         // get list of documents that contain all the phrase tokens
@@ -64,10 +65,10 @@ public class Search {
         if (!accum.isEmpty()) {
             // loop through each doc that contains all the tokens
             for (Integer docID : accum) {
-                List<List<Integer>> tokenPositions = new ArrayList<List<Integer>>(tokens.length);
+                List<List<Integer>> tokenPositions = new ArrayList<List<Integer>>();
                 // get position list of each phrase token in the current document
-                for (int i = 0; i < tokenPositions.size(); i++) {
-                    tokenPositions.set(i, index.getPositionsInDoc(tokens[i], docID.intValue()));
+                for (int i = 0; i < tokens.length; i++) {
+                    tokenPositions.add(index.getPositionsInDoc(tokens[i], docID.intValue()));
                 }
 
                 // loop through first token's positions and check if other tokens are adjacent
