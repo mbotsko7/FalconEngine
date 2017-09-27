@@ -3,7 +3,6 @@ import java.util.Arrays;
 
 // utility methods for processing queries
 public class Query {
-    // TODO deal with hyphens
 
     public static String[] getSubqueries(String query) {
         // breaks down query into list of subqueries, separating by +
@@ -19,8 +18,8 @@ public class Query {
         while (i != -1) {
             if (i != 0) {
                 // separate out single tokens and add to list
-                String singles = str.substring(0,i);
-                queryLiterals.addAll(Arrays.asList(singles.split(" ")));
+                String[] singlesList = str.substring(0,i).split(" ");
+                queryLiterals = addSingleTokensToList(singlesList, queryLiterals);
                 str = str.substring(i, str.length());
             }
             // add phrase literals to list
@@ -35,8 +34,18 @@ public class Query {
             }
         }
         if (str.length() != 0)
-            queryLiterals.addAll(Arrays.asList(str.split(" ")));
+//            queryLiterals.addAll(Arrays.asList(str.split(" ")));
+            queryLiterals = addSingleTokensToList(str.split(" "), queryLiterals);
         return queryLiterals;
+    }
+
+    private static ArrayList<String> addSingleTokensToList(String[] singles, ArrayList<String> list) {
+        for (String single: singles) {
+            if (single.contains("-"))
+                single = single.replace("-","");
+            list.add(single);
+        }
+        return list;
     }
 
     public static String[] getPhraseTokens(String phrase) {
