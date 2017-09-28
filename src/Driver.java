@@ -1,8 +1,7 @@
 import com.google.gson.*;
 import org.tartarus.snowball.ext.englishStemmer;
 
-import java.io.File;
-import java.io.FileWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -39,7 +38,7 @@ public class Driver {
 
         String query = "";
         while (!query.equals(":q")) {
-            System.out.println("Enter search query: ");
+            System.out.println("\nEnter search query: ");
             query = in.nextLine();
 
             if (query.startsWith(":stem")) {
@@ -80,6 +79,25 @@ public class Driver {
             } else {
                 Search search = new Search(index);
                 search.searchForQuery(query);
+
+                System.out.print("\nDocument to view? ");
+                String selectedDoc = in.nextLine();
+                File fileToView = new File(dir + "/" + selectedDoc);
+
+                try {
+                    System.out.println("Displaying document.. \n");
+                    BufferedReader br = new BufferedReader(new FileReader(fileToView));
+                    String line = "";
+                    while ((line = br.readLine()) != null) {
+                        System.out.println(line);
+                    }
+                    br.close();
+                } catch (FileNotFoundException e) {
+                    System.out.println("Error: File does not exist.");
+                } catch (IOException e) {
+                    System.out.println("Error");
+                }
+
             }
         }
 
