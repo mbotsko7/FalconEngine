@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -22,6 +23,7 @@ public class Driver {
 
             if(f.exists() && f.isDirectory()){
                 String[] fileList = f.list();
+                Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
                 Parser parser = new Parser();
                 int i = 1;
                 for(String path : fileList){
