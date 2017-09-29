@@ -41,6 +41,7 @@ public class SimpleTokenStream implements TokenStream {
 
    public String parseAndStem(String str){
       String next = str.replaceAll("\\W", "").toLowerCase();
+      next = next.replaceAll("_", "");
       try {
          Class stemClass = Class.forName("org.tartarus.snowball.ext.englishStemmer");
          SnowballStemmer stemmer = (SnowballStemmer) stemClass.newInstance();
