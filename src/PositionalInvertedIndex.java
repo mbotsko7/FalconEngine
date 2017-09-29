@@ -11,17 +11,27 @@ public class PositionalInvertedIndex {
         //check if the term is in the index already
         if (mIndex.containsKey(term)) {
             //locate term
-            PositionalIndex docIndex = null;
-            for (PositionalIndex temp : getPostings(term)) {
-                if (temp.getDocID() == documentID) {
-                    docIndex = temp;
-                }
+//            PositionalIndex docIndex = null;
+//            for (PositionalIndex temp : getPostings(term)) {
+//                if (temp.getDocID() == documentID) {
+//                    docIndex = temp;
+//                }
+//            }
+            ArrayList<PositionalIndex> postings = (ArrayList<PositionalIndex>) getPostings(term);
+            if(postings.size() == documentID) {
+                postings.get(documentID-1).addPosition(position);
+//                PositionalIndex temp = postings.get(documentID-1);
+//                if (temp.getDocID() == documentID) {
+//                    docIndex = temp;
+//
+//                }
             }
-            //if doc exists, add the new position
-            if (docIndex != null) {
-                docIndex.addPosition(position);
-            } else { //add doc and position to the index
-                ArrayList<PositionalIndex> postings = (ArrayList<PositionalIndex>) getPostings(term);
+//            //if doc exists, add the new position
+//            if (docIndex != null) {
+//                docIndex.addPosition(position);
+//            }
+            else { //add doc and position to the index
+
                 ArrayList<Integer> posList = new ArrayList<>();
                 posList.add(position);
                 postings.add(new PositionalIndex(documentID, posList));

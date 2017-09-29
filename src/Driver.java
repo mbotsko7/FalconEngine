@@ -24,10 +24,14 @@ public class Driver {
                 String[] fileList = f.list();
                 Parser parser = new Parser();
                 int i = 1;
+                long begin = System.nanoTime();
                 for(String path : fileList){
+
                     String[] file = parser.parseJSON(f.getPath()+"/"+path);
                     indexFile(file, index, i);
                     i++;
+                    if(i % 1000 == 0)
+                        System.out.println("#"+i+" "+(System.nanoTime()-begin));
                 }
             } else {
                 System.out.println("Error: Directory invalid");

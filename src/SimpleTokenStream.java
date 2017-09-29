@@ -69,14 +69,15 @@ public class SimpleTokenStream implements TokenStream {
          next = mReader.next();
       }
 
+      hyphen = null;
       if(next.contains("-")) {
          hyphen = next.split("-");
          for(int i = 0; i < hyphen.length; i++){
             hyphen[i] = parseAndStem(hyphen[i]);
          }
       }
-      else
-         hyphen = null;
+//      else
+//         hyphen = null;
 
       next = parseAndStem(next);
       if(next.length() > 0){

@@ -24,12 +24,12 @@ public class Parser {
             String fileData = new String(Files.readAllBytes(Paths.get(path)));
             JsonParser parser = new JsonParser();
             JsonElement json = parser.parse(fileData);
-            if(json.isJsonObject()){
+            //if(json.isJsonObject()){
                 JsonObject obj = json.getAsJsonObject();
                 String body = obj.get("body").getAsString();
                 String title = obj.get("title").getAsString();
                 return new String[] {title, body};
-            }
+            //}
         }
         catch (Exception e){
             System.out.println(e.getMessage());
