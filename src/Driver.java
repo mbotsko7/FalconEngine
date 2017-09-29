@@ -16,6 +16,7 @@ public class Driver {
         System.out.println("Enter a directory to index: ");
         String dir = "";
         PositionalInvertedIndex index = new PositionalInvertedIndex();
+        KGramIndex kGramIndex = new KGramIndex();
         if(in.hasNextLine()){
             dir = in.nextLine();
             File f = new File(dir);
@@ -29,7 +30,7 @@ public class Driver {
                 for(String path : fileList){
 
                     String[] file = parser.parseJSON(f.getPath()+"/"+path);
-                    indexFile(file, index, i);
+                    indexFile(file, index, kGramIndex, i);
                     i++;
                     if(i % 1000 == 0)
                         System.out.println("#"+i+" "+(System.nanoTime()-begin));
@@ -65,7 +66,7 @@ public class Driver {
                     int i = 1;
                     for(String path : fileList){
                         String[] file = parser.parseJSON(f.getPath()+"/"+path);
-                        indexFile(file, index, i);
+                        indexFile(file, index, kGramIndex, i);
                         i++;
                     }
                 } else {
@@ -107,16 +108,19 @@ public class Driver {
 
     }
 
-    private static void indexFile(String[] fileData, PositionalInvertedIndex index,
+    private static void indexFile(String[] fileData, PositionalInvertedIndex index, KGramIndex kIndex,
                                   int docID){
         try{
             int  i = 0;
             SimpleTokenStream stream = new SimpleTokenStream(fileData[1]); //currently not including title in the indexing
             while (stream.hasNextToken()){
-                index.addTerm(stream.nextToken(), docID, i);
+                String next = stream.nextToken();
+                index.addTerm(next, docID, i);
+                kIndex.add(next);
                 if(stream.getHyphen() != null){
                     for(String str : stream.getHyphen()){
                         index.addTerm(str, docID, i);
+                        kIndex.add(next);
                     }
                 }
                 i++;
