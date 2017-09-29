@@ -30,11 +30,17 @@ public class Driver {
                 for(String path : fileList){
 
                     String[] file = parser.parseJSON(f.getPath()+"/"+path);
-                    indexFile(file, index, kGramIndex, i);
+                    indexFile(file, index, i);
                     i++;
                     if(i % 1000 == 0)
                         System.out.println("#"+i+" "+(System.nanoTime()-begin));
                 }
+                System.out.println("building k-index");
+                String[] dict = index.getDictionary();
+                for(int j = 0; j < dict.length; j++){
+                    kGramIndex.add(dict[j]);
+                }
+                System.out.println(System.nanoTime()-begin);
             } else {
                 System.out.println("Error: Directory invalid");
             }
@@ -66,9 +72,15 @@ public class Driver {
                     int i = 1;
                     for(String path : fileList){
                         String[] file = parser.parseJSON(f.getPath()+"/"+path);
-                        indexFile(file, index, kGramIndex, i);
+                        indexFile(file, index, i);
                         i++;
                     }
+                    System.out.println("building k-index");
+                    String[] dict = index.getDictionary();
+                    for(int j = 0; j < dict.length; j++){
+                        kGramIndex.add(dict[j]);
+                    }
+
                 } else {
                     System.out.println("Error: Directory invalid");
                 }
@@ -108,19 +120,19 @@ public class Driver {
 
     }
 
-    private static void indexFile(String[] fileData, PositionalInvertedIndex index, KGramIndex kIndex,
+    private static void indexFile(String[] fileData, PositionalInvertedIndex index,
                                   int docID){
         try{
             int  i = 0;
             SimpleTokenStream stream = new SimpleTokenStream(fileData[1]); //currently not including title in the indexing
             while (stream.hasNextToken()){
                 String next = stream.nextToken();
+                if(next == null)
+                    continue;
                 index.addTerm(next, docID, i);
-                kIndex.add(next);
                 if(stream.getHyphen() != null){
                     for(String str : stream.getHyphen()){
                         index.addTerm(str, docID, i);
-                        kIndex.add(next);
                     }
                 }
                 i++;

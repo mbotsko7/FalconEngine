@@ -68,7 +68,6 @@ public class SimpleTokenStream implements TokenStream {
       else {
          next = mReader.next();
       }
-
       hyphen = null;
       if(next.contains("-")) {
          hyphen = next.split("-");
@@ -76,8 +75,7 @@ public class SimpleTokenStream implements TokenStream {
             hyphen[i] = parseAndStem(hyphen[i]);
          }
       }
-//      else
-//         hyphen = null;
+
 
       next = parseAndStem(next);
       if(next.length() > 0){

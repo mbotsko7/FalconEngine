@@ -9,42 +9,60 @@ public class KGramIndex {
     private TreeMap<String, ArrayList<String>> kIndex;
     public KGramIndex(){
         kIndex = new TreeMap<>();
+        char[] arr = "_0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
+        for(char c : arr)
+            kIndex.put(c+"", new ArrayList<>());
+
     }
 
-    public void add(String str){
-        ArrayList<String> kgrams = index(str);
-        for (String s : kgrams){
-            if(kIndex.containsKey(s)){
-                kIndex.get(s).add(str);
-            }
-            else{
-                ArrayList<String> temp = new ArrayList<>();
-                temp.add(str);
-                kIndex.put(s, temp);
-            }
-        }
-    }
+//    public void add(String str){
+//        ArrayList<String> kgrams = index(str);
+//        for (String s : kgrams){
+//            if(kIndex.containsKey(s)){
+//                kIndex.get(s).add(str);
+//            }
+//            else{
+//                ArrayList<String> temp = new ArrayList<>();
+//                temp.add(str);
+//                kIndex.put(s, temp);
+//            }
+//        }
+//    }
 
     public ArrayList<String> findByKGram(String str){
         return kIndex.get(str);
     }
 
-    public ArrayList<String> index(String str){
-        ArrayList<String> tokenList = new ArrayList<>();
-        String token = "$" + str + "$";
+    public void add(String str){
         //for a 1-gram
-        char[] single = token.toCharArray();
+        char[] single = str.toCharArray();
         for(char c : single){
-            tokenList.add(""+c);
+            try {
+                kIndex.get(c + "").add(str);
+            }
+            catch (NullPointerException e){
+                System.out.println("Stop");
+            }
+            //tokenList.add(""+c);
         }
 
+        String token = "$" + str + "$";
         //for a 2-gram and a 3 gram
         for(int c = 2; c < 4; c++) {
             for (int i = 0; i <= token.length() - c; i++) {
-                tokenList.add(token.substring(i, i + c));
+                String s = token.substring(i, i+c);
+//                tokenList.add(token.substring(i, i + c));
+                if(kIndex.containsKey(s)){
+                    kIndex.get(s).add(str);
+                }
+                else{
+                    ArrayList<String> temp = new ArrayList<>();
+                    temp.add(str);
+                    kIndex.put(s, temp);
+                }
             }
         }
-        return tokenList;
+
     }
 
 
