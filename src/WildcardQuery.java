@@ -58,7 +58,7 @@ public class WildcardQuery {
                 }
             }
         }
-        if(p == i)
+        if(p == pat.length()+2)
             return true;
         return false;
     }
@@ -85,7 +85,7 @@ public class WildcardQuery {
 
     private void parse(String str){
         //for a 1-gram
-        char[] single = str.replaceAll("*", "").toCharArray();
+        char[] single = str.replaceAll("\\*", "").toCharArray();
         for(char c : single){
             parseList.add(""+c);
         }
@@ -108,7 +108,7 @@ public class WildcardQuery {
     private ArrayList<String> mergeList(ArrayList<String> one, ArrayList<String> two){
         ArrayList<String> results = new ArrayList<>();
         for(String s : one){
-            if(two.contains(s))
+            if(two.contains(s) && !results.contains(s))
                 results.add(s);
         }
         return results;
