@@ -23,7 +23,7 @@ public class Driver {
 
             if(f.exists() && f.isDirectory()){
                 String[] fileList = f.list();
-                Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
+                //Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
                 Parser parser = new Parser();
                 int i = 1;
                 long begin = System.nanoTime();
