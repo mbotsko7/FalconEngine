@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Label?>
+
+<?import javafx.scene.text.Text?>
+<GridPane alignment="center" gridLinesVisible="true" hgap="10" styleClass="root" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="Controller">
+    <padding><Insets bottom="5" left="5" right="5" top="5" /></padding>
+    <children>
+
+        <HBox alignment="top_center" spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="4" >
+            <children>
+                <Button id="index_button" onAction="#handleIndexButtonAction" text="Index a directory" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="1" />
+                <Button id="vocab_button" onAction="#handleVocabButtonAction" text="Print the vocabulary" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="2" />
+
+                <!--<Button id="exit_button" onAction="#handleExitButtonAction" text="X" />-->
+            </children>
+        </HBox>
+
+        <!--<Button id="index_button" onAction="#handleIndexButtonAction" text="Index a directory" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="1" />-->
+        <!--<Button id="vocab_button" onAction="#handleVocabButtonAction" text="Print the vocabulary" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="2" />-->
+        <!---->
+        <!--<Label text="Stem token:" GridPane.columnIndex="0" GridPane.rowIndex="2" />-->
+        <!--<TextField prefHeight="25.0" prefWidth="247.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />-->
+        <!---->
+        <!--<Label text="Search query:" GridPane.columnIndex="0" GridPane.rowIndex="3" />-->
+        <!--<TextField GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1" />-->
+
+        <VBox fx:id="vbox" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <children>
+
+                <!--<Label text="Stem token:" GridPane.columnIndex="0" GridPane.rowIndex="1" />-->
+                <TextArea fx:id="textbox" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <HBox>
+                    <children>
+
+                        <Button fx:id="stem_button" onAction="#handleStemButtonAction" text="Stem token" />
+                        <Button fx:id="search_button" onAction="#handleSearchButtonAction" text="Search query" />
+                    </children>
+                </HBox>
+
+                <!--<Label text="Search query:" GridPane.columnIndex="0" GridPane.rowIndex="3" />-->
+                <!--<TextArea fx:id="textarea" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1" />-->
+
+            </children>
+
+
+        </VBox>
+
+        <ScrollPane fx:id="display_box" minWidth="400" maxWidth="400" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.rowSpan="4">
+            <Label fx:id="status_text" minWidth="400" maxWidth="400"/>
+        </ScrollPane>
+
+
+    </children>
+
+    <stylesheets>
+        <URL value="@searchengine.css" />
+    </stylesheets>
+
+</GridPane>

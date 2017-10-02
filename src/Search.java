@@ -1,7 +1,4 @@
 import java.util.*;
-
-// TODO deal with hyphens
-
 public class Search {
 
     private PositionalInvertedIndex index = new PositionalInvertedIndex();
@@ -93,7 +90,7 @@ public class Search {
         return results;
     }
 
-    public void searchForQuery(String query) {
+    public Set<Integer> searchForQuery(String query) {
         // search the document for the query
 
         List<List<Integer>> subqueryResults = new ArrayList<List<Integer>>();
@@ -127,16 +124,17 @@ public class Search {
             finalResults.addAll(result);
         }
         finalResults.remove(null);
-        printResults(finalResults);
+        return finalResults;
+        //printResults(finalResults);
     }
 
-    public void printResults(Set<Integer> results ) {
-        System.out.println("RESULTS:");
-        for (Integer docID: results) {
-            System.out.format("article%d.json %n", docID);
-        }
-        System.out.format("%nTotal documents: %d%n", results.size());
-    }
+//    public void printResults(Set<Integer> results ) {
+//        System.out.println("RESULTS:");
+//        for (Integer docID: results) {
+//            System.out.format("article%d.json %n", docID);
+//        }
+//        System.out.format("%nTotal documents: %d%n", results.size());
+//    }
 
 
 }

@@ -1,0 +1,29 @@
+.root {
+    -fx-background-color: white;
+}
+
+.result-button {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+.button:hover {
+    -fx-border-color: transparent, black;
+}
+
+
+#exit_button {
+    -fx-text-fill: FIREBRICK;
+    -fx-font-weight: bold;
+}
+
+#vbox {
+   -fx-background-color: #ddddfe;
+}
+
+#display-box {
+   -fx-border-color: BLACK;
+   -fx-background: #ddddfe;
+   -fx-min-width: 400px;
+}
+
