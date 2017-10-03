@@ -83,13 +83,9 @@ public class Controller {
                 String title = "";
 
                 try {
-                    BufferedReader br = new BufferedReader(new FileReader("nps\\"+fileName));
-                    // grabs title from document to display in results
-                    Document doc = gson.fromJson(br, Document.class);
-                    title = doc.getTitle();
-                    br.close();
 
-                    Button button = new Button(title);
+
+                    Button button = new Button(fileName);
                     button.getStyleClass().add("result-button");
                     content.getChildren().add(button);
 
@@ -117,16 +113,18 @@ public class Controller {
                         }
                     });
 
-                } catch (FileNotFoundException e) {
+                } catch (Exception e) {
                     System.err.println("File doesn't exist");
-                } catch (IOException e) {
-
                 }
             }
 
             display_box.setContent(content);
-            String msg = results.size() + " results - Click file to open";
-            status.setText(msg);
+            if (results.size() > 0) {
+                String msg = results.size() + " results - Click file to view";
+                status.setText(msg);
+            } else {
+                status.setText("No results found");
+            }
 
         } else {
             display_box.setContent(null);
