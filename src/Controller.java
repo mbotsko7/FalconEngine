@@ -105,8 +105,12 @@ public class Controller {
                 });
             }
             display_box.setContent(content);
-            String msg = results.size() + " results - Click file to open";
-            status.setText(msg);
+            if (results.size() > 0) {
+                String msg = results.size() + " results - Click file to view";
+                status.setText(msg);
+            } else {
+                status.setText("No results found");
+            }
 
         } else {
             display_box.setContent(null);

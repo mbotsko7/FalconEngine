@@ -33,8 +33,8 @@ public class Search {
     }
 
     public List<Integer> unionLists(List<Integer> listA, List<Integer> listB) {
-        // perform an AND intersection on two lists of docIDs
-        // return a list of docIDs for documents that contain both terms
+        // perform an OR operation on two lists of docIDs
+        // return a list of docIDs that appear in either list
         List<Integer> results = new ArrayList<>();
         if (listA.isEmpty() && listB.isEmpty())
             return results;
@@ -114,11 +114,21 @@ public class Search {
                 // loop through first token's positions and check if other tokens are adjacent
                 boolean matched;
                 List<Integer> first = tokenPositions.get(0);
+                int[] seekPos = new int[tokens.length]; // array of seek positions for all tokens in phrase
+                for (int i = 0; i < seekPos.length; i++)      // initialize all seek positions as 0
+                    seekPos[i] = 0;
+
                 for (int i = 0; i < first.size(); i++) {
                     matched = true;
                     int start = first.get(i).intValue();
-                    for (int j = 1; j < tokenPositions.size(); j++) {
-                        if (!tokenPositions.get(j).contains(new Integer(start + j))) {
+                    for (int j=1; j < tokenPositions.size(); j++) { // look at jth adjacent word from first token in phrase
+                        int pos = seekPos[j];
+                        int listSize = tokenPositions.get(j).size();
+                        while (pos < listSize -1 && tokenPositions.get(j).get(pos) < start + j) {
+                            pos++;
+                        }
+                        seekPos[j] = pos;   // update position in seekPos array
+                        if (!tokenPositions.get(j).get(pos).equals(start + j)) {
                             matched = false;
                             break;
                         }
@@ -128,6 +138,21 @@ public class Search {
                         break;
                     }
                 }
+
+//                for (int i = 0; i < first.size(); i++) {
+//                    matched = true;
+//                    int start = first.get(i).intValue();
+//                    for (int j = 1; j < tokenPositions.size(); j++) {
+//                        if (!tokenPositions.get(j).contains(new Integer(start + j))) {
+//                            matched = false;
+//                            break;
+//                        }
+//                    }
+//                    if (matched) {
+//                        results.add(docID);
+//                        break;
+//                    }
+//                }
             }
         }
         return results;
