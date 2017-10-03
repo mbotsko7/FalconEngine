@@ -51,7 +51,8 @@ public class SimpleTokenStream implements TokenStream {
             stemmer.setCurrent(next);
             stemmer.stem();
             next = stemmer.getCurrent();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.out.println("Exception while stemming: " + e.getMessage());
             e.printStackTrace();
         }
@@ -82,7 +83,8 @@ public class SimpleTokenStream implements TokenStream {
         next = parseAndStem(next);
         if (next.length() > 0) {
             return next;
-        } else if (hasNextToken()) {
+        }
+        else if (hasNextToken()) {
             return nextToken();
         }
         return null;

@@ -23,9 +23,11 @@ public class Search {
                     results.add(listA.get(i));
                     i++;
                     j++;
-                } else if (compare > 0) {
+                }
+                else if (compare > 0) {
                     j++;
-                } else {
+                }
+                else {
                     i++;
                 }
             }
@@ -51,10 +53,12 @@ public class Search {
                     results.add(listA.get(i));
                     i++;
                     j++;
-                } else if (compare > 0) {
+                }
+                else if (compare > 0) {
                     results.add(listB.get(j));
                     j++;
-                } else {
+                }
+                else {
                     results.add(listA.get(i));
                     i++;
                 }
@@ -140,20 +144,6 @@ public class Search {
                     }
                 }
 
-//                for (int i = 0; i < first.size(); i++) {
-//                    matched = true;
-//                    int start = first.get(i).intValue();
-//                    for (int j = 1; j < tokenPositions.size(); j++) {
-//                        if (!tokenPositions.get(j).contains(new Integer(start + j))) {
-//                            matched = false;
-//                            break;
-//                        }
-//                    }
-//                    if (matched) {
-//                        results.add(docID);
-//                        break;
-//                    }
-//                }
             }
         }
         return results;
@@ -174,12 +164,14 @@ public class Search {
             for (String literal : literals) {
                 if (literal.startsWith("\"")) {  // for phrases
                     literalsPostings.add(searchPhraseLiteral(literal));
-                } else if (literal.contains("*")) {
+                }
+                else if (literal.contains("*")) {
                     WildcardQuery q = new WildcardQuery(query);
                     for (String wild : q.queryResult(kindex)) {
                         literalsPostings.add(getDocIDList(wild));
                     }
-                } else { // for single tokens
+                }
+                else { // for single tokens
                     literal = stream.parseAndStem((literal));
                     literalsPostings.add(getDocIDList(literal));
                 }
@@ -188,7 +180,8 @@ public class Search {
             List<Integer> mergedList = literalsPostings.get(0);
             for (int i = 1; i < literalsPostings.size(); i++) {
                 mergedList = intersectLists(mergedList, literalsPostings.get(i));
-                if (mergedList.isEmpty()) break;
+                if (mergedList.isEmpty())
+                    break;
             }
             subqueryResults.add(mergedList);
         }
@@ -198,16 +191,11 @@ public class Search {
             finalResults = unionLists(finalResults, subqueryResults.get(i));
         }
         return finalResults;
-        //printResults(finalResults);
+
     }
 
-//    public void printResults(Set<Integer> results ) {
-//        System.out.println("RESULTS:");
-//        for (Integer docID: results) {
-//            System.out.format("article%d.json %n", docID);
-//        }
-//        System.out.format("%nTotal documents: %d%n", results.size());
-//    }
+
+
 
 
 }

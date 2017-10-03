@@ -7,11 +7,10 @@ import java.util.HashMap;
 public class WildcardQuery {
     private String query;
     private ArrayList<String> parseList;
-    private ArrayList<String> wildList;
+
     public WildcardQuery(String q){
         query = q;
         parseList = new ArrayList<>();
-        wildList = new ArrayList<>();
         parse(query);
     }
 
@@ -99,9 +98,7 @@ public class WildcardQuery {
         for(int c = 2; c < 4; c++) {
             for (int i = 0; i <= token.length() - c; i++) {
                 String s = token.substring(i, i+c);
-                if(s.contains("*"))
-                    wildList.add(s);
-                else
+                if(!s.contains("*"))
                     parseList.add(s);
 
             }

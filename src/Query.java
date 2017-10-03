@@ -28,13 +28,13 @@ public class Query {
             if (i != str.length() - 1) {
                 str = str.substring(i + 2, str.length());
                 i = str.indexOf('"');
-            } else {
+            }
+            else {
                 str = "";
                 break;
             }
         }
         if (str.length() != 0)
-//            queryLiterals.addAll(Arrays.asList(str.split(" ")));
             queryLiterals = addSingleTokensToList(str.split(" "), queryLiterals);
         return queryLiterals;
     }

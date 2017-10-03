@@ -30,7 +30,8 @@ public class Parser {
             String title = obj.get("title").getAsString();
             return new String[]{title, body};
             //}
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return null;
@@ -69,7 +70,8 @@ public class Parser {
             }
 
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }

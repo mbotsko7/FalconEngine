@@ -63,7 +63,8 @@ public class Controller {
             String stemmedToken = driver.stemToken(term);
             display_box.setContent(new Label(stemmedToken));  // test
             status.setText("");
-        } else {
+        }
+        else {
             display_box.setContent(null);
             status.setText("Please enter a token to stem");
         }
@@ -113,7 +114,8 @@ public class Controller {
                         }
                     });
 
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     System.err.println("File doesn't exist");
                 }
             }
@@ -122,11 +124,13 @@ public class Controller {
             if (results.size() > 0) {
                 String msg = results.size() + " results - Click file to view";
                 status.setText(msg);
-            } else {
+            }
+            else {
                 status.setText("No results found");
             }
 
-        } else {
+        }
+        else {
             display_box.setContent(null);
             status.setText("Please input search query");
         }

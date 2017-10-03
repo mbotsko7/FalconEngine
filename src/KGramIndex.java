@@ -38,7 +38,8 @@ public class KGramIndex {
                 String s = token.substring(i, i + c);
                 if (kIndex.containsKey(s)) {
                     kIndex.get(s).add(str);
-                } else {
+                }
+                else {
                     ArrayList<String> temp = new ArrayList<>();
                     temp.add(str);
                     kIndex.put(s, temp);

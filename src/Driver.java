@@ -30,7 +30,8 @@ public class Driver {
                     kGramIndex.add(dict[j]);
                 }
                 return true;
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
                 return false;
             }
@@ -85,7 +86,8 @@ public class Driver {
                 }
                 i++;
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -99,9 +101,11 @@ public class Driver {
                 text += line;
             }
             br.close();
-        } catch (FileNotFoundException e) {
+        }
+        catch (FileNotFoundException e) {
             System.out.println("Error: File does not exist.");
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.out.println("Error");
         }
 
