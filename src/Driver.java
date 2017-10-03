@@ -62,7 +62,7 @@ public class Driver {
     }
 
     public List<Integer> search(String query) {
-        Search search = new Search(index);
+        Search search = new Search(index, kGramIndex);
         return search.searchForQuery(query);
     }
 
