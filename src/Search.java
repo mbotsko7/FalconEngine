@@ -10,7 +10,7 @@ public class Search {
         this.kindex = k;
     }
 
-    public List<Integer> mergeLists(List<Integer> listA, List<Integer> listB) {
+    public List<Integer> intersectLists(List<Integer> listA, List<Integer> listB) {
         // perform an AND intersection on two lists of docIDs
         // return a list of docIDs for documents that contain both terms
         List<Integer> results = new ArrayList<>();
@@ -32,13 +32,54 @@ public class Search {
         return results;
     }
 
+    public List<Integer> unionLists(List<Integer> listA, List<Integer> listB) {
+        // perform an AND intersection on two lists of docIDs
+        // return a list of docIDs for documents that contain both terms
+        List<Integer> results = new ArrayList<>();
+        if (listA.isEmpty() && listB.isEmpty())
+            return results;
+        else if (listB.isEmpty())
+            return listA;
+        else if (listA.isEmpty())
+            return listB;
+        else {
+            int i = 0, j = 0;
+            while (i < listA.size() && j < listB.size()) {
+                int compare = listA.get(i).compareTo(listB.get(j));
+                if (compare == 0) {
+                    results.add(listA.get(i));
+                    i++;
+                    j++;
+                } else if (compare > 0) {
+                    results.add(listB.get(j));
+                    j++;
+                } else {
+                    results.add(listA.get(i));
+                    i++;
+                }
+            }
+            while (j < listB.size()) {
+                results.add(listB.get(j));
+                j++;
+            }
+
+            while (i < listA.size()) {
+                results.add(listA.get(i));
+                i++;
+            }
+            return results;
+        }
+    }
+
     public List<Integer> getDocIDList(String term) {
         // get list of documents that contain the given term
         List<PositionalIndex> postings = index.getPostings(term);
         List<Integer> docList = new ArrayList<>();
         if (postings != null) {
             for (int i = 0; i < postings.size(); i++) {
-                docList.add(postings.get(i).getDocID());
+                int id = postings.get(i).getDocID();
+                if (docList.isEmpty() || id != docList.get(docList.size()-1))
+                    docList.add(id);
             }
         }
         return docList;
@@ -59,7 +100,7 @@ public class Search {
         List<Integer> accum = getDocIDList(tokens[0]);
         for (int i = 1; i < tokens.length; i++) {
             List<Integer> curr = getDocIDList(tokens[i]);
-            accum = mergeLists(accum, curr);
+            accum = intersectLists(accum, curr);
         }
         if (!accum.isEmpty()) {
             // loop through each doc that contains all the tokens
@@ -92,11 +133,11 @@ public class Search {
         return results;
     }
 
-    public Set<Integer> searchForQuery(String query) {
+    public List<Integer> searchForQuery(String query) {
         // search the document for the query
 
         List<List<Integer>> subqueryResults = new ArrayList<List<Integer>>();
-        Set<Integer> finalResults = new HashSet<>();
+        List<Integer> finalResults = new ArrayList<>();
 
         // process each subquery one at a time
         String[] subqueries = Query.getSubqueries(query);
@@ -122,17 +163,16 @@ public class Search {
             // merge doc lists for each literal
             List<Integer> mergedList = literalsPostings.get(0);
             for (int i = 1; i < literalsPostings.size(); i++) {
-                mergedList = mergeLists(mergedList, literalsPostings.get(i));
+                mergedList = intersectLists(mergedList, literalsPostings.get(i));
                 if (mergedList.isEmpty()) break;
             }
             subqueryResults.add(mergedList);
         }
 
         // OR the results from the subqueries
-        for (List<Integer> result: subqueryResults) {
-            finalResults.addAll(result);
+        for (int i = 0; i < subqueryResults.size(); i++) {
+            finalResults = unionLists(finalResults, subqueryResults.get(i));
         }
-        finalResults.remove(null);
         return finalResults;
         //printResults(finalResults);
     }

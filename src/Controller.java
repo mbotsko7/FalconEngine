@@ -14,6 +14,8 @@ import javafx.stage.Stage;
 import javafx.geometry.Insets;
 
 import java.io.*;
+import java.util.List;
+
 import java.util.Set;
 
 public class Controller {
@@ -74,7 +76,7 @@ public class Controller {
         VBox content = new VBox();
 
         if (term != null && !term.trim().isEmpty()) {
-            Set<Integer> results = driver.search(term);
+            List<Integer> results = driver.search(term);
             for (Integer result: results) {
                 Gson gson = new Gson();
                 String fileName = "article" + result + ".json";
@@ -123,7 +125,8 @@ public class Controller {
             }
 
             display_box.setContent(content);
-            status.setText(results.size() + " Results (Click file to open)");
+            String msg = results.size() + " results - Click file to open";
+            status.setText(msg);
 
         } else {
             display_box.setContent(null);
