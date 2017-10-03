@@ -105,7 +105,8 @@ public class Controller {
                 });
             }
             display_box.setContent(content);
-            status.setText("Results - Click file to open");
+            String msg = results.size() + " results - Click file to open";
+            status.setText(msg);
 
         } else {
             display_box.setContent(null);

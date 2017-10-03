@@ -33,12 +33,15 @@ public class Search {
     }
 
     public List<Integer> unionLists(List<Integer> listA, List<Integer> listB) {
-        // perform OR operations on two lists of docIDs
+        // perform an AND intersection on two lists of docIDs
+        // return a list of docIDs for documents that contain both terms
         List<Integer> results = new ArrayList<>();
-        if (listA.isEmpty())
-            return listB;
+        if (listA.isEmpty() && listB.isEmpty())
+            return results;
         else if (listB.isEmpty())
             return listA;
+        else if (listA.isEmpty())
+            return listB;
         else {
             int i = 0, j = 0;
             while (i < listA.size() && j < listB.size()) {
@@ -47,19 +50,23 @@ public class Search {
                     results.add(listA.get(i));
                     i++;
                     j++;
-                } else if (compare > 0) {   // listA num is bigger
+                } else if (compare > 0) {
                     results.add(listB.get(j));
                     j++;
-                } else {    // listB num is bigger
+                } else {
                     results.add(listA.get(i));
                     i++;
                 }
             }
-            // add remainder of list
-            if (i < listA.size())
-                results.addAll(i, listA);
-            else if (j < listB.size())
-                results.addAll(j, listB);
+            while (j < listB.size()) {
+                results.add(listB.get(j));
+                j++;
+            }
+
+            while (i < listA.size()) {
+                results.add(listA.get(i));
+                i++;
+            }
             return results;
         }
     }
@@ -70,7 +77,9 @@ public class Search {
         List<Integer> docList = new ArrayList<>();
         if (postings != null) {
             for (int i = 0; i < postings.size(); i++) {
-                docList.add(postings.get(i).getDocID());
+                int id = postings.get(i).getDocID();
+                if (docList.isEmpty() || id != docList.get(docList.size()-1))
+                    docList.add(id);
             }
         }
         return docList;
@@ -161,15 +170,20 @@ public class Search {
         }
 
         // OR the results from the subqueries
-        finalResults = subqueryResults.get(0);
-        for (int i = 1; i < subqueryResults.size(); i++) {
+        for (int i = 0; i < subqueryResults.size(); i++) {
             finalResults = unionLists(finalResults, subqueryResults.get(i));
         }
         return finalResults;
         //printResults(finalResults);
     }
 
-
+//    public void printResults(Set<Integer> results ) {
+//        System.out.println("RESULTS:");
+//        for (Integer docID: results) {
+//            System.out.format("article%d.json %n", docID);
+//        }
+//        System.out.format("%nTotal documents: %d%n", results.size());
+//    }
 
 
 }
