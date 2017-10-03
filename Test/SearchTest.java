@@ -1,4 +1,7 @@
+import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,69 +10,89 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class SearchTest {
-    private PositionalInvertedIndex index = new PositionalInvertedIndex();
-    private Search search = new Search(index);
+    private PositionalInvertedIndex pIndex;
+    private KGramIndex kGramIndex;
+    private Search search;
 
-    @Test
-    public void mergeLists() throws Exception {
-        ArrayList<Integer> testList1 = new ArrayList<>(Arrays.asList(2, 5, 8, 20, 54, 77, 100));
-        ArrayList<Integer> testList2 = new ArrayList<>(Arrays.asList(2, 8, 13, 49));
-        ArrayList<Integer> testList3 = new ArrayList<>();   // empty list
+    @Before
+    public void setUp() {
+        pIndex = new PositionalInvertedIndex();
+        kGramIndex = new KGramIndex();
+        search = new Search(pIndex, kGramIndex);
 
-        // first list longer than second
-        List<Integer> results = search.mergeLists(testList1, testList2);
-        List<Integer> expected = new ArrayList<>(Arrays.asList(2, 8));
-        assertTrue(results.equals(expected));
+        String dir = "junit_json";
+        File f = new File(dir);
 
-        // second list longer than first
-        results = search.mergeLists(testList2, testList1);
-        assertTrue(results.equals(expected));
-
-        // one of the lists is empty
-        results = search.mergeLists(testList1, testList3);
-        expected = Collections.emptyList();
-        assertTrue(results.equals(expected));
+        if (f.exists() && f.isDirectory()) {
+            String[] fileList = f.list();
+            Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
+            Parser parser = new Parser();
+            int i = 1;
+            for (String path : fileList) {
+                String[] file = parser.parseJSON(f.getPath() + "/" + path);
+                indexFile(file, pIndex, i);
+                i++;
+            }
+        }
     }
 
     @Test
     public void getDocIDList() throws Exception {
-        String testTerm = "test";
-        index.addTerm(testTerm, 1, 2);
-        index.addTerm(testTerm, 4, 4);
-        index.addTerm(testTerm, 12, 10);
-
+        String testTerm = "is";
         List<Integer> postings = search.getDocIDList(testTerm);
         assertNotNull(postings);    // shouldn't ever be null (just empty)
-        List<Integer> expected = new ArrayList<>(Arrays.asList(1, 4, 12));
+        List<Integer> expected = new ArrayList<>(Arrays.asList(1, 5));
         assertTrue(postings.equals(expected));
     }
 
     @Test
+    // for phrases
     public void searchPhraseLiteral() throws Exception {
-        index.addTerm("this", 1, 2);
-        index.addTerm("this", 4, 4);
-        index.addTerm("this", 6, 77);
-        index.addTerm("is", 12, 10);
-        index.addTerm("is", 6, 86);
-        index.addTerm("a", 2, 2);
-        index.addTerm("a", 6, 4);
-        index.addTerm("test", 5, 4);
-        index.addTerm("test", 8, 10);
-        index.addTerm("test", 6, 2);
-        index.addTerm("phrase", 3, 4);
-        index.addTerm("phrase", 6, 10);
-
-        // still working on
-        List<Integer> postings = search.searchPhraseLiteral("this is a test phrase");
-        List<Integer> expected = new ArrayList<>(Arrays.asList(6));
-        assertTrue(postings.equals(expected));
+        List<Integer> list = search.searchPhraseLiteral("\"some chocolate\"");
+        List<Integer> expected = new ArrayList<>(Arrays.asList(4));
+        assertTrue(list.equals(expected));
     }
 
-
-    // still working on. something seems off with the Search class
-    // might need to make some changes on that
     @Test
-    public void searchForQuery() throws Exception {
+    // AND
+    public void intersectList() throws Exception {
+        List<Integer> postings1 = search.getDocIDList("marian");
+        List<Integer> postings2 = search.getDocIDList("is");
 
+        List<Integer> expected = new ArrayList<>(Arrays.asList(1));
+        List<Integer> results = search.intersectLists(postings1, postings2);
+        assertTrue(expected.equals(results));
+    }
+
+    @Test
+    // OR
+    public void unionList() {
+        List<Integer> postings1 = search.getDocIDList("marian");
+        List<Integer> postings2 = search.getDocIDList("michael");
+        List<Integer> expected = new ArrayList<>(Arrays.asList(1, 2));
+        List<Integer> results = search.unionLists(postings1, postings2);
+        assertTrue(expected.equals(results));
+    }
+
+    // from driver.java
+    private static void indexFile(String[] fileData, PositionalInvertedIndex index,
+                                  int docID){
+        try{
+            int  i = 0;
+            SimpleTokenStream stream = new SimpleTokenStream(fileData[1]); //currently not including title in the indexing
+            while (stream.hasNextToken()){
+                String next = stream.nextToken();
+                if(next == null)
+                    continue;
+                index.addTerm(next, docID, i);
+                if(stream.getHyphen() != null){
+                    for(String str : stream.getHyphen()){
+                        index.addTerm(str, docID, i);
+                    }
+                }
+                i++;
+            }
+        }
+        catch (Exception e) {e.printStackTrace();}
     }
 }
