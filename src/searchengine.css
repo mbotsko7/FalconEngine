@@ -27,3 +27,8 @@
    -fx-min-width: 400px;
 }
 
+.text-area .content, .text-field {
+    -fx-background-color: yellow;
+}
+
+

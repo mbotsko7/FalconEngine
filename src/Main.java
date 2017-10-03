@@ -4,11 +4,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class Main extends javafx.application.Application {
+public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getgiClass().getResource("searchengine.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("searchengine.fxml"));
         primaryStage.setTitle("Search Engine Milestone 1");
         primaryStage.setScene(new Scene(root, 800, 650));
         primaryStage.show();

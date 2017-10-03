@@ -1,8 +1,5 @@
 
 import com.google.gson.*;
-
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import org.tartarus.snowball.ext.englishStemmer;
 import java.io.*;
 import java.util.Arrays;
@@ -13,31 +10,33 @@ public class Driver {
     PositionalInvertedIndex index = new PositionalInvertedIndex();
     KGramIndex kGramIndex = new KGramIndex();
 
-    public void indexDirectory(File f, ScrollPane pane) {
+    public boolean indexDirectory(File f) {
         if (f.exists() && f.isDirectory()) {
-            String[] fileList = f.list();
-            Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
-            Parser parser = new Parser();
-            int i = 1;
-            long begin = System.nanoTime();
-            for (String path : fileList) {
-                String[] file = parser.parseJSON(f.getPath() + "/" + path);
-                indexFile(file, index, i);
-                i++;
+            try {
+                String[] fileList = f.list();
+                Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
+                Parser parser = new Parser();
+                int i = 1;
+                long begin = System.nanoTime();
+                for (String path : fileList) {
+                    String[] file = parser.parseJSON(f.getPath() + "/" + path);
+                    indexFile(file, index, i);
+                    i++;
+                }
+                String[] dict = index.getDictionary();
+                for (int j = 0; j < dict.length; j++) {
+                    kGramIndex.add(dict[j]);
+                }
+                return true;
+            } catch(Exception e) {
+                e.printStackTrace();
+                return false;
             }
-            pane.setContent(new Label("Building k-index..."));
-            String[] dict = index.getDictionary();
-            for (int j = 0; j < dict.length; j++) {
-                kGramIndex.add(dict[j]);
-            }
-            pane.setContent(new Label("Indexing complete"));
-            //System.out.println(System.nanoTime()-begin);
-        } else {
-            pane.setContent(new Label("Directory invalid"));
         }
+        return false;
     }
 
-    public void printVocab(ScrollPane pane) {
+    public String getVocabList() {
 
         String[] keys = index.getDictionary();
         String line = "";
@@ -47,21 +46,21 @@ public class Driver {
 
         int vocabTotal = index.getTermCount();
 
-        line = "Total number of vocabulary terms: " + vocabTotal + "\n" + line;
-        pane.setContent(new Label(line));
+        return "Total number of vocabulary terms: " + vocabTotal + "\n" + line;
+
     }
 
-    public void stemToken(String token, ScrollPane display) {
+    public String stemToken(String token) {
         // stems a term given by the user
+
         englishStemmer stemmer = new englishStemmer();
         stemmer.setCurrent(token);
         stemmer.stem();
         String wordAfterStemmed = stemmer.getCurrent();
-        display.setContent(new Label(token + " --stemmed--> " + wordAfterStemmed));  // test
-
+        return token + " --stemmed--> " + wordAfterStemmed;  // test
     }
 
-    public Set<Integer> search(String query, ScrollPane display) {
+    public Set<Integer> search(String query) {
         Search search = new Search(index);
         return search.searchForQuery(query);
         //display.setContent(new Label(results.toString()));

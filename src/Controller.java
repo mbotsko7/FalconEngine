@@ -14,9 +14,13 @@ import java.util.Set;
 
 public class Controller {
     @FXML
-    private TextArea textbox;
+    private TextField stem_field;
+    @FXML
+    private TextArea query_field;
     @FXML
     private ScrollPane display_box;
+    @FXML
+    private Label status;
 
     Driver driver = new Driver();
     String path = "";
@@ -26,38 +30,48 @@ public class Controller {
 //    }
 
     public void handleIndexButtonAction(ActionEvent event) {
+        display_box.setContent(null);
         Node node = (Node) event.getSource();
         final DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select the directory to index");
-        final File selectedDirectory = directoryChooser.showDialog(node.getScene().getWindow());
-        if (selectedDirectory != null) {
-            path = selectedDirectory.getAbsolutePath();
+        final File dir = directoryChooser.showDialog(node.getScene().getWindow());
+        if (dir != null) {
+            path = dir.getAbsolutePath();
             File f = new File(path);
-            driver.indexDirectory(f, display_box);
+            boolean indexed = driver.indexDirectory(f);
+            if (indexed)
+                status.setText("Indexing complete");
+            else
+                status.setText("Directory invalid");
         }
     }
 
     public void handleVocabButtonAction() {
         Label label = new Label();
-        driver.printVocab(display_box);
+        String vocab = driver.getVocabList();
+        display_box.setContent(new Label(vocab));
+        status.setText(null);
     }
 
     public void handleStemButtonAction() {
-        String term = textbox.getText();
+        String term = stem_field.getText();
         if (term != null && !term.trim().isEmpty()) {
-            driver.stemToken(term, display_box);
+            String stemmedToken = driver.stemToken(term);
+            display_box.setContent(new Label(stemmedToken));  // test
+            status.setText("");
         } else {
-            display_box.setContent(new Label("Please enter a token to stem"));
+            display_box.setContent(null);
+            status.setText("Please enter a token to stem");
         }
     }
 
     @FXML
     private void handleSearchButtonAction(ActionEvent event) {
-        String term = textbox.getText();
+        String term = query_field.getText();
         VBox content = new VBox();
 
         if (term != null && !term.trim().isEmpty()) {
-            Set<Integer> results = driver.search(term, display_box);
+            Set<Integer> results = driver.search(term);
             for (Integer result: results) {
                 String title = "article" + result+ ".json";
                 Button button = new Button(title);
@@ -89,9 +103,11 @@ public class Controller {
                 });
             }
             display_box.setContent(content);
+            status.setText("Search complete - click on document to open");
 
         } else {
-            display_box.setContent(new Label("Please input search query"));
+            display_box.setContent(null);
+            status.setText("Please input search query");
         }
     }
 }
