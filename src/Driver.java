@@ -72,7 +72,7 @@ public class Driver {
                                   int docID) {
         try {
             int i = 0;
-            SimpleTokenStream stream = new SimpleTokenStream(fileData[1]); //currently not including title in the indexing
+            SimpleTokenStream stream = new SimpleTokenStream(fileData[0]+" "+fileData[1]); //currently not including title in the indexing
             while (stream.hasNextToken()) {
                 String next = stream.nextToken();
                 if (next == null)
