@@ -5,7 +5,7 @@ import java.util.List;
  * Created by bardsko on 9/9/17.
  */
 
-
+// for each object in json file
 public class Document {
     private String body, url, title;
     public Document(String b, String u, String t){

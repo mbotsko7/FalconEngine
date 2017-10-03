@@ -38,7 +38,7 @@ public class Driver {
     }
 
     public String getVocabList() {
-
+        // returns all dictionary in positional inverted index
         String[] keys = index.getDictionary();
         String line = "";
         for (String k : keys) {
@@ -53,7 +53,6 @@ public class Driver {
 
     public String stemToken(String token) {
         // stems a term given by the user
-
         englishStemmer stemmer = new englishStemmer();
         stemmer.setCurrent(token);
         stemmer.stem();

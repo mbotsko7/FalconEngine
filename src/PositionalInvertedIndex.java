@@ -7,6 +7,7 @@ public class PositionalInvertedIndex {
         mIndex = new HashMap<String, List<PositionalIndex>>();
     }
 
+    // adds term from document to postional inverted index
     public void addTerm(String term, int documentID, int position) {
         //check if the term is in the index already
         if (mIndex.containsKey(term)) {
@@ -52,6 +53,8 @@ public class PositionalInvertedIndex {
         return mIndex.get(term);
     }
 
+    // for specified term and docID, return all positions
+    // that term is located in that document
     public ArrayList<Integer> getPositionsInDoc(String term, int docID) {
         // retrieve a term's postings list from a specified document
         List<PositionalIndex> postings = mIndex.get(term);
@@ -66,6 +69,7 @@ public class PositionalInvertedIndex {
         return mIndex.size();
     }
 
+    // returns all keys in index
     public String[] getDictionary() {
         Iterator<String> itr = mIndex.keySet().iterator();
         ArrayList<String> list = new ArrayList<>();

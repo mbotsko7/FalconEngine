@@ -15,6 +15,7 @@ public class WildcardQuery {
         parse(query);
     }
 
+    // goes through postings and removes non-candidate terms
     public ArrayList<String> queryResult(KGramIndex kIndex){
         ArrayList<String> possible = mergePostings(kIndex);
         for(int i = 0; i < possible.size(); i++){
@@ -27,6 +28,7 @@ public class WildcardQuery {
         return possible;
     }
 
+    // verifies that the term matches wildcard pattern
     public boolean verify(String a, String pat){
         int p = 0, f = 0;
         char[] candidate = ("$"+a+"$").toCharArray();
@@ -63,6 +65,7 @@ public class WildcardQuery {
         return false;
     }
 
+    // edit distance
     public int dist(char[] a, int lenA, char[] b, int lenB){
         int cost = 0;
         if(lenA == 0)
@@ -83,6 +86,7 @@ public class WildcardQuery {
             return third;
     }
 
+    // takes term and parses it into 1, 2, and 3 kgram indexes
     private void parse(String str){
         //for a 1-gram
         char[] single = str.replaceAll("\\*", "").toCharArray();

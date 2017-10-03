@@ -21,6 +21,8 @@ public class KGramIndex {
         return kIndex.get(str);
     }
 
+    // splits query into 1, 2, and 3 gram indexes
+    // adds each to kgramindex
     public void add(String str){
         //for a 1-gram
         char[] single = str.toCharArray();
