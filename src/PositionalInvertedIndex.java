@@ -19,8 +19,8 @@ public class PositionalInvertedIndex {
 //                }
 //            }
             ArrayList<PositionalIndex> postings = (ArrayList<PositionalIndex>) getPostings(term);
-            if (postings.size() == documentID) {
-                postings.get(documentID - 1).addPosition(position);
+            if (postings.get(postings.size()-1).getDocID() == documentID) {
+                postings.get(postings.size() - 1).addPosition(position);
 //                PositionalIndex temp = postings.get(documentID-1);
 //                if (temp.getDocID() == documentID) {
 //                    docIndex = temp;
