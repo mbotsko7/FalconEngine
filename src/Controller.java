@@ -1,3 +1,5 @@
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -11,7 +13,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.geometry.Insets;
 
-import java.io.File;
+import java.io.*;
 import java.util.Set;
 
 public class Controller {
@@ -74,37 +76,54 @@ public class Controller {
         if (term != null && !term.trim().isEmpty()) {
             Set<Integer> results = driver.search(term);
             for (Integer result: results) {
-                String title = "article" + result+ ".json";
-                Button button = new Button(title);
-                button.getStyleClass().add("result-button");
-                content.getChildren().add(button);
+                Gson gson = new Gson();
+                String fileName = "article" + result + ".json";
+                String title = "";
 
-                button.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent e) {
-                        Stage stage = new Stage();
-                        stage.setTitle(title);
-                        File fileToView = new File(path + "/" + title);
-                        Label doc = new Label(Driver.readDocument(fileToView));
-                        doc.setWrapText(true);
+                try {
+                    BufferedReader br = new BufferedReader(new FileReader("nps\\"+fileName));
+                    // grabs title from document to display in results
+                    Document doc = gson.fromJson(br, Document.class);
+                    title = doc.getTitle();
+                    br.close();
 
-                        ScrollPane pane = new ScrollPane(doc);
-                        pane.setPadding(new Insets(45,10,20,10));
-                        pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-                        pane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+                    Button button = new Button(title);
+                    button.getStyleClass().add("result-button");
+                    content.getChildren().add(button);
 
-                        Scene scene = new Scene(pane, 500,600);
-                        pane.setMinWidth(scene.getWidth());
-                        doc.setMaxWidth(pane.getWidth() - 60);
+                    button.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent e) {
+                            Stage stage = new Stage();
+                            stage.setTitle(fileName);
+                            File fileToView = new File(path + "/" + fileName);
+                            Label doc = new Label(Driver.readDocument(fileToView));
+                            doc.setWrapText(true);
 
-                        stage.setScene(scene);
-                        stage.sizeToScene();
-                        stage.show();
-                    }
-                });
+                            ScrollPane pane = new ScrollPane(doc);
+                            pane.setPadding(new Insets(45,10,20,10));
+                            pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+                            pane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+                            Scene scene = new Scene(pane, 500,600);
+                            pane.setMinWidth(scene.getWidth());
+                            doc.setMaxWidth(pane.getWidth() - 60);
+
+                            stage.setScene(scene);
+                            stage.sizeToScene();
+                            stage.show();
+                        }
+                    });
+
+                } catch (FileNotFoundException e) {
+                    System.err.println("File doesn't exist");
+                } catch (IOException e) {
+
+                }
             }
+
             display_box.setContent(content);
-            status.setText("Results - Click file to open");
+            status.setText(results.size() + " Results (Click file to open)");
 
         } else {
             display_box.setContent(null);
