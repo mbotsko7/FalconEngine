@@ -10,7 +10,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("searchengine.fxml"));
         primaryStage.setTitle("Search Engine Milestone 1");
-        primaryStage.setScene(new Scene(root, 800, 650));
+        primaryStage.setScene(new Scene(root, 600, 650));
         primaryStage.show();
     }
 

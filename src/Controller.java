@@ -27,12 +27,8 @@ public class Controller {
     Driver driver = new Driver();
     String path = "";
 
-//    public void handleExitButtonAction() {
-//        Platform.exit();
-//    }
-
-
     public void handleIndexButtonAction(ActionEvent event) {
+        status.setText("Indexing...");
         display_box.setContent(null);
         Node node = (Node) event.getSource();
         final DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -50,6 +46,7 @@ public class Controller {
     }
 
     public void handleVocabButtonAction() {
+        status.setText("Getting vocab...");
         Label label = new Label();
         String vocab = driver.getVocabList();
         display_box.setContent(new Label(vocab));
@@ -70,6 +67,7 @@ public class Controller {
 
     @FXML
     private void handleSearchButtonAction(ActionEvent event) {
+        status.setText("Searching...");
         String term = query_field.getText();
         VBox content = new VBox();
 
@@ -106,7 +104,7 @@ public class Controller {
                 });
             }
             display_box.setContent(content);
-            status.setText("Search complete - Click on result to open");
+            status.setText("Results - Click file to open");
 
         } else {
             display_box.setContent(null);
