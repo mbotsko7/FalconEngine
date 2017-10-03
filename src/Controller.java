@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import javafx.geometry.Insets;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 public class Controller {
@@ -72,7 +73,7 @@ public class Controller {
         VBox content = new VBox();
 
         if (term != null && !term.trim().isEmpty()) {
-            Set<Integer> results = driver.search(term);
+            List<Integer> results = driver.search(term);
             for (Integer result: results) {
                 String title = "article" + result+ ".json";
                 Button button = new Button(title);

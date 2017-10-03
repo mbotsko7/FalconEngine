@@ -3,6 +3,7 @@ import com.google.gson.*;
 import org.tartarus.snowball.ext.englishStemmer;
 import java.io.*;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 public class Driver {
@@ -60,11 +61,9 @@ public class Driver {
         return token + " --stemmed--> " + wordAfterStemmed;  // test
     }
 
-    public Set<Integer> search(String query) {
+    public List<Integer> search(String query) {
         Search search = new Search(index);
         return search.searchForQuery(query);
-        //display.setContent(new Label(results.toString()));
-
     }
 
     private static void indexFile(String[] fileData, PositionalInvertedIndex index,

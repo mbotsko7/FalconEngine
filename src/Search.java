@@ -8,7 +8,7 @@ public class Search {
         this.index = index;
     }
 
-    public List<Integer> mergeLists(List<Integer> listA, List<Integer> listB) {
+    public List<Integer> intersectLists(List<Integer> listA, List<Integer> listB) {
         // perform an AND intersection on two lists of docIDs
         // return a list of docIDs for documents that contain both terms
         List<Integer> results = new ArrayList<>();
@@ -28,6 +28,38 @@ public class Search {
             }
         }
         return results;
+    }
+
+    public List<Integer> unionLists(List<Integer> listA, List<Integer> listB) {
+        // perform OR operations on two lists of docIDs
+        List<Integer> results = new ArrayList<>();
+        if (listA.isEmpty())
+            return listB;
+        else if (listB.isEmpty())
+            return listA;
+        else {
+            int i = 0, j = 0;
+            while (i < listA.size() && j < listB.size()) {
+                int compare = listA.get(i).compareTo(listB.get(j));
+                if (compare == 0) {
+                    results.add(listA.get(i));
+                    i++;
+                    j++;
+                } else if (compare > 0) {   // listA num is bigger
+                    results.add(listB.get(j));
+                    j++;
+                } else {    // listB num is bigger
+                    results.add(listA.get(i));
+                    i++;
+                }
+            }
+            // add remainder of list
+            if (i < listA.size())
+                results.addAll(i, listA);
+            else if (j < listB.size())
+                results.addAll(j, listB);
+            return results;
+        }
     }
 
     public List<Integer> getDocIDList(String term) {
@@ -57,7 +89,7 @@ public class Search {
         List<Integer> accum = getDocIDList(tokens[0]);
         for (int i = 1; i < tokens.length; i++) {
             List<Integer> curr = getDocIDList(tokens[i]);
-            accum = mergeLists(accum, curr);
+            accum = intersectLists(accum, curr);
         }
         if (!accum.isEmpty()) {
             // loop through each doc that contains all the tokens
@@ -90,11 +122,11 @@ public class Search {
         return results;
     }
 
-    public Set<Integer> searchForQuery(String query) {
+    public List<Integer> searchForQuery(String query) {
         // search the document for the query
 
         List<List<Integer>> subqueryResults = new ArrayList<List<Integer>>();
-        Set<Integer> finalResults = new HashSet<>();
+        List<Integer> finalResults = new ArrayList<>();
 
         // process each subquery one at a time
         String[] subqueries = Query.getSubqueries(query);
@@ -113,28 +145,22 @@ public class Search {
             // merge doc lists for each literal
             List<Integer> mergedList = literalsPostings.get(0);
             for (int i = 1; i < literalsPostings.size(); i++) {
-                mergedList = mergeLists(mergedList, literalsPostings.get(i));
+                mergedList = intersectLists(mergedList, literalsPostings.get(i));
                 if (mergedList.isEmpty()) break;
             }
             subqueryResults.add(mergedList);
         }
 
         // OR the results from the subqueries
-        for (List<Integer> result: subqueryResults) {
-            finalResults.addAll(result);
+        finalResults = subqueryResults.get(0);
+        for (int i = 1; i < subqueryResults.size(); i++) {
+            finalResults = unionLists(finalResults, subqueryResults.get(i));
         }
-        finalResults.remove(null);
         return finalResults;
         //printResults(finalResults);
     }
 
-//    public void printResults(Set<Integer> results ) {
-//        System.out.println("RESULTS:");
-//        for (Integer docID: results) {
-//            System.out.format("article%d.json %n", docID);
-//        }
-//        System.out.format("%nTotal documents: %d%n", results.size());
-//    }
+
 
 
 }
