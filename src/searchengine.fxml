@@ -14,7 +14,8 @@
     <padding><Insets bottom="5" left="5" right="5" top="5" /></padding>
     <children>
 
-        <HBox alignment="top_center" spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="4" >
+        <HBox alignment="top_center" spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="0" >
+
             <children>
                 <Button id="index_button" onAction="#handleIndexButtonAction" text="Index a directory" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="1" />
                 <Button id="vocab_button" onAction="#handleVocabButtonAction" text="Print the vocabulary" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="2" />
@@ -22,6 +23,8 @@
                 <!--<Button id="exit_button" onAction="#handleExitButtonAction" text="X" />-->
             </children>
         </HBox>
+
+        <Label fx:id="status" GridPane.columnIndex="4" GridPane.rowIndex="0" />
 
         <!--<Button id="index_button" onAction="#handleIndexButtonAction" text="Index a directory" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="1" />-->
         <!--<Button id="vocab_button" onAction="#handleVocabButtonAction" text="Print the vocabulary" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="2" />-->
@@ -32,28 +35,22 @@
         <!--<Label text="Search query:" GridPane.columnIndex="0" GridPane.rowIndex="3" />-->
         <!--<TextField GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1" />-->
 
-        <VBox fx:id="vbox" GridPane.columnIndex="1" GridPane.rowIndex="3">
-            <children>
 
                 <!--<Label text="Stem token:" GridPane.columnIndex="0" GridPane.rowIndex="1" />-->
-                <TextArea fx:id="textbox" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                <HBox>
-                    <children>
+        <TextField fx:id="stem_field" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <Button fx:id="stem_button" onAction="#handleStemButtonAction" text="Stem token"
+                GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-                        <Button fx:id="stem_button" onAction="#handleStemButtonAction" text="Stem token" />
-                        <Button fx:id="search_button" onAction="#handleSearchButtonAction" text="Search query" />
-                    </children>
-                </HBox>
+        <TextArea fx:id="query_field" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <Button fx:id="search_button" onAction="#handleSearchButtonAction" text="Search query"
+                GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+
 
                 <!--<Label text="Search query:" GridPane.columnIndex="0" GridPane.rowIndex="3" />-->
                 <!--<TextArea fx:id="textarea" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1" />-->
 
-            </children>
 
-
-        </VBox>
-
-        <ScrollPane fx:id="display_box" minWidth="400" maxWidth="400" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.rowSpan="4">
+        <ScrollPane fx:id="display_box" minWidth="400" minHeight="500" maxWidth="400" maxHeight="500" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.rowSpan="4">
             <Label fx:id="status_text" minWidth="400" maxWidth="400"/>
         </ScrollPane>
 
