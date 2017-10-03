@@ -3,9 +3,11 @@ public class Search {
 
     private PositionalInvertedIndex index = new PositionalInvertedIndex();
     private SimpleTokenStream stream = new SimpleTokenStream();
+    private KGramIndex kindex = new KGramIndex();
 
-    public Search(PositionalInvertedIndex index) {
+    public Search(PositionalInvertedIndex index, KGramIndex k) {
         this.index = index;
+        this.kindex = k;
     }
 
     public List<Integer> mergeLists(List<Integer> listA, List<Integer> listB) {
@@ -105,7 +107,14 @@ public class Search {
             for (String literal: literals) {
                 if (literal.startsWith("\"")) {  // for phrases
                     literalsPostings.add(searchPhraseLiteral(literal));
-                } else { // for single tokens
+                }
+                else if(literal.contains("*")){
+                    WildcardQuery q = new WildcardQuery(query);
+                    for(String wild : q.queryResult(kindex)){
+                        literalsPostings.add(getDocIDList(wild));
+                    }
+                }
+                else { // for single tokens
                     literal = stream.parseAndStem((literal));
                     literalsPostings.add(getDocIDList(literal));
                 }

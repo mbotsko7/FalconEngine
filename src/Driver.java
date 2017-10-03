@@ -61,7 +61,7 @@ public class Driver {
     }
 
     public Set<Integer> search(String query) {
-        Search search = new Search(index);
+        Search search = new Search(index, kGramIndex);
         return search.searchForQuery(query);
         //display.setContent(new Label(results.toString()));
 
