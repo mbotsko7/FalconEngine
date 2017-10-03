@@ -11,20 +11,12 @@
     -fx-border-color: transparent, black;
 }
 
-
-#exit_button {
-    -fx-text-fill: FIREBRICK;
-    -fx-font-weight: bold;
+#display_box > .viewport {
+   -fx-background-color: transparent;
 }
 
-#vbox {
-   -fx-background-color: #ddddfe;
-}
-
-#display-box {
-   -fx-border-color: BLACK;
-   -fx-background: #ddddfe;
-   -fx-min-width: 400px;
+#display_box {
+   -fx-background-color: #eeeeee;
 }
 
 .text-area .content, .text-field {

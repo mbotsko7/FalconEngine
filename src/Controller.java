@@ -4,6 +4,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -16,7 +18,7 @@ public class Controller {
     @FXML
     private TextField stem_field;
     @FXML
-    private TextArea query_field;
+    private TextField query_field;
     @FXML
     private ScrollPane display_box;
     @FXML
@@ -28,6 +30,7 @@ public class Controller {
 //    public void handleExitButtonAction() {
 //        Platform.exit();
 //    }
+
 
     public void handleIndexButtonAction(ActionEvent event) {
         display_box.setContent(null);
@@ -50,7 +53,7 @@ public class Controller {
         Label label = new Label();
         String vocab = driver.getVocabList();
         display_box.setContent(new Label(vocab));
-        status.setText(null);
+        status.setText("");
     }
 
     public void handleStemButtonAction() {
@@ -103,7 +106,7 @@ public class Controller {
                 });
             }
             display_box.setContent(content);
-            status.setText("Search complete - click on document to open");
+            status.setText("Search complete - Click on result to open");
 
         } else {
             display_box.setContent(null);

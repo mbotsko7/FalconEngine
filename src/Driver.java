@@ -46,7 +46,7 @@ public class Driver {
 
         int vocabTotal = index.getTermCount();
 
-        return "Total number of vocabulary terms: " + vocabTotal + "\n" + line;
+        return "Total vocab terms: " + vocabTotal + "\n\n" + line;
 
     }
 
@@ -92,7 +92,6 @@ public class Driver {
     public static String readDocument(File file) {
         String text = "";
         try {
-            System.out.println("Displaying document.. \n");
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line = "";
             while ((line = br.readLine()) != null) {
