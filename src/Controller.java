@@ -77,7 +77,7 @@ public class Controller {
 
         if (term != null && !term.trim().isEmpty()) {
             List<Integer> results = driver.search(term);
-            for (Integer result: results) {
+            for (Integer result : results) {
                 Gson gson = new Gson();
                 String fileName = "article" + result + ".json";
                 String title = "";
@@ -99,11 +99,11 @@ public class Controller {
                             doc.setWrapText(true);
 
                             ScrollPane pane = new ScrollPane(doc);
-                            pane.setPadding(new Insets(45,10,20,10));
+                            pane.setPadding(new Insets(45, 10, 20, 10));
                             pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
                             pane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-                            Scene scene = new Scene(pane, 500,600);
+                            Scene scene = new Scene(pane, 500, 600);
                             pane.setMinWidth(scene.getWidth());
                             doc.setMaxWidth(pane.getWidth() - 60);
 

@@ -111,8 +111,8 @@ public class WildcardQuery {
 
     private ArrayList<String> mergeList(ArrayList<String> one, ArrayList<String> two){
         ArrayList<String> results = new ArrayList<>();
-        for(String s : one){
-            if(two.contains(s) && !results.contains(s))
+        for (String s : one) {
+            if (two.contains(s) && !results.contains(s))
                 results.add(s);
         }
         return results;

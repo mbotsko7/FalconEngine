@@ -1,4 +1,5 @@
 import java.util.*;
+
 public class Search {
 
     private PositionalInvertedIndex index = new PositionalInvertedIndex();
@@ -78,7 +79,7 @@ public class Search {
         if (postings != null) {
             for (int i = 0; i < postings.size(); i++) {
                 int id = postings.get(i).getDocID();
-                if (docList.isEmpty() || id != docList.get(docList.size()-1))
+                if (docList.isEmpty() || id != docList.get(docList.size() - 1))
                     docList.add(id);
             }
         }
@@ -121,10 +122,10 @@ public class Search {
                 for (int i = 0; i < first.size(); i++) {
                     matched = true;
                     int start = first.get(i).intValue();
-                    for (int j=1; j < tokenPositions.size(); j++) { // look at jth adjacent word from first token in phrase
+                    for (int j = 1; j < tokenPositions.size(); j++) { // look at jth adjacent word from first token in phrase
                         int pos = seekPos[j];
                         int listSize = tokenPositions.get(j).size();
-                        while (pos < listSize -1 && tokenPositions.get(j).get(pos) < start + j) {
+                        while (pos < listSize - 1 && tokenPositions.get(j).get(pos) < start + j) {
                             pos++;
                         }
                         seekPos[j] = pos;   // update position in seekPos array
@@ -166,21 +167,19 @@ public class Search {
 
         // process each subquery one at a time
         String[] subqueries = Query.getSubqueries(query);
-        for (String subquery: subqueries) {
+        for (String subquery : subqueries) {
             List<List<Integer>> literalsPostings = new ArrayList<List<Integer>>();
             List<String> literals = Query.getQueryLiterals(subquery);
             // get list of docs for each literal
-            for (String literal: literals) {
+            for (String literal : literals) {
                 if (literal.startsWith("\"")) {  // for phrases
                     literalsPostings.add(searchPhraseLiteral(literal));
-                }
-                else if(literal.contains("*")){
+                } else if (literal.contains("*")) {
                     WildcardQuery q = new WildcardQuery(query);
-                    for(String wild : q.queryResult(kindex)){
+                    for (String wild : q.queryResult(kindex)) {
                         literalsPostings.add(getDocIDList(wild));
                     }
-                }
-                else { // for single tokens
+                } else { // for single tokens
                     literal = stream.parseAndStem((literal));
                     literalsPostings.add(getDocIDList(literal));
                 }

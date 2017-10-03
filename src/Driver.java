@@ -1,6 +1,7 @@
 
 import com.google.gson.*;
 import org.tartarus.snowball.ext.englishStemmer;
+
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +30,7 @@ public class Driver {
                     kGramIndex.add(dict[j]);
                 }
                 return true;
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 return false;
             }
@@ -71,7 +72,7 @@ public class Driver {
                                   int docID) {
         try {
             int i = 0;
-            SimpleTokenStream stream = new SimpleTokenStream(fileData[0]+" "+fileData[1]); //currently not including title in the indexing
+            SimpleTokenStream stream = new SimpleTokenStream(fileData[0] + " " + fileData[1]); //currently not including title in the indexing
             while (stream.hasNextToken()) {
                 String next = stream.nextToken();
                 if (next == null)

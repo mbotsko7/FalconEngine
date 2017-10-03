@@ -8,7 +8,8 @@ import java.util.List;
 // for each object in json file
 public class Document {
     private String body, url, title;
-    public Document(String b, String u, String t){
+
+    public Document(String b, String u, String t) {
         body = b;
         url = u;
         title = t;

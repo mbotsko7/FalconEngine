@@ -18,15 +18,15 @@ public class Query {
         while (i != -1) {
             if (i != 0) {
                 // separate out single tokens and add to list
-                String[] singlesList = str.substring(0,i).split(" ");
+                String[] singlesList = str.substring(0, i).split(" ");
                 queryLiterals = addSingleTokensToList(singlesList, queryLiterals);
                 str = str.substring(i, str.length());
             }
             // add phrase literals to list
             i = str.indexOf('"', 1);
-            queryLiterals.add(str.substring(0, i+1));
-            if (i != str.length()-1) {
-                str = str.substring(i+2, str.length());
+            queryLiterals.add(str.substring(0, i + 1));
+            if (i != str.length() - 1) {
+                str = str.substring(i + 2, str.length());
                 i = str.indexOf('"');
             } else {
                 str = "";
@@ -40,9 +40,9 @@ public class Query {
     }
 
     private static ArrayList<String> addSingleTokensToList(String[] singles, ArrayList<String> list) {
-        for (String single: singles) {
+        for (String single : singles) {
             if (single.contains("-"))
-                single = single.replace("-","");
+                single = single.replace("-", "");
             list.add(single);
         }
         return list;
@@ -50,7 +50,7 @@ public class Query {
 
     public static String[] getPhraseTokens(String phrase) {
         // break a phrase literal down into individual stemmed tokens
-        phrase = phrase.substring(1, phrase.length()-1);
+        phrase = phrase.substring(1, phrase.length() - 1);
         String[] tokens = phrase.split(" ");
         return tokens;
     }

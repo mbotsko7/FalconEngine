@@ -8,8 +8,8 @@ public class PositionalIndex {
     private ArrayList<Integer> positions;
     private int docID;
 
-    public PositionalIndex (int doc, ArrayList<Integer> list){
-        docID =  doc;
+    public PositionalIndex(int doc, ArrayList<Integer> list) {
+        docID = doc;
         positions = list;
     }
 
@@ -29,7 +29,7 @@ public class PositionalIndex {
         this.docID = docID;
     }
 
-    public void addPosition(int pos){
+    public void addPosition(int pos) {
         this.positions.add(pos);
     }
 
