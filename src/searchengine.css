@@ -9,10 +9,11 @@
 
 .button:hover {
     -fx-border-color: transparent, black;
+    -fx-background-color: #ffe34c;
 }
 
 #display_box > .viewport {
-   -fx-background-color: transparent;
+   -fx-background-color: #fff7cc;
 }
 
 #display_box {
@@ -20,7 +21,7 @@
 }
 
 .text-area .content, .text-field {
-    -fx-background-color: yellow;
+    -fx-background-color: #fff7cc;
 }
 
 

@@ -1,13 +1,10 @@
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -51,10 +48,13 @@ public class Controller {
 
     public void handleVocabButtonAction() {
         status.setText("Getting vocab...");
-        Label label = new Label();
-        String vocab = driver.getVocabList();
-        display_box.setContent(new Label(vocab));
-        status.setText("");
+        VBox box = new VBox();
+        display_box.setContent(box);
+        String[] vocab = driver.getVocabList();
+        for (String term: vocab) {
+            box.getChildren().add(new Label(term));
+        }
+        status.setText(vocab.length + " terms fetched");
     }
 
     public void handleStemButtonAction() {
@@ -84,12 +84,10 @@ public class Controller {
                 String title = "";
 
                 try {
-
-
                     Button button = new Button(fileName);
                     button.getStyleClass().add("result-button");
                     content.getChildren().add(button);
-
+                    // open file in a new window
                     button.setOnAction(new EventHandler<ActionEvent>() {
                         @Override
                         public void handle(ActionEvent e) {

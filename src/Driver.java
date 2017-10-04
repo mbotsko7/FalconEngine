@@ -1,11 +1,10 @@
 
 import com.google.gson.*;
 import org.tartarus.snowball.ext.englishStemmer;
-
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+
 
 public class Driver {
 
@@ -39,17 +38,17 @@ public class Driver {
         return false;
     }
 
-    public String getVocabList() {
+    public String[] getVocabList() {
         // returns all dictionary in positional inverted index
-        String[] keys = index.getDictionary();
-        String line = "";
-        for (String k : keys) {
-            line += k + "\n";
-        }
-
-        int vocabTotal = index.getTermCount();
-
-        return "Total vocab terms: " + vocabTotal + "\n\n" + line;
+        return index.getDictionary();
+//        String line = "";
+//        for (String k : keys) {
+//            line += k + "\n";
+//        }
+//
+//        int vocabTotal = index.getTermCount();
+//
+//        return "Total vocab terms: " + vocabTotal + "\n\n" + line;
 
     }
 
