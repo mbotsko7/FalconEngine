@@ -44,11 +44,11 @@ public class PositionalInvertedIndex {
     public ArrayList<Integer> getPositionsInDoc(String term, int docID) {
         // retrieve a term's postings list from a specified document
         List<PositionalIndex> postings = mIndex.get(term);
-        for (int i = 0; i < postings.size(); i++) {  // use binary search instead?
+        for (int i = 0; i < postings.size(); i++) {
             if (postings.get(i).getDocID() == docID)
                 return postings.get(i).getPositions();
         }
-        return null;
+        return new ArrayList<>();
     }
 
     public int getTermCount() {

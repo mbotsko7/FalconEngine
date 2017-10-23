@@ -96,55 +96,55 @@ public class Search {
         List<Integer> results = new ArrayList<>();
 
         // separate phrase into individual stemmed tokens
-        String[] tokens = Query.getPhraseTokens(phrase);
-        for (int i = 0; i < tokens.length; i++) {
-            tokens[i] = stream.parseAndStem(tokens[i]);
+        String[] terms = Query.getPhraseTokens(phrase);
+        for (int i = 0; i < terms.length; i++) {
+            terms[i] = stream.parseAndStem(terms[i]);
         }
 
-        // get list of documents that contain all the phrase tokens
-        List<Integer> accum = getDocIDList(tokens[0]);
-        for (int i = 1; i < tokens.length; i++) {
-            List<Integer> curr = getDocIDList(tokens[i]);
-            accum = intersectLists(accum, curr);
-        }
-        if (!accum.isEmpty()) {
-            // loop through each doc that contains all the tokens
-            for (Integer docID : accum) {
-                List<List<Integer>> tokenPositions = new ArrayList<List<Integer>>();
-                // get position list of each phrase token in the current document
-                for (int i = 0; i < tokens.length; i++) {
-                    tokenPositions.add(index.getPositionsInDoc(tokens[i], docID.intValue()));
-                }
+        // get list of documents that contain the first term
+        List<Integer> firstTermDocs = getDocIDList(terms[0]);
+        if (!firstTermDocs.isEmpty()) {
+            // loop through each doc that contains the first term
+            searchCurrentDoc:
+                for (Integer docID : firstTermDocs) {
+                    List<List<Integer>> termPositionsLists = new ArrayList<List<Integer>>();
+                    // get position list of each phrase term in the current document
+                    for (int i = 0; i < terms.length; i++) {
+                        List<Integer> termPostingsInDoc = index.getPositionsInDoc(terms[i], docID.intValue());
+                        if (termPostingsInDoc.isEmpty())
+                            continue searchCurrentDoc; // phrase is not in current doc, skip to next doc
+                        termPositionsLists.add(termPostingsInDoc);
+                    }
 
-                // loop through first token's positions and check if other tokens are adjacent
-                boolean matched;
-                List<Integer> first = tokenPositions.get(0);
-                int[] seekPos = new int[tokens.length]; // array of seek positions for all tokens in phrase
-                for (int i = 0; i < seekPos.length; i++)      // initialize all seek positions as 0
-                    seekPos[i] = 0;
+                    // loop through first term's positions and check if other tokens are adjacent
+                    boolean matched;
+                    List<Integer> first = termPositionsLists.get(0);
+                    int[] seekPos = new int[terms.length]; // array of seek positions for all terms in phrase
+                    for (int i = 0; i < seekPos.length; i++)      // initialize all seek positions as 0
+                        seekPos[i] = 0;
 
-                for (int i = 0; i < first.size(); i++) {
-                    matched = true;
-                    int start = first.get(i).intValue();
-                    for (int j = 1; j < tokenPositions.size(); j++) { // look at jth adjacent word from first token in phrase
-                        int pos = seekPos[j];
-                        int listSize = tokenPositions.get(j).size();
-                        while (pos < listSize - 1 && tokenPositions.get(j).get(pos) < start + j) {
-                            pos++;
+                    for (int i = 0; i < first.size(); i++) {
+                        matched = true;
+                        int start = first.get(i).intValue();
+                        for (int j = 1; j < termPositionsLists.size(); j++) { // look at jth adjacent word from first term in phrase
+                            int pos = seekPos[j];
+                            int listSize = termPositionsLists.get(j).size();
+                            while (pos < listSize - 1 && termPositionsLists.get(j).get(pos) < start + j) {
+                                pos++;
+                            }
+                            seekPos[j] = pos;   // update position in seekPos array
+                            if (!termPositionsLists.get(j).get(pos).equals(start + j)) {
+                                matched = false;
+                                break;
+                            }
                         }
-                        seekPos[j] = pos;   // update position in seekPos array
-                        if (!tokenPositions.get(j).get(pos).equals(start + j)) {
-                            matched = false;
+                        if (matched) {
+                            results.add(docID);
                             break;
                         }
                     }
-                    if (matched) {
-                        results.add(docID);
-                        break;
-                    }
-                }
 
-            }
+                }
         }
         return results;
     }
