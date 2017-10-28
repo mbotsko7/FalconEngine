@@ -166,7 +166,7 @@ public class Search {
                     literalsPostings.add(searchPhraseLiteral(literal));
                 }
                 else if (literal.contains("*")) {
-                    WildcardQuery q = new WildcardQuery(query);
+                    WildcardQuery q = new WildcardQuery(literal);
                     for (String wild : q.queryResult(kindex)) {
                         literalsPostings.add(getDocIDList(wild));
                     }
