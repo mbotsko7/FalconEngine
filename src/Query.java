@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // utility methods for processing queries
 public class Query {
@@ -11,42 +13,39 @@ public class Query {
 
     public static ArrayList<String> getQueryLiterals(String str) {
         // breaks down a subquery and returns an ArrayList of query literals
-        // (single tokens and phrase literals)
+        // (single tokens, near-k, phrase literals)
         str = str.trim();
         ArrayList<String> queryLiterals = new ArrayList<String>();
-        int i = str.indexOf('"');
-        while (i != -1) {
-            if (i != 0) {
-                // separate out single tokens and add to list
-                String[] singlesList = str.substring(0, i).split(" ");
-                queryLiterals = addSingleTokensToList(singlesList, queryLiterals);
-                str = str.substring(i, str.length());
-            }
-            // add phrase literals to list
-            i = str.indexOf('"', 1);
-            queryLiterals.add(str.substring(0, i + 1));
-            if (i != str.length() - 1) {
-                str = str.substring(i + 2, str.length());
-                i = str.indexOf('"');
-            }
-            else {
-                str = "";
-                break;
-            }
+
+        Pattern phrasePat = Pattern.compile("\"([a-zA-Z-\']+\\s*)*\"");
+        Matcher m = phrasePat.matcher(str);
+        while (m.find()) {
+            String matched = m.group();
+            queryLiterals.add(matched);
+            str = str.replaceFirst(matched, "");
         }
-        if (str.length() != 0)
-            queryLiterals = addSingleTokensToList(str.split(" "), queryLiterals);
+
+        Pattern nearPat = Pattern.compile("[a-zA-Z-\']+\\s+NEAR/-*\\d+\\s+[a-zA-Z-\']+");
+        m = nearPat.matcher(str);
+        while (m.find()) {
+            String matched = m.group();
+            matched = matched.replaceAll("-",  "");
+            queryLiterals.add(matched);
+            str = str.replaceFirst(matched, "");
+        }
+
+        Pattern wordPat = Pattern.compile("[a-zA-Z-\']+");
+        m = wordPat.matcher(str);
+        while (m.find()) {
+            String matched = m.group();
+            matched = matched.replaceAll("-",  "");
+            queryLiterals.add(matched);
+            str = str.replaceFirst(matched,  "");
+        }
+
         return queryLiterals;
     }
 
-    private static ArrayList<String> addSingleTokensToList(String[] singles, ArrayList<String> list) {
-        for (String single : singles) {
-            if (single.contains("-"))
-                single = single.replace("-", "");
-            list.add(single);
-        }
-        return list;
-    }
 
     public static String[] getPhraseTokens(String phrase) {
         // break a phrase literal down into individual stemmed tokens
