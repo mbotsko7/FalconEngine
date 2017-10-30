@@ -34,8 +34,6 @@ public class WildcardQuery {
     // verifies that the term matches wildcard pattern
     public boolean verify(String a, String pat){
         int p = 0, f = 0;
-        if(a.equals("yosemite"))
-            System.out.println("xxx");
         char[] candidate = ("$"+a+"$").toCharArray();
         char[] pattern = ("$"+pat+"$").toCharArray();
         int i;

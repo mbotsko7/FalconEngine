@@ -93,6 +93,7 @@ public class Search {
     public List<Integer> searchPhraseLiteral(String phrase) {
         // returns a list of docIDs that contain the entire phrase
 
+
         List<Integer> results = new ArrayList<>();
 
         // separate phrase into individual stemmed tokens
@@ -167,9 +168,23 @@ public class Search {
                 }
                 else if (literal.contains("*")) {
                     WildcardQuery q = new WildcardQuery(literal);
+                    ArrayList<ArrayList<Integer>> wildcardListing = new ArrayList<>();
+                    ArrayList<Integer> wildList = new ArrayList<>();
+//                    int size = 0;
                     for (String wild : q.queryResult(kindex)) {
-                        literalsPostings.add(getDocIDList(wild));
+                        ArrayList<Integer> t = (ArrayList<Integer>) getDocIDList(wild);
+                        wildcardListing.add(t);
+//                        size += t.size();
+                        //literalsPostings.add(getDocIDList(wild));
                     }
+//                    System.out.println(size);
+                    wildList.addAll(wildcardListing.get(0));
+                    if(wildcardListing.size() >= 2){
+                        for(int i = 1; i < wildcardListing.size(); i++){
+                            wildList = (ArrayList<Integer>) unionLists(wildList, wildcardListing.get(i));
+                        }
+                    }
+                    literalsPostings.add(wildList);
                 }
                 else { // for single tokens
                     literal = stream.parseAndStem((literal));
