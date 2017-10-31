@@ -17,7 +17,7 @@ public class Query {
         str = str.trim();
         ArrayList<String> queryLiterals = new ArrayList<String>();
 
-        Pattern phrasePat = Pattern.compile("\"([a-zA-Z-\']+\\s*)*\"");
+        Pattern phrasePat = Pattern.compile("\"([\\w-\']+\\s*)*\"");
         Matcher m = phrasePat.matcher(str);
         while (m.find()) {
             String matched = m.group();
@@ -25,16 +25,15 @@ public class Query {
             str = str.replaceFirst(matched, "");
         }
 
-        Pattern nearPat = Pattern.compile("[a-zA-Z-\']+\\s+NEAR/-*\\d+\\s+[a-zA-Z-\']+");
+        Pattern nearPat = Pattern.compile("[\\w-\']+\\s+NEAR/\\d+\\s+[\\w-\']+");
         m = nearPat.matcher(str);
         while (m.find()) {
             String matched = m.group();
-            matched = matched.replaceAll("-",  "");
             queryLiterals.add(matched);
             str = str.replaceFirst(matched, "");
         }
 
-        Pattern wordPat = Pattern.compile("[a-zA-Z-\']+");
+        Pattern wordPat = Pattern.compile("[\\w-\']+");
         m = wordPat.matcher(str);
         while (m.find()) {
             String matched = m.group();
