@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by bardsko on 9/29/17.
@@ -17,6 +19,8 @@ public class WildcardQuery {
     // goes through postings and removes non-candidate terms
     public ArrayList<String> queryResult(KGramIndex kIndex){
         ArrayList<String> possible = mergePostings(kIndex);
+        if(possible.contains("yosemite"))
+            System.out.println("fuck life");
         for(int i = 0; i < possible.size(); i++){
             String str = possible.get(i);
             if(verify(str, query) ==  false){
@@ -30,6 +34,8 @@ public class WildcardQuery {
     // verifies that the term matches wildcard pattern
     public boolean verify(String a, String pat){
         int p = 0, f = 0;
+        if(a.equals("yosemite"))
+            System.out.println("xxx");
         char[] candidate = ("$"+a+"$").toCharArray();
         char[] pattern = ("$"+pat+"$").toCharArray();
         int i;
@@ -43,6 +49,11 @@ public class WildcardQuery {
                     f = p;
                     p++;
                 }
+                else{
+                    return false;
+                }
+
+
             }
             else {
                 if(pattern[p] == '*'){ //if there is a wildcard, set it up
@@ -59,6 +70,7 @@ public class WildcardQuery {
                 }
             }
         }
+
         if(p == pat.length()+2)
             return true;
         return false;
@@ -106,23 +118,68 @@ public class WildcardQuery {
 
     }
 
-    private ArrayList<String> mergeList(ArrayList<String> one, ArrayList<String> two){
+    //what happens if they're the same thing?
+    //i = 14, 'voldemort' & 'voldemort
+    //yields nothing, THIS is why the list is shrinking
+    private ArrayList<String> mergeList(ArrayList<String> listA, ArrayList<String> listB){
         ArrayList<String> results = new ArrayList<>();
-        for (String s : one) {
-            if (two.contains(s) && !results.contains(s))
-                results.add(s);
+//        System.out.println(listA);
+//        System.out.println(listB);
+        if (!listA.isEmpty() && !listB.isEmpty()) {
+            int i = 0, j = 0;
+            String prev = "", current = "";
+            while (i < listA.size() && j < listB.size()) {
+                int compare = listA.get(i).compareTo(listB.get(j));
+                if (compare == 0) {
+                    current = listA.get(i);
+                    if(current.equals(prev) == false) {
+                        prev = current;
+                        results.add(prev);
+                    }
+                    i++;
+                    j++;
+                }
+                else if (compare < 0) { // >
+                    prev = listB.get(j);
+                    results.add(prev);
+                    j++;
+                }
+                else {
+                    prev = listA.get(i);
+                    results.add(prev);
+                    i++;
+                }
+            }
         }
+        else if(listA.isEmpty() && listB.isEmpty() == false){
+            results.addAll(listB);
+        }
+        else if(listA.isEmpty() == false && listB.isEmpty()){
+            results.addAll(listA);
+        }
+
         return results;
+//        ArrayList<String> results = new ArrayList<>();
+//        for (String s : one) {
+//            if (two.contains(s) && !results.contains(s))
+//                results.add(s);
+//        }
+//        return results;
     }
 
 
     public ArrayList<String> mergePostings(KGramIndex kIndex){
         int size = parseList.size();
         ArrayList<String> merged = new ArrayList<String>();
-        if(size > 2){
+        if(size >= 2){
+            ArrayList<String> x = kIndex.find(parseList.get(0));
+            ArrayList<String> y = kIndex.find(parseList.get(0));
             merged.addAll(mergeList(kIndex.find(parseList.get(0)), kIndex.find(parseList.get(1))));
-            for(int i = 2; i < size; i++)
+            for(int i = 2; i < size; i++) {
+                y = kIndex.find(parseList.get(i));
                 merged = mergeList(merged, kIndex.find(parseList.get(i)));
+            }
+            Collections.sort(merged);
         }
         else if(size == 1){
             merged = kIndex.find(parseList.get(0));
