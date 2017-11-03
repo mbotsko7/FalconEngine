@@ -102,6 +102,10 @@ public class IndexWriter {
                     postingsFile.write(docIdBytes, 0, docIdBytes.length);
                     lastDocId = pIndex.getDocID();
 
+                    byte[] posFreqBytes = ByteBuffer.allocate(4)
+                            .putInt(pIndex.getPositions().size()).array();
+                    postingsFile.write(posFreqBytes, 0, posFreqBytes.length);
+
                     int lastPosition = 0;
                     for (int position : pIndex.getPositions()) {
                         byte[] positionBytes = ByteBuffer.allocate(4)

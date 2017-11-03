@@ -63,7 +63,7 @@ public class DiskEngine {
                         break;
                     }
 
-                    DiskPosting[] postingsList = index.getPostings(input.toLowerCase());
+                    DiskPosting[] postingsList = index.getPostingsWithPositions(input.toLowerCase());
 
                     if (postingsList == null) {
                         System.out.println("Term not found");
@@ -71,7 +71,7 @@ public class DiskEngine {
                         System.out.print("\nDocs: \n");
                         for (DiskPosting d : postingsList) {
                             int docID = d.getDocID();
-                            System.out.println("Doc# " + docID + "-- Positions: ");
+                            System.out.print("Doc# " + docID + "-- Positions: ");
                             for (int i = 0; i < d.getTermFrequency(); i++) {
                                 System.out.print(d.getPositions().get(i) + " ");
                             }
