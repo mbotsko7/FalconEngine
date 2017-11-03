@@ -78,7 +78,7 @@ public class Search {
 
     public List<Integer> getDocIDList(String term) {
         // get list of documents that contain the given term
-        List<PositionalIndex> postings = index.getPostings(term);
+        List<PositionalIndex> postings = index.getPostings2(term);
         List<Integer> docList = new ArrayList<>();
         if (postings != null) {
             for (int i = 0; i < postings.size(); i++) {

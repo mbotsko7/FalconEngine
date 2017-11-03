@@ -11,7 +11,7 @@ public class PositionalInvertedIndex {
     public void addTerm(String term, int documentID, int position) {
         //check if the term is in the index already
         if (mIndex.containsKey(term)) {
-            ArrayList<PositionalIndex> postings = (ArrayList<PositionalIndex>) getPostings(term);
+            ArrayList<PositionalIndex> postings = (ArrayList<PositionalIndex>) getPostings2(term);
             if (postings.get(postings.size()-1).getDocID() == documentID) {
                 postings.get(postings.size() - 1).addPosition(position);
 
@@ -35,8 +35,19 @@ public class PositionalInvertedIndex {
     }
 
 
-    public List<PositionalIndex> getPostings(String term) {
+    // returns postings with positions
+    public List<PositionalIndex> getPostings2(String term) {
         return mIndex.get(term);
+    }
+
+    // returns postings with just doc IDs
+    public List<Integer> getPostings(String term) {
+        List<PositionalIndex> pIndex = mIndex.get(term);
+        List<Integer> docIDs = new ArrayList<>();
+        for (PositionalIndex p : pIndex) {
+            docIDs.add(p.getDocID());
+        }
+        return docIDs;
     }
 
     // for specified term and docID, return all positions
