@@ -34,7 +34,7 @@ public class Query {
             str = str.replaceFirst(matched, "");
         }
 
-        Pattern wordPat = Pattern.compile("[a-zA-Z-\']+");
+        Pattern wordPat = Pattern.compile("[\\w-\\*\']+");
         m = wordPat.matcher(str);
         while (m.find()) {
             String matched = m.group();

@@ -172,6 +172,7 @@ public class Search {
                     ArrayList<Integer> wildList = new ArrayList<>();
 //                    int size = 0;
                     for (String wild : q.queryResult(kindex)) {
+                        wild = stream.parseAndStem(wild);
                         ArrayList<Integer> t = (ArrayList<Integer>) getDocIDList(wild);
                         wildcardListing.add(t);
 //                        size += t.size();
