@@ -10,9 +10,9 @@ public class KGramIndex {
 
     public KGramIndex() {
         kIndex = new TreeMap<>();
-        char[] arr = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
-        for (char c : arr)
-            kIndex.put(c + "", new ArrayList<>());
+        for(int i = 0; i < 256; i++){
+            kIndex.put(((char)i)+"", new ArrayList<>());
+        }
 
     }
 
@@ -27,7 +27,24 @@ public class KGramIndex {
         //for a 1-gram
         char[] single = str.toCharArray();
         for (char c : single) {
-            kIndex.get(c + "").add(str);
+            ArrayList<String> temp;
+            try {
+                temp = kIndex.get(c + "");
+                temp.add(str);
+                kIndex.put(c+"", temp);
+            }
+            catch (Exception e) {
+                temp = new ArrayList<>();
+                temp.add(str);
+                kIndex.put(c+"", temp);
+            }
+//            if(kIndex.containsKey(c+""))
+//                kIndex.get(c + "").add(str);
+//            else{
+//                ArrayList<String> temp = new ArrayList<>();
+//                temp.add(str);
+//                kIndex.put(c+"", temp);
+//            }
 
         }
 
@@ -37,7 +54,9 @@ public class KGramIndex {
             for (int i = 0; i <= token.length() - c; i++) {
                 String s = token.substring(i, i + c);
                 if (kIndex.containsKey(s)) {
-                    kIndex.get(s).add(str);
+                    ArrayList<String> l = kIndex.get(s);
+                    l.add(str);
+                    kIndex.put(s, l);
                 }
                 else {
                     ArrayList<String> temp = new ArrayList<>();

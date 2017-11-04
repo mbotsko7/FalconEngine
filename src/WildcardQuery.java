@@ -19,14 +19,19 @@ public class WildcardQuery {
     // goes through postings and removes non-candidate terms
     public ArrayList<String> queryResult(KGramIndex kIndex){
         ArrayList<String> possible = mergePostings(kIndex);
-        if(possible.contains("yosemite"))
-            System.out.println("fuck life");
         for(int i = 0; i < possible.size(); i++){
             String str = possible.get(i);
-            if(verify(str, query) ==  false){
+//            if(verify(str, query) ==  false){
+//                possible.remove(i);
+//                i--;
+//            }
+            char[] arr = str.toCharArray();
+            if(arr[0] != 'c' || arr[arr.length-1] != 'g'){
                 possible.remove(i);
                 i--;
             }
+
+
         }
         return possible;
     }
@@ -37,6 +42,7 @@ public class WildcardQuery {
         char[] candidate = ("$"+a+"$").toCharArray();
         char[] pattern = ("$"+pat+"$").toCharArray();
         int i;
+        boolean wildcard = false;
         for(i = 0; i < candidate.length;){
             if(f == 0) { //if wildcard has not been triggered
                 if (pattern[p] == candidate[i]) { //see if it's the same character, if so continue
@@ -46,6 +52,7 @@ public class WildcardQuery {
                 else if (pattern[p] == '*') { //if it is a wildcard
                     f = p;
                     p++;
+                    wildcard = true;
                 }
                 else{
                     return false;
@@ -54,13 +61,17 @@ public class WildcardQuery {
 
             }
             else {
+                if(p == pattern.length)
+                    return false;
                 if(pattern[p] == '*'){ //if there is a wildcard, set it up
                     f = p;
                     p++;
+                    wildcard = true;
                 }
                 else if(pattern[p] == candidate[i]){ //if they match, wildcard effect ends
                     p++;
                     i++;
+                    wildcard = false;
                 }
                 else { //if not match, continue searching until the end of time :'(
                     p = f+1;
@@ -116,13 +127,10 @@ public class WildcardQuery {
 
     }
 
-    //what happens if they're the same thing?
-    //i = 14, 'voldemort' & 'voldemort
-    //yields nothing, THIS is why the list is shrinking
+    // AND the two lists
     private ArrayList<String> mergeList(ArrayList<String> listA, ArrayList<String> listB){
         ArrayList<String> results = new ArrayList<>();
-//        System.out.println(listA);
-//        System.out.println(listB);
+
         if (!listA.isEmpty() && !listB.isEmpty()) {
             int i = 0, j = 0;
             String prev = "", current = "";
@@ -157,12 +165,6 @@ public class WildcardQuery {
         }
 
         return results;
-//        ArrayList<String> results = new ArrayList<>();
-//        for (String s : one) {
-//            if (two.contains(s) && !results.contains(s))
-//                results.add(s);
-//        }
-//        return results;
     }
 
 
@@ -170,11 +172,8 @@ public class WildcardQuery {
         int size = parseList.size();
         ArrayList<String> merged = new ArrayList<String>();
         if(size >= 2){
-            ArrayList<String> x = kIndex.find(parseList.get(0));
-            ArrayList<String> y = kIndex.find(parseList.get(0));
             merged.addAll(mergeList(kIndex.find(parseList.get(0)), kIndex.find(parseList.get(1))));
             for(int i = 2; i < size; i++) {
-                y = kIndex.find(parseList.get(i));
                 merged = mergeList(merged, kIndex.find(parseList.get(i)));
             }
             Collections.sort(merged);
@@ -182,6 +181,6 @@ public class WildcardQuery {
         else if(size == 1){
             merged = kIndex.find(parseList.get(0));
         }
-        return merged;
+         return merged;
     }
 }

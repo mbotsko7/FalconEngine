@@ -2,14 +2,14 @@
 import com.google.gson.*;
 import org.tartarus.snowball.ext.englishStemmer;
 import java.io.*;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 
 public class Driver {
 
     PositionalInvertedIndex index = new PositionalInvertedIndex();
     KGramIndex kGramIndex = new KGramIndex();
+    HashMap<String, String> keys = new HashMap<>();
 
     public boolean indexDirectory(File f) {
         if (f.exists() && f.isDirectory()) {
@@ -21,13 +21,15 @@ public class Driver {
                 long begin = System.nanoTime();
                 for (String path : fileList) {
                     String[] file = parser.parseJSON(f.getPath() + "/" + path);
-                    indexFile(file, index, i);
+                    indexFile(file, index, i, keys);
                     i++;
                 }
-                String[] dict = index.getDictionary();
-                for (int j = 0; j < dict.length; j++) {
-                    kGramIndex.add(dict[j]);
+                System.out.println(System.nanoTime()-begin);
+                begin = System.nanoTime();
+                for(String s : keys.keySet()){
+                    kGramIndex.add(s);
                 }
+                System.out.println(System.nanoTime()-begin);
                 return true;
             }
             catch (Exception e) {
@@ -41,14 +43,6 @@ public class Driver {
     public String[] getVocabList() {
         // returns all dictionary in positional inverted index
         return index.getDictionary();
-//        String line = "";
-//        for (String k : keys) {
-//            line += k + "\n";
-//        }
-//
-//        int vocabTotal = index.getTermCount();
-//
-//        return "Total vocab terms: " + vocabTotal + "\n\n" + line;
 
     }
 
@@ -62,21 +56,24 @@ public class Driver {
     }
 
     public List<Integer> search(String query) {
-        Search search = new Search(index, kGramIndex);
+        Search search = new Search(index, kGramIndex, keys);
         return search.searchForQuery(query);
         //display.setContent(new Label(results.toString()));
 
     }
 
     private static void indexFile(String[] fileData, PositionalInvertedIndex index,
-                                  int docID) {
+                                  int docID, HashMap<String, String> k) {
+
         try {
             int i = 0;
-            SimpleTokenStream stream = new SimpleTokenStream(fileData[0] + " " + fileData[1]); //currently not including title in the indexing
+            SimpleTokenStream stream = new SimpleTokenStream(fileData[0] + " " + fileData[1]); //currently not including url in the indexing
             while (stream.hasNextToken()) {
                 String next = stream.nextToken();
                 if (next == null)
                     continue;
+                if(k.containsKey(stream.getOriginal()) == false)
+                    k.put(stream.getOriginal(), next);
                 index.addTerm(next, docID, i);
                 if (stream.getHyphen() != null) {
                     for (String str : stream.getHyphen()) {
@@ -89,6 +86,7 @@ public class Driver {
         catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     public static String readDocument(File file) {

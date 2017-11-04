@@ -12,6 +12,7 @@ import java.util.*;
 public class SimpleTokenStream implements TokenStream {
     private Scanner mReader;
     private String[] hyphen;
+    private String original;
 
     public SimpleTokenStream() {
     }
@@ -24,7 +25,12 @@ public class SimpleTokenStream implements TokenStream {
     }
 
     public String[] getHyphen() {
+
         return hyphen;
+    }
+
+    public String getOriginal() {
+        return original;
     }
 
     /**
@@ -42,9 +48,10 @@ public class SimpleTokenStream implements TokenStream {
         return mReader.hasNext();
     }
 
-    public String parseAndStem(String str) {
-        String next = str.replaceAll("\\W", "").toLowerCase();
-        next = next.replaceAll("_", "");
+    public String stem(String next) {
+        //String next = str.replaceAll("\\W", "").toLowerCase();
+        //String next = str.replaceAll("^[^a-zA-Z0-9\\\\s]+|[^a-zA-Z0-9\\\\s]+$", "").toLowerCase();
+
         try {
             Class stemClass = Class.forName("org.tartarus.snowball.ext.englishStemmer");
             SnowballStemmer stemmer = (SnowballStemmer) stemClass.newInstance();
@@ -57,6 +64,12 @@ public class SimpleTokenStream implements TokenStream {
             e.printStackTrace();
         }
         return next;
+    }
+
+    public String parseAndStem(String str){
+        String next = str.replaceAll("^\\W+|\\W+$", "").toLowerCase();
+        next = next.replaceAll("_", "");
+        return stem(next);
     }
 
     /**
@@ -72,14 +85,16 @@ public class SimpleTokenStream implements TokenStream {
             next = mReader.next();
         }
         hyphen = null;
+        original = "";
         if (next.contains("-")) {
             hyphen = next.split("-");
             for (int i = 0; i < hyphen.length; i++) {
-                hyphen[i] = parseAndStem(hyphen[i]);
+                String h = hyphen[i].replaceAll("^\\W+|\\W+$", "").toLowerCase();
+                h = h.replaceAll("_", "");
+                hyphen[i] = stem(h);
             }
         }
-
-
+        original = next;
         next = parseAndStem(next);
         if (next.length() > 0) {
             return next;

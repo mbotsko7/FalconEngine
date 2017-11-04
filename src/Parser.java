@@ -28,7 +28,8 @@ public class Parser {
             JsonObject obj = json.getAsJsonObject();
             String body = obj.get("body").getAsString();
             String title = obj.get("title").getAsString();
-            return new String[]{title, body};
+            String url = obj.get("url").getAsString();
+            return new String[]{title, body, url};
             //}
         }
         catch (Exception e) {

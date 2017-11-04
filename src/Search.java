@@ -7,10 +7,12 @@ public class Search {
     private PositionalInvertedIndex index = new PositionalInvertedIndex();
     private SimpleTokenStream stream = new SimpleTokenStream();
     private KGramIndex kindex = new KGramIndex();
+    private HashMap<String, String> kGramKeys = new HashMap<>();
 
-    public Search(PositionalInvertedIndex index, KGramIndex k) {
+    public Search(PositionalInvertedIndex index, KGramIndex k, HashMap<String, String> map) {
         this.index = index;
         this.kindex = k;
+        this.kGramKeys = map;
     }
 
     public List<Integer> intersectLists(List<Integer> listA, List<Integer> listB) {
@@ -207,15 +209,12 @@ public class Search {
                     WildcardQuery q = new WildcardQuery(literal);
                     ArrayList<ArrayList<Integer>> wildcardListing = new ArrayList<>();
                     ArrayList<Integer> wildList = new ArrayList<>();
-//                    int size = 0;
+
                     for (String wild : q.queryResult(kindex)) {
-                        wild = stream.parseAndStem(wild);
+                        wild = kGramKeys.get(wild);
                         ArrayList<Integer> t = (ArrayList<Integer>) getDocIDList(wild);
                         wildcardListing.add(t);
-//                        size += t.size();
-                        //literalsPostings.add(getDocIDList(wild));
                     }
-//                    System.out.println(size);
                     wildList.addAll(wildcardListing.get(0));
                     if(wildcardListing.size() >= 2){
                         for(int i = 1; i < wildcardListing.size(); i++){
