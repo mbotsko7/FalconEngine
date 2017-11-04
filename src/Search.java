@@ -1,4 +1,6 @@
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Search {
 
@@ -78,7 +80,7 @@ public class Search {
 
     public List<Integer> getDocIDList(String term) {
         // get list of documents that contain the given term
-        List<PositionalIndex> postings = index.getPostings(term);
+        List<PositionalIndex> postings = index.getPostings2(term);
         List<Integer> docList = new ArrayList<>();
         if (postings != null) {
             for (int i = 0; i < postings.size(); i++) {
@@ -88,6 +90,41 @@ public class Search {
             }
         }
         return docList;
+    }
+
+    public List<Integer> searchNearK(String query) {
+        List<Integer> results = new ArrayList<>();
+        
+        Pattern p = Pattern.compile("([\\w-\']+)\\sNEAR/(\\d+)\\s([\\w-\']+)");
+        Matcher m = p.matcher(query);
+        if (m.matches()) {
+            String first = stream.parseAndStem(m.group(1));
+            int k = Integer.parseInt(m.group(2));
+            String second = stream.parseAndStem(m.group(3));
+
+            // get list of docs that contain the first term
+            List<Integer> firstDocs = getDocIDList(first);
+            if (!firstDocs.isEmpty()) {
+                searchDoc:
+                    // loop through each doc that contains the first term
+                    for (Integer docID:firstDocs) {
+                        List<Integer> positionsOfFirst = index.getPositionsInDoc(first, docID.intValue());
+                        List<Integer> positionsOfSecond = index.getPositionsInDoc(second, docID.intValue());
+                        // loop through first's positions in the current doc
+                        int j = 0;
+                        for (Integer firstPos: positionsOfFirst) {
+                            while (j < positionsOfSecond.size()-1 && positionsOfSecond.get(j) < firstPos) {
+                               j++;
+                           }
+                           if (positionsOfSecond.get(j) > firstPos && positionsOfSecond.get(j) <= firstPos + k) {
+                               results.add(docID);
+                               continue searchDoc;
+                           }
+                        }
+                    }
+            }
+        }
+        return results;
     }
 
     public List<Integer> searchPhraseLiteral(String phrase) {
@@ -186,6 +223,10 @@ public class Search {
                         }
                     }
                     literalsPostings.add(wildList);
+
+                } else if (literal.contains("NEAR/")){
+                    literalsPostings.add(searchNearK(literal));
+
                 }
                 else { // for single tokens
                     literal = stream.parseAndStem((literal));
