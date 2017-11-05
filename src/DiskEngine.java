@@ -2,6 +2,7 @@
 import javafx.geometry.Pos;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -12,6 +13,7 @@ public class DiskEngine {
     public static void main(String[] args) {
         PositionalInvertedIndex pIndex;
         HashMap<String, String> k;
+        ArrayList<Double> documentWeights;
         Scanner scan = new Scanner(System.in);
 
         System.out.println("Menu:");
@@ -30,6 +32,7 @@ public class DiskEngine {
                 // creates positional inverted index that will be written to disk
                 pIndex = new PositionalInvertedIndex();
                 k = new HashMap<>();
+                documentWeights = new ArrayList<>();
                 File f = new File(folder);
 
                 if (f.exists() && f.isDirectory()) {
@@ -38,8 +41,10 @@ public class DiskEngine {
                     Parser parser = new Parser();
                     int i = 1;
                     for (String path : fileList) {
+                        DocumentWeight documentWeight = new DocumentWeight();
                         String[] file = parser.parseJSON(f.getPath() + "/" + path);
-                        indexFile(file, pIndex, i, k);
+                        indexFile(file, pIndex, i, k, documentWeight);
+                        documentWeights.add(documentWeight.calculateWeight());
                         i++;
                     }
                 }
@@ -92,7 +97,7 @@ public class DiskEngine {
 
     // from driver.java
     private static void indexFile(String[] fileData, PositionalInvertedIndex index,
-                                  int docID, HashMap<String, String> k) {
+                                  int docID, HashMap<String, String> k, DocumentWeight documentWeight) {
 
         try {
             int i = 0;
@@ -101,8 +106,10 @@ public class DiskEngine {
                 String next = stream.nextToken();
                 if (next == null)
                     continue;
-                if(k.containsKey(stream.getOriginal()) == false)
-                    k.put(stream.getOriginal(), next);
+                String original = stream.getOriginal();
+                if(k.containsKey(original) == false)
+                    k.put(original, next);
+                documentWeight.addTerm(original);
                 index.addTerm(next, docID, i);
                 if (stream.getHyphen() != null) {
                     for (String str : stream.getHyphen()) {
