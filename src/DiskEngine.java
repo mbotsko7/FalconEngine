@@ -3,6 +3,7 @@ import javafx.geometry.Pos;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Scanner;
 
 
@@ -10,6 +11,7 @@ public class DiskEngine {
 
     public static void main(String[] args) {
         PositionalInvertedIndex pIndex;
+        HashMap<String, String> k;
         Scanner scan = new Scanner(System.in);
 
         System.out.println("Menu:");
@@ -27,6 +29,7 @@ public class DiskEngine {
 
                 // creates positional inverted index that will be written to disk
                 pIndex = new PositionalInvertedIndex();
+                k = new HashMap<>();
                 File f = new File(folder);
 
                 if (f.exists() && f.isDirectory()) {
@@ -36,7 +39,7 @@ public class DiskEngine {
                     int i = 1;
                     for (String path : fileList) {
                         String[] file = parser.parseJSON(f.getPath() + "/" + path);
-                        indexFile(file, pIndex, i);
+                        indexFile(file, pIndex, i, k);
                         i++;
                     }
                 }
@@ -89,14 +92,17 @@ public class DiskEngine {
 
     // from driver.java
     private static void indexFile(String[] fileData, PositionalInvertedIndex index,
-                                  int docID) {
+                                  int docID, HashMap<String, String> k) {
+
         try {
             int i = 0;
-            SimpleTokenStream stream = new SimpleTokenStream(fileData[1]); //currently not including title in the indexing
+            SimpleTokenStream stream = new SimpleTokenStream(fileData[0] + " " + fileData[1]); //currently not including url in the indexing
             while (stream.hasNextToken()) {
                 String next = stream.nextToken();
                 if (next == null)
                     continue;
+                if(k.containsKey(stream.getOriginal()) == false)
+                    k.put(stream.getOriginal(), next);
                 index.addTerm(next, docID, i);
                 if (stream.getHyphen() != null) {
                     for (String str : stream.getHyphen()) {
@@ -105,8 +111,10 @@ public class DiskEngine {
                 }
                 i++;
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 }
