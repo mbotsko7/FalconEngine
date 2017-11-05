@@ -52,7 +52,7 @@ public class DiskEngine {
                 // creates binary files and saves them
                 // in the same directory that was indexed
                 IndexWriter writer = new IndexWriter(folder);
-                writer.buildIndex(pIndex);
+                writer.buildIndex(pIndex, documentWeights);
 
                 break;
 
