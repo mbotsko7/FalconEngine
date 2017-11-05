@@ -30,8 +30,9 @@ public class IndexWriter {
      * postings.bin, containing the postings list of document IDs;
      * vocabTable.bin, containing a table that maps vocab terms to postings locations
      */
-    public void buildIndex(PositionalInvertedIndex index) {
+    public void buildIndex(PositionalInvertedIndex index, ArrayList<Double> docWeights) {
         buildIndexForDirectory(index, mFolderPath);
+        buildDocumentWeightsFile(docWeights, mFolderPath);
     }
 
     /**
@@ -126,6 +127,43 @@ public class IndexWriter {
             try {
                 postingsFile.close();
             } catch (IOException ex) {
+            }
+        }
+    }
+
+    private static void buildDocumentWeightsFile(ArrayList<Double> docWeights, String folder){
+        long[] docPositions = new long[docWeights.size()];
+        //OutputStreamWriter weightList = null;
+        FileOutputStream weightList = null;
+        try{
+            int docI = 0;
+//            weightList = new OutputStreamWriter(
+//                    new FileOutputStream(new File(folder, "docWeights.bin")), "ASCII"
+//            );
+            weightList = new FileOutputStream(new File(folder, "docWeights.bin"));
+            int docPos = 0;
+            for(Double weight : docWeights){
+                docPositions[docI] = docPos;
+                byte[] wBytes = ByteBuffer.allocate(8)
+                        .putDouble(weight).array();
+
+                weightList.write(wBytes, 0, wBytes.length);
+                docI++;
+                docPos += wBytes.length;
+            }
+
+        }
+        catch (FileNotFoundException ex) {
+            System.out.println(ex.toString());
+        } catch (UnsupportedEncodingException ex) {
+            System.out.println(ex.toString());
+        } catch (IOException ex) {
+            System.out.println(ex.toString());
+        } finally {
+            try {
+                weightList.close();
+            } catch (IOException ex) {
+                System.out.println(ex.toString());
             }
         }
     }
