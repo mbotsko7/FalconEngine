@@ -112,11 +112,13 @@ public class Search {
                     for (Integer docID:firstDocs) {
                         List<Integer> positionsOfFirst = index.getPositionsInDoc(first, docID.intValue());
                         List<Integer> positionsOfSecond = index.getPositionsInDoc(second, docID.intValue());
-                        // loop through first's positions in the current doc
+                        // loop through first's positions in the current doc and compare with second's positions
                         int j = 0;
                         for (Integer firstPos: positionsOfFirst) {
+                            if (positionsOfSecond.size() == 0) continue searchDoc;
                             while (j < positionsOfSecond.size()-1 && positionsOfSecond.get(j) < firstPos) {
                                j++;
+                               int a = positionsOfSecond.get(j);
                            }
                            if (positionsOfSecond.get(j) > firstPos && positionsOfSecond.get(j) <= firstPos + k) {
                                results.add(docID);
@@ -249,9 +251,4 @@ public class Search {
         return finalResults;
 
     }
-
-
-
-
-
 }

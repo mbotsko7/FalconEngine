@@ -62,36 +62,47 @@ public class DiskEngine {
 
                 DiskInvertedIndex index = new DiskInvertedIndex(indexName);
 
-                while (true) {
-                    System.out.println("\nEnter one or more search terms, separated " +
-                            "by spaces:");
-                    String input = scan.nextLine();
+                System.out.println("Enter query mode:");
+                System.out.println("1) boolean retrieval");
+                System.out.println("2) ranked retrieval");
 
-                    if (input.equals("EXIT")) {
-                        break;
-                    }
+                int queryChoice = scan.nextInt();
+                scan.nextLine();
 
-                    DiskPosting[] postingsList = index.getPostingsWithPositions(input.toLowerCase());
+                switch (queryChoice) {
+                    case 1:
+                        while (true) {
+                            System.out.println("\nEnter one or more search terms");
+                            String input = scan.nextLine();
 
-                    if (postingsList == null) {
-                        System.out.println("Term not found");
-                    } else {
-                        System.out.print("\nDocs: \n");
-                        for (DiskPosting d : postingsList) {
-                            int docID = d.getDocID();
-                            System.out.print("Doc# " + docID + "-- Positions: ");
-                            for (int i = 0; i < d.getTermFrequency(); i++) {
-                                System.out.print(d.getPositions().get(i) + " ");
+                            if (input.equals("EXIT")) {
+                                break;
                             }
 
-                            System.out.println();
-                        }
-                        System.out.println();
-                        System.out.println();
-                    }
-                }
+                            DiskPosting[] postingsList = index.getPostingsWithPositions(input.toLowerCase());
 
-                break;
+                            if (postingsList == null) {
+                                System.out.println("Term not found");
+                            } else {
+                                System.out.print("\nDocs: \n");
+                                for (DiskPosting d : postingsList) {
+                                    int docID = d.getDocID();
+                                    System.out.print("Doc# " + docID + "-- Positions: ");
+                                    for (int i = 0; i < d.getTermFrequency(); i++) {
+                                        System.out.print(d.getPositions().get(i) + " ");
+                                    }
+                                    System.out.println();
+                                }
+                                System.out.println();
+                                System.out.println();
+                            }
+                        }
+                        break;
+                    case 2:
+                        /*** ranked retrieval code ***/
+                        System.out.println("coming soon");
+
+                }
         }
     }
 
