@@ -1,5 +1,4 @@
 
-import com.google.gson.*;
 import org.tartarus.snowball.ext.englishStemmer;
 import java.io.*;
 import java.util.*;
@@ -56,7 +55,7 @@ public class Driver {
     }
 
     public List<Integer> search(String query) {
-        Search search = new Search(index, kGramIndex, keys);
+        BooleanRetrieval search = new BooleanRetrieval(index, kGramIndex, keys);
         return search.searchForQuery(query);
         //display.setContent(new Label(results.toString()));
 

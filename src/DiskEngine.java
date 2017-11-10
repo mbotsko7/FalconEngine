@@ -2,10 +2,7 @@
 import javafx.geometry.Pos;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 
 
 public class DiskEngine {
@@ -60,7 +57,7 @@ public class DiskEngine {
                 System.out.println("Enter the name of an index to read:");
                 String indexName = scan.nextLine();
 
-                DiskInvertedIndex index = new DiskInvertedIndex(indexName);
+//                DiskInvertedIndex index = new DiskInvertedIndex(indexName);
 
                 System.out.println("Enter query mode:");
                 System.out.println("1) boolean retrieval");
@@ -72,30 +69,39 @@ public class DiskEngine {
                 switch (queryChoice) {
                     case 1:
                         while (true) {
-                            System.out.println("\nEnter one or more search terms");
+                            System.out.println("\nEnter boolearn retrieval query:");
                             String input = scan.nextLine();
 
                             if (input.equals("EXIT")) {
                                 break;
                             }
+                            KGramIndex kGramIndex = new KGramIndex();
+                            HashMap<String, String> keys = new HashMap<>();
+                            BooleanRetrieval search = new BooleanRetrieval(indexName, kGramIndex, keys);
 
-                            DiskPosting[] postingsList = index.getPostingsWithPositions(input.toLowerCase());
+                            List<Integer> results = search.searchForQuery(input);
 
-                            if (postingsList == null) {
-                                System.out.println("Term not found");
-                            } else {
-                                System.out.print("\nDocs: \n");
-                                for (DiskPosting d : postingsList) {
-                                    int docID = d.getDocID();
-                                    System.out.print("Doc# " + docID + "-- Positions: ");
-                                    for (int i = 0; i < d.getTermFrequency(); i++) {
-                                        System.out.print(d.getPositions().get(i) + " ");
-                                    }
-                                    System.out.println();
-                                }
-                                System.out.println();
-                                System.out.println();
+                            for (Integer result: results) {
+                                System.out.println("Doc# " + result);
                             }
+
+//                            DiskPosting[] postingsList = index.getPostings(input.toLowerCase());
+//
+//                            if (postingsList == null) {
+//                                System.out.println("Term not found");
+//                            } else {
+//                                System.out.print("\nDocs: \n");
+//                                for (DiskPosting d : postingsList) {
+//                                    int docID = d.getDocID();
+//                                    System.out.print("Doc# " + docID + "-- Positions: ");
+//                                    for (int i = 0; i < d.getTermFrequency(); i++) {
+//                                        System.out.print(d.getPositions().get(i) + " ");
+//                                    }
+//                                    System.out.println();
+//                                }
+//                                System.out.println();
+//                                System.out.println();
+//                            }
                         }
                         break;
                     case 2:
