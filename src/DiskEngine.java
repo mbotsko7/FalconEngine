@@ -106,12 +106,14 @@ public class DiskEngine {
                         break;
                     case 2:
                         /*** ranked retrieval code ***/
-                        System.out.println("in testing...\nW_dt calculations are tested to be correct\n" +
+                        System.out.println("Welcome! Ranked Retrieval is in testing...\n" +
+                                "W_dt calculations are tested to be correct\n" +
                                 "testing ranking...");
                         DiskInvertedIndex index = new DiskInvertedIndex(indexName);
                         documentWeights = new ArrayList<>();
                         for(double d : index.getWeights()) {
                             documentWeights.add(d);
+                            System.out.println(d);
                         }
                 }
         }
