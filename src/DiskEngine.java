@@ -11,6 +11,7 @@ public class DiskEngine {
         PositionalInvertedIndex pIndex;
         HashMap<String, String> k;
         ArrayList<Double> documentWeights;
+        KGramIndex kGramIndex = new KGramIndex();
         Scanner scan = new Scanner(System.in);
 
         System.out.println("Menu:");
@@ -40,7 +41,7 @@ public class DiskEngine {
                     for (String path : fileList) {
                         DocumentWeight documentWeight = new DocumentWeight();
                         String[] file = parser.parseJSON(f.getPath() + "/" + path);
-                        indexFile(file, pIndex, i, k, documentWeight);
+                        indexFile(file, pIndex, i, k, documentWeight, kGramIndex);
                         documentWeights.add(documentWeight.calculateWeight());
                         i++;
                     }
@@ -51,6 +52,10 @@ public class DiskEngine {
                 IndexWriter writer = new IndexWriter(folder);
                 writer.buildIndex(pIndex, documentWeights);
                 documentWeights.clear();
+
+                // creates binary files for kgram index
+                KGIndexWriter kWriter = new KGIndexWriter(folder);
+                kWriter.buildKGIndex(kGramIndex);
                 break;
 
             case 2:
@@ -75,7 +80,7 @@ public class DiskEngine {
                             if (input.equals("EXIT")) {
                                 break;
                             }
-                            KGramIndex kGramIndex = new KGramIndex();
+
                             HashMap<String, String> keys = new HashMap<>();
                             BooleanRetrieval search = new BooleanRetrieval(indexName, kGramIndex, keys);
 
@@ -121,7 +126,7 @@ public class DiskEngine {
 
     // from driver.java
     private static void indexFile(String[] fileData, PositionalInvertedIndex index,
-                                  int docID, HashMap<String, String> k, DocumentWeight documentWeight) {
+                                  int docID, HashMap<String, String> k, DocumentWeight documentWeight, KGramIndex kGramIndex) {
 
         try {
             int i = 0;
@@ -141,6 +146,10 @@ public class DiskEngine {
                     }
                 }
                 i++;
+            }
+
+            for(String s : k.keySet()){
+                kGramIndex.add(s);
             }
         }
         catch (Exception e) {
