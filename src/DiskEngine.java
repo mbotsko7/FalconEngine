@@ -108,6 +108,7 @@ public class DiskEngine {
                         /*** ranked retrieval code ***/
                         System.out.println("in testing...\nW_dt calculations are tested to be correct\n" +
                                 "testing ranking...");
+                        DiskInvertedIndex index = new DiskInvertedIndex(indexName);
                         documentWeights = new ArrayList<>();
                         for(double d : index.getWeights()) {
                             documentWeights.add(d);
