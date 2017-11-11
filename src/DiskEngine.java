@@ -53,7 +53,7 @@ public class DiskEngine {
                 // in the same directory that was indexed
                 IndexWriter writer = new IndexWriter(folder);
                 writer.buildIndex(pIndex, documentWeights);
-
+                documentWeights.clear();
                 break;
 
             case 2:
@@ -100,8 +100,12 @@ public class DiskEngine {
                         break;
                     case 2:
                         /*** ranked retrieval code ***/
-                        System.out.println("coming soon");
-
+                        System.out.println("in testing...\nW_dt calculations are tested to be correct\n" +
+                                "testing ranking...");
+                        documentWeights = new ArrayList<>();
+                        for(double d : index.getWeights()) {
+                            documentWeights.add(d);
+                        }
                 }
         }
     }

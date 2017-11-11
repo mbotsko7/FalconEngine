@@ -21,6 +21,7 @@ public class DiskInvertedIndex {
     private RandomAccessFile mVocabList;
     private RandomAccessFile mPostings;
     private long[] mVocabTable;
+    private double[] mWeights;
 
     // Opens a disk inverted index that was constructed in the given path.
     public DiskInvertedIndex(String path) {
@@ -29,14 +30,19 @@ public class DiskInvertedIndex {
             mVocabList = new RandomAccessFile(new File(path, "vocab.bin"), "r");
             mPostings = new RandomAccessFile(new File(path, "postings.bin"), "r");
             mVocabTable = readVocabTable(path);
+            mWeights = readDocWeights(path);
             //mFileNames = readFileNames(path);       ??
         } catch (FileNotFoundException ex) {
             System.out.println(ex.toString());
         }
     }
 
+    public double[] getWeights() {
+        return mWeights;
+    }
+
     private static DiskPosting[] readPostingsFromFile(RandomAccessFile postings,
-                                              long postingsPosition, boolean withPositions) {
+                                                      long postingsPosition, boolean withPositions) {
         try {
             // seek to the position in the file where the postings start.
             // "seek": sets the file-pointer offset
@@ -143,6 +149,35 @@ public class DiskInvertedIndex {
             }
         }
         return -1;
+    }
+
+    private static double[] readDocWeights(String indexName){
+        try {
+            double[] docWeights;
+
+            RandomAccessFile tableFile = new RandomAccessFile(
+                    new File(indexName, "docWeights.bin"),
+                    "r");
+
+            byte[] byteBuffer = new byte[4];
+//            tableFile.read(byteBuffer, 0, byteBuffer.length);
+
+            int tableIndex = 0;
+            docWeights = new double[36803];
+            byteBuffer = new byte[8];
+
+            while (tableFile.read(byteBuffer, 0, byteBuffer.length) > 0) { // while we keep reading 4 bytes
+                docWeights[tableIndex] = ByteBuffer.wrap(byteBuffer).getDouble();
+                tableIndex++;
+            }
+            tableFile.close();
+            return docWeights;
+        } catch (FileNotFoundException ex) {
+            System.out.println(ex.toString());
+        } catch (IOException ex) {
+            System.out.println(ex.toString());
+        }
+        return null;
     }
 
     // Reads the file vocabTable.bin into memory.
