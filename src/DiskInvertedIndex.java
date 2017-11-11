@@ -86,6 +86,7 @@ public class DiskInvertedIndex {
                     for (int j = 0; j < positionFrequency; j++) {
                         postings.read(buffer, 0, buffer.length);        // skips through all positions
                     }
+                    pList = null;
                 }
                 dPostings[i] = new DiskPosting(docId, positionFrequency, pList);
             }
@@ -103,13 +104,35 @@ public class DiskInvertedIndex {
         if (postingsPosition >= 0) {
             return readPostingsFromFile(mPostings, postingsPosition, false);
         }
-        return null;
+        return new DiskPosting[0];
     }
 
     public DiskPosting[] getPostingsWithPositions(String term) {
         long postingsPosition = binarySearchVocabulary(term);
         if (postingsPosition >= 0) {
             return readPostingsFromFile(mPostings, postingsPosition, true);
+        }
+        return new DiskPosting[0];
+    }
+
+    public List<Integer> getPositionsInDoc(String term, int docID) {
+        DiskPosting[] postings = getPostingsWithPositions(term);
+        DiskPosting posting = binarySearchPostings(postings, docID);
+        if (posting != null)
+            return posting.getPositions();
+        return new ArrayList<>();
+    }
+
+    private static DiskPosting binarySearchPostings(DiskPosting[] p, int docID) {
+        int i = 0, j = p.length -1;
+        while(j >= i) {
+            int m = (i + j) / 2;
+            if (p[m].getDocID() == docID)
+                return p[m];
+            if (p[m].getDocID() < docID)
+                i = m + 1;
+            if (p[m].getDocID() > docID)
+                j = m - 1;
         }
         return null;
     }

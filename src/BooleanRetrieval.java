@@ -2,14 +2,22 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Search {
+public class BooleanRetrieval {
 
     private PositionalInvertedIndex index = new PositionalInvertedIndex();
     private SimpleTokenStream stream = new SimpleTokenStream();
     private KGramIndex kindex = new KGramIndex();
     private HashMap<String, String> kGramKeys = new HashMap<>();
 
-    public Search(PositionalInvertedIndex index, KGramIndex k, HashMap<String, String> map) {
+    private DiskInvertedIndex dIndex;
+
+    public BooleanRetrieval(String path, KGramIndex k, HashMap<String, String> map) {
+        this.dIndex = new DiskInvertedIndex(path);
+        this.kindex = k;
+        this.kGramKeys = map;
+    }
+
+    public BooleanRetrieval(PositionalInvertedIndex index, KGramIndex k, HashMap<String, String> map) {
         this.index = index;
         this.kindex = k;
         this.kGramKeys = map;
@@ -82,14 +90,10 @@ public class Search {
 
     public List<Integer> getDocIDList(String term) {
         // get list of documents that contain the given term
-        List<PositionalIndex> postings = index.getPostings2(term);
+        DiskPosting[] postings = dIndex.getPostings(term);
         List<Integer> docList = new ArrayList<>();
-        if (postings != null) {
-            for (int i = 0; i < postings.size(); i++) {
-                int id = postings.get(i).getDocID();
-                if (docList.isEmpty() || id != docList.get(docList.size() - 1))
-                    docList.add(id);
-            }
+        for (DiskPosting posting: postings) {
+            docList.add(posting.getDocID());
         }
         return docList;
     }
@@ -106,12 +110,12 @@ public class Search {
 
             // get list of docs that contain the first term
             List<Integer> firstDocs = getDocIDList(first);
-            if (!firstDocs.isEmpty()) {
+            if (!firstDocs.isEmpty() && !getDocIDList(second).isEmpty()) {
                 searchDoc:
                     // loop through each doc that contains the first term
                     for (Integer docID:firstDocs) {
-                        List<Integer> positionsOfFirst = index.getPositionsInDoc(first, docID.intValue());
-                        List<Integer> positionsOfSecond = index.getPositionsInDoc(second, docID.intValue());
+                        List<Integer> positionsOfFirst = dIndex.getPositionsInDoc(first, docID);
+                        List<Integer> positionsOfSecond = dIndex.getPositionsInDoc(second, docID);
                         // loop through first's positions in the current doc and compare with second's positions
                         int j = 0;
                         for (Integer firstPos: positionsOfFirst) {
@@ -133,8 +137,6 @@ public class Search {
 
     public List<Integer> searchPhraseLiteral(String phrase) {
         // returns a list of docIDs that contain the entire phrase
-
-
         List<Integer> results = new ArrayList<>();
 
         // separate phrase into individual stemmed tokens
@@ -152,7 +154,7 @@ public class Search {
                     List<List<Integer>> termPositionsLists = new ArrayList<List<Integer>>();
                     // get position list of each phrase term in the current document
                     for (int i = 0; i < terms.length; i++) {
-                        List<Integer> termPostingsInDoc = index.getPositionsInDoc(terms[i], docID.intValue());
+                        List<Integer> termPostingsInDoc = dIndex.getPositionsInDoc(terms[i], docID);
                         if (termPostingsInDoc.isEmpty())
                             continue searchCurrentDoc; // phrase is not in current doc, skip to next doc
                         termPositionsLists.add(termPostingsInDoc);
@@ -167,7 +169,7 @@ public class Search {
 
                     for (int i = 0; i < first.size(); i++) {
                         matched = true;
-                        int start = first.get(i).intValue();
+                        int start = first.get(i);
                         for (int j = 1; j < termPositionsLists.size(); j++) { // look at jth adjacent word from first term in phrase
                             int pos = seekPos[j];
                             int listSize = termPositionsLists.get(j).size();
@@ -227,7 +229,6 @@ public class Search {
 
                 } else if (literal.contains("NEAR/")){
                     literalsPostings.add(searchNearK(literal));
-
                 }
                 else { // for single tokens
                     literal = stream.parseAndStem((literal));
