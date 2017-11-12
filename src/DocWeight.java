@@ -1,6 +1,11 @@
 public class DocWeight implements Comparable {
     private int docID;
     private double docWeight;
+    public DocWeight(int id){
+        docID = id;
+        docWeight = 0;
+    }
+
     public DocWeight(int id, double weight){
         docID = id;
         docWeight = weight;

@@ -110,11 +110,32 @@ public class DiskEngine {
                                 "W_dt calculations are tested to be correct\n" +
                                 "testing ranking...");
                         DiskInvertedIndex index = new DiskInvertedIndex(indexName);
-                        documentWeights = new ArrayList<>();
-                        for(double d : index.getWeights()) {
-                            documentWeights.add(d);
-                            System.out.println(d);
+
+                        System.out.println("Query: ");
+                        try{
+                            Scanner in = new Scanner(System.in);
+                            String line = in.nextLine().trim();
+                            SimpleTokenStream s = new SimpleTokenStream(line);
+                            ArrayList<String> queryList = new ArrayList<>();
+                            while (s.hasNextToken()){
+                                String token = s.nextToken();
+                                if(token.isEmpty() == false){
+                                    queryList.add(token);
+                                }
+                            }
+                            RankedRetrieval rankedRetrieval = new RankedRetrieval(queryList, index);
+                            int i = 1;
+                            for(DocWeight dw : rankedRetrieval.rank()){
+                                if(dw == null) {
+                                    System.out.println("No other documents scored for query");
+                                    break;
+                                }
+                                System.out.println((i++) +". Doc"+ dw.getDocID()+" "+dw.getDocWeight());
+
+                            }
                         }
+                        catch (Exception e){e.printStackTrace();}
+                        break;
                 }
         }
     }
