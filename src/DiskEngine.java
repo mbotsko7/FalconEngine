@@ -41,9 +41,13 @@ public class DiskEngine {
                     for (String path : fileList) {
                         DocumentWeight documentWeight = new DocumentWeight();
                         String[] file = parser.parseJSON(f.getPath() + "/" + path);
-                        indexFile(file, pIndex, i, k, documentWeight, kGramIndex);
+                        indexFile(file, pIndex, i, k, documentWeight);
                         documentWeights.add(documentWeight.calculateWeight());
                         i++;
+                    }
+
+                    for(String s : k.keySet()){
+                        kGramIndex.add(s);
                     }
                 }
 
@@ -80,6 +84,10 @@ public class DiskEngine {
                             if (input.equals("EXIT")) {
                                 break;
                             }
+
+                            // kgram index disk test
+                            DiskKGIndex kIndex = new DiskKGIndex(indexName);
+                            String[] testList = kIndex.getTerms(input);
 
                             HashMap<String, String> keys = new HashMap<>();
                             BooleanRetrieval search = new BooleanRetrieval(indexName, kGramIndex, keys);
@@ -126,7 +134,7 @@ public class DiskEngine {
 
     // from driver.java
     private static void indexFile(String[] fileData, PositionalInvertedIndex index,
-                                  int docID, HashMap<String, String> k, DocumentWeight documentWeight, KGramIndex kGramIndex) {
+                                  int docID, HashMap<String, String> k, DocumentWeight documentWeight) {
 
         try {
             int i = 0;
@@ -146,10 +154,6 @@ public class DiskEngine {
                     }
                 }
                 i++;
-            }
-
-            for(String s : k.keySet()){
-                kGramIndex.add(s);
             }
         }
         catch (Exception e) {

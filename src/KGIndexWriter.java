@@ -68,9 +68,11 @@ public class KGIndexWriter {
                 termsFile.write(termFreqBytes, 0, termFreqBytes.length);
 
                 for (String term : terms) {
-                    byte[] termBytes = ByteBuffer.allocate(4)
+                    byte[] termSize = ByteBuffer.allocate(4)
                             .putInt(term.length()).array();
+                    termsFile.write(termSize, 0, termSize.length);
 
+                    byte[] termBytes = term.getBytes();
                     termsFile.write(termBytes, 0, termBytes.length);
                 }
 
