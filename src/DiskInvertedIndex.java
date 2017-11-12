@@ -67,12 +67,13 @@ public class DiskInvertedIndex {
                 previousDocId = docId;
 
                 ArrayList<Integer> pList = new ArrayList<>();
+                postings.read(buffer, 0, buffer.length);
                 int positionFrequency = ByteBuffer.wrap(buffer).getInt();
                 // if withPositions set to true, get positions
                 if (withPositions) {
                     int previousPosition = 0;
 
-                    postings.read(buffer, 0, buffer.length);
+                    //postings.read(buffer, 0, buffer.length);
                     for (int j = 0; j < positionFrequency; j++) {
                         postings.read(buffer, 0, buffer.length);
                         int position = ByteBuffer.wrap(buffer).getInt() + previousPosition;

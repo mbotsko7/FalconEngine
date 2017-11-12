@@ -60,6 +60,9 @@ public class DiskEngine {
                 // creates binary files for kgram index
                 KGIndexWriter kWriter = new KGIndexWriter(folder);
                 kWriter.buildKGIndex(kGramIndex);
+
+                List<PositionalIndex> test1 = pIndex.getPostings2("i");
+                List<PositionalIndex> test2 = pIndex.getPostings2("am");
                 break;
 
             case 2:
@@ -86,8 +89,12 @@ public class DiskEngine {
                             }
 
                             // kgram index disk test
-                            DiskKGIndex kIndex = new DiskKGIndex(indexName);
-                            String[] testList = kIndex.getTerms(input);
+//                            DiskKGIndex kIndex = new DiskKGIndex(indexName);
+//                            String[] testList = kIndex.getTerms(input);
+
+                            // testing diskinvertedindex
+                            DiskInvertedIndex piIndex = new DiskInvertedIndex(indexName);
+                            DiskPosting[] diskPostings = piIndex.getPostingsWithPositions(input);
 
                             HashMap<String, String> keys = new HashMap<>();
                             BooleanRetrieval search = new BooleanRetrieval(indexName, kGramIndex, keys);
