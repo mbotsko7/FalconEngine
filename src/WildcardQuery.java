@@ -21,12 +21,7 @@ public class WildcardQuery {
         ArrayList<String> possible = mergePostings(kIndex);
         for(int i = 0; i < possible.size(); i++){
             String str = possible.get(i);
-//            if(verify(str, query) ==  false){
-//                possible.remove(i);
-//                i--;
-//            }
-            char[] arr = str.toCharArray();
-            if(arr[0] != 'c' || arr[arr.length-1] != 'g'){
+            if(verify(str, query) ==  false){
                 possible.remove(i);
                 i--;
             }
