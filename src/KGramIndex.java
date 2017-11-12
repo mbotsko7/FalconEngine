@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by bardsko on 9/22/17.
@@ -68,4 +66,21 @@ public class KGramIndex {
 
     }
 
+    // returns all keys in index
+    // used to create binary file
+    public String[] getDictionary() {
+        Iterator<String> itr = kIndex.keySet().iterator();
+        ArrayList<String> list = new ArrayList<>();
+        while (itr.hasNext()) {
+            list.add(itr.next());
+        }
+        Collections.sort(list);
+        return list.toArray(new String[list.size()]);
+    }
+
+    // returns all terms of a specified key
+    // used to create binary file
+    public List<String> getTerms(String key) {
+        return kIndex.get(key);
+    }
 }
