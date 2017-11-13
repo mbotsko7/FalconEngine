@@ -81,7 +81,7 @@ public class DiskEngine {
                 switch (queryChoice) {
                     case 1:
                         while (true) {
-                            System.out.println("\nEnter boolearn retrieval query:");
+                            System.out.println("\nEnter boolean retrieval query:");
                             String input = scan.nextLine();
 
                             if (input.equals("EXIT")) {
@@ -89,7 +89,7 @@ public class DiskEngine {
                             }
 
                             // kgram index disk test
-//                            DiskKGIndex kIndex = new DiskKGIndex(indexName);
+                            DiskKGIndex kIndex = new DiskKGIndex(indexName);
 //                            String[] testList = kIndex.getTerms(input);
 
                             // testing diskinvertedindex
@@ -97,7 +97,7 @@ public class DiskEngine {
                             DiskPosting[] diskPostings = piIndex.getPostingsWithPositions(input);
 
                             HashMap<String, String> keys = new HashMap<>();
-                            BooleanRetrieval search = new BooleanRetrieval(indexName, kGramIndex, keys);
+                            BooleanRetrieval search = new BooleanRetrieval(indexName, kIndex, keys);
 
                             List<Integer> results = search.searchForQuery(input);
 
@@ -130,7 +130,7 @@ public class DiskEngine {
                                 "W_dt calculations are tested to be correct\n" +
                                 "testing ranking...");
                         DiskInvertedIndex index = new DiskInvertedIndex(indexName);
-
+                        DiskKGIndex kgIndex = new DiskKGIndex(indexName);
                         System.out.println("Query: ");
                         try{
                             Scanner in = new Scanner(System.in);
@@ -140,7 +140,29 @@ public class DiskEngine {
                             while (s.hasNextToken()){
                                 String token = s.nextToken();
                                 if(token.isEmpty() == false){
-                                    queryList.add(token);
+                                    if(token.contains("*") == false)
+                                        queryList.add(token);
+                                    else{
+                                        ArrayList<String> wildTerms = new ArrayList<>();
+                                        for(String str : KGramIndex.kGramify(s.getOriginal())){
+                                            for(String str2:kgIndex.getTerms(str))
+                                                wildTerms.add(str2);
+
+
+                                        }
+                                        Collections.sort(wildTerms);
+                                        String prev = wildTerms.get(0);
+                                        for(int i = 0; i < wildTerms.size(); i++){
+                                            String current = wildTerms.get(i);
+                                            if(prev.equals(current)){
+                                                wildTerms.remove(i);
+                                                i--;
+                                            }
+                                            else
+                                                prev = current;
+                                        }
+                                        queryList.addAll(wildTerms);
+                                    }
                                 }
                             }
                             RankedRetrieval rankedRetrieval = new RankedRetrieval(queryList, index);

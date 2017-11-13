@@ -7,13 +7,14 @@ public class BooleanRetrieval {
     private PositionalInvertedIndex index = new PositionalInvertedIndex();
     private SimpleTokenStream stream = new SimpleTokenStream();
     private KGramIndex kindex = new KGramIndex();
+    private DiskKGIndex diskKGIndex;
     private HashMap<String, String> kGramKeys = new HashMap<>();
 
     private DiskInvertedIndex dIndex;
 
-    public BooleanRetrieval(String path, KGramIndex k, HashMap<String, String> map) {
+    public BooleanRetrieval(String path, DiskKGIndex k, HashMap<String, String> map) {
         this.dIndex = new DiskInvertedIndex(path);
-        this.kindex = k;
+        diskKGIndex = k;
         this.kGramKeys = map;
     }
 
@@ -90,7 +91,7 @@ public class BooleanRetrieval {
 
     public List<Integer> getDocIDList(String term) {
         // get list of documents that contain the given term
-        DiskPosting[] postings = dIndex.getPostings(term);
+        DiskPosting[] postings = dIndex.getPostingsWithPositions(term);
         List<Integer> docList = new ArrayList<>();
         for (DiskPosting posting: postings) {
             docList.add(posting.getDocID());
@@ -214,7 +215,7 @@ public class BooleanRetrieval {
                     ArrayList<ArrayList<Integer>> wildcardListing = new ArrayList<>();
                     ArrayList<Integer> wildList = new ArrayList<>();
 
-                    for (String wild : q.queryResult(kindex)) {
+                    for (String wild : q.queryResult(diskKGIndex)) {
                         wild = kGramKeys.get(wild);
                         ArrayList<Integer> t = (ArrayList<Integer>) getDocIDList(wild);
                         wildcardListing.add(t);

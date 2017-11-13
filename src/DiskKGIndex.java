@@ -19,7 +19,7 @@ public class DiskKGIndex {
         try {
             mPath = path;
             mKeyList = new RandomAccessFile(new File(path, "kgVocab.bin"), "r");
-            mTerms = new RandomAccessFile(new File(path, "KGTerms.bin"), "r");
+            mTerms = new RandomAccessFile(new File(path, "kgTerms.bin"), "r");
             mKeyTable = readVocabTable(path);
         } catch (FileNotFoundException ex) {
             System.out.println(ex.toString());
@@ -41,18 +41,20 @@ public class DiskKGIndex {
 
             // initialize the array that will hold the terms.
             String[] termsList = new String[termFrequency];
+//            ArrayList<String> termsList = new ArrayList<>();
 
             // reads 4 bytes at a time from file
             // grabs terms for a key in kgram index
             for (int i = 0; i < termFrequency; i++) {
                 terms.read(buffer, 0, buffer.length);
                 int termLength = ByteBuffer.wrap(buffer).getInt();
-
+                System.out.println(termLength);
                 byte[] tBuffer = new byte[termLength];
                 terms.read(tBuffer, 0, tBuffer.length);
 
                 String actualTerm = new String(tBuffer);
                 termsList[i] = actualTerm;
+//                termsList.add(actualTerm);
             }
 
             return termsList;
@@ -63,12 +65,17 @@ public class DiskKGIndex {
     }
 
     // Reads and returns a list of disk postings that contain the given term.
-    public String[] getTerms(String term) {
+    public ArrayList<String> getTerms(String term) {
+        System.out.println(term);
         long termsPosition = binarySearchKey(term);
         if (termsPosition >= 0) {
-            return readTermsFromFile(mTerms, termsPosition);
+            ArrayList<String> l = new ArrayList<>();
+            for(String s : readTermsFromFile(mTerms, termsPosition)){
+                l.add(s);
+            }
+            return l;
         }
-        return new String[0];
+        return new ArrayList<>();
     }
 
     private static DiskPosting binarySearchTerms(DiskPosting[] p, int docID) {

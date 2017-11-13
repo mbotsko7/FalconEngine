@@ -19,6 +19,37 @@ public class KGramIndex {
         return kIndex.get(str);
     }
 
+    /*
+    Breaks string into all KGRAM tokens
+     */
+    public static ArrayList<String> kGramify(String str){
+        ArrayList<String> ret = new ArrayList<>();
+        char[] single = str.toCharArray();
+        for(char c: single){
+            ret.add(c+"");
+        }
+        String token = "$"+str+"$";
+        //for a 2-gram and a 3 gram
+        for (int c = 2; c < 4; c++) {
+            for (int i = 0; i <= token.length() - c; i++) {
+                String s = token.substring(i, i + c);
+                ret.add(s);
+            }
+        }
+        Collections.sort(ret);
+        String prev = ret.get(0);
+        for(int i = 1; i < ret.size(); i++){
+            String current = ret.get(i);
+            if(prev.equals(current)){
+                ret.remove(i);
+                i--;
+            }
+            else
+                prev = current;
+        }
+        return ret;
+    }
+
     // splits query into 1, 2, and 3 gram indexes
     // adds each to kgramindex
     public void add(String str) {
