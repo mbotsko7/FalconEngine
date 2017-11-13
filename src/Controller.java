@@ -11,9 +11,8 @@ import javafx.stage.Stage;
 import javafx.geometry.Insets;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
-
-import java.util.Set;
 
 public class Controller {
     @FXML
@@ -24,6 +23,16 @@ public class Controller {
     private ScrollPane display_box;
     @FXML
     private Label status;
+    @FXML
+     private ToggleGroup search_mode;
+    @FXML
+    private RadioButton boolean_retrieval;
+    @FXML
+    private RadioButton ranked_retrieval;
+    @FXML
+    private TextField index_location;
+    @FXML
+    private Button directory_button;
 
     Driver driver = new Driver();
     String path = "";
@@ -71,66 +80,88 @@ public class Controller {
     }
 
     @FXML
-    private void handleSearchButtonAction(ActionEvent event) {
-        status.setText("Searching...");
-        String term = query_field.getText();
-        VBox content = new VBox();
-
-        if (term != null && !term.trim().isEmpty()) {
-            List<Integer> results = driver.search(term);
-            for (Integer result : results) {
-                Gson gson = new Gson();
-                String fileName = "article" + result + ".json";
-                String title = "";
-
-                try {
-                    Button button = new Button(fileName);
-                    button.getStyleClass().add("result-button");
-                    content.getChildren().add(button);
-                    // open file in a new window
-                    button.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent e) {
-                            Stage stage = new Stage();
-                            stage.setTitle(fileName);
-                            File fileToView = new File(path + "/" + fileName);
-                            Label doc = new Label(Driver.readDocument(fileToView));
-                            doc.setWrapText(true);
-
-                            ScrollPane pane = new ScrollPane(doc);
-                            pane.setPadding(new Insets(45, 10, 20, 10));
-                            pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-                            pane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-
-                            Scene scene = new Scene(pane, 500, 600);
-                            pane.setMinWidth(scene.getWidth());
-                            doc.setMaxWidth(pane.getWidth() - 60);
-
-                            stage.setScene(scene);
-                            stage.sizeToScene();
-                            stage.show();
-                        }
-                    });
-
-                }
-                catch (Exception e) {
-                    System.err.println("File doesn't exist");
-                }
-            }
-
-            display_box.setContent(content);
-            if (results.size() > 0) {
-                String msg = results.size() + " results - Click file to view";
-                status.setText(msg);
-            }
-            else {
-                status.setText("No results found");
-            }
-
+    private void handleIndexLocationAction(ActionEvent event) {
+        Node node = (Node) event.getSource();
+        final DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select the index to read");
+        final File directory = directoryChooser.showDialog(node.getScene().getWindow());
+        if (directory != null) {
+            path = directory.getAbsolutePath();
+            index_location.setText(path);
         }
-        else {
-            display_box.setContent(null);
-            status.setText("Please input search query");
+    }
+
+    @FXML
+    private void handleSearchButtonAction(ActionEvent event) {
+        List<Integer> results = new ArrayList<>();
+        path = index_location.getText();
+
+        if (boolean_retrieval.isSelected()) {   // boolean retrieval
+            status.setText("Searching...");
+            String term = query_field.getText();
+            VBox content = new VBox();
+
+
+            if (term != null && !term.trim().isEmpty()) {
+                results = driver.searchBoolean(path, term);
+                for (Integer result : results) {
+                    Gson gson = new Gson();
+                    String fileName = "article" + result + ".json";
+                    String title = "";
+
+                    try {
+                        Button button = new Button(fileName);
+                        button.getStyleClass().add("result-button");
+                        content.getChildren().add(button);
+                        // open file in a new window
+                        button.setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent e) {
+                                Stage stage = new Stage();
+                                stage.setTitle(fileName);
+                                File fileToView = new File(path + "/" + fileName);
+                                Label doc = new Label(Driver.readDocument(fileToView));
+                                doc.setWrapText(true);
+
+                                ScrollPane pane = new ScrollPane(doc);
+                                pane.setPadding(new Insets(45, 10, 20, 10));
+                                pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+                                pane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+                                Scene scene = new Scene(pane, 500, 600);
+                                pane.setMinWidth(scene.getWidth());
+                                doc.setMaxWidth(pane.getWidth() - 60);
+
+                                stage.setScene(scene);
+                                stage.sizeToScene();
+                                stage.show();
+                            }
+                        });
+
+                    } catch (Exception e) {
+                        System.err.println("File doesn't exist");
+                    }
+                }
+
+                display_box.setContent(content);
+                if (results.size() > 0) {
+                    String msg = results.size() + " results - Click file to view";
+                    status.setText(msg);
+                } else {
+                    status.setText("No results found");
+                }
+
+            } else {
+                display_box.setContent(null);
+                status.setText("Please input search query");
+            }
+        } else if (ranked_retrieval.isSelected()) {
+
+            // TODO: hook up ranked retrieval here
+
+        } else {
+            status.setText("Please select a search mode");
+
         }
     }
 }
