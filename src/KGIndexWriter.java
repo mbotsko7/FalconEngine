@@ -1,5 +1,6 @@
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class KGIndexWriter {
                             .putInt(term.length()).array();
                     termsFile.write(termSize, 0, termSize.length);
 
-                    byte[] termBytes = term.getBytes();
+                    byte[] termBytes = term.getBytes(StandardCharsets.UTF_8);
                     termsFile.write(termBytes, 0, termBytes.length);
                 }
 

@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class DiskKGIndex {
                 byte[] tBuffer = new byte[termLength];
                 terms.read(tBuffer, 0, tBuffer.length);
 
-                String actualTerm = new String(tBuffer);
+                String actualTerm = new String(tBuffer, StandardCharsets.UTF_8);
                 termsList[i] = actualTerm;
 //                termsList.add(actualTerm);
             }
