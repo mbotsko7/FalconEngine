@@ -3,8 +3,12 @@
 }
 
 .result-button {
-    -fx-border-color: transparent;
+    -fx-border-color: transparent, white;
     -fx-background-color: transparent;
+}
+
+.button {
+    -fx-border-color:transparent;
 }
 
 .button:hover {

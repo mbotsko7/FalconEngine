@@ -29,13 +29,44 @@
          </padding>
         </VBox>
 
-        <VBox GridPane.columnIndex="0" GridPane.rowIndex="4">
+        <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="4">
+            <fx:define>
+                <ToggleGroup fx:id="search_mode" />
+            </fx:define>
+            <children>
+                <RadioButton fx:id="boolean_retrieval" text="Boolean retrieval" toggleGroup="$search_mode"/>
+                <RadioButton fx:id="ranked_retrieval" text="Ranked retrieval" toggleGroup="$search_mode"/>
+            </children>
+        </VBox>
+
+        <!--<Label text="Set index location:" GridPane.columnIndex="0" GridPane.rowIndex="5" />-->
+        <!--<TextField fx:id="index_location" onMouseClicked="#handleIndexButtonAction" GridPane.rowIndex="6" />-->
+
+        <VBox GridPane.columnIndex="0" GridPane.rowIndex="5">
+            <children>
+                <Label text="Select index location:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <TextField fx:id="index_location" GridPane.rowIndex="6" />
+            </children>
+        </VBox>
+        <VBox alignment="TOP_CENTER" GridPane.columnIndex="1" GridPane.rowIndex="5">
+            <children>
+                <Button fx:id="directory_button" onAction="#handleIndexLocationAction" text="Go" />
+            </children>
+            <padding>
+                <Insets top="15.0" />
+            </padding>
+        </VBox>
+
+
+
+
+        <VBox GridPane.columnIndex="0" GridPane.rowIndex="7">
    <children>
                <Label text="Search query:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                <TextField fx:id="query_field" GridPane.columnIndex="0" GridPane.rowIndex="3" />
    </children>
         </VBox>
-        <VBox alignment="TOP_CENTER" GridPane.columnIndex="1" GridPane.rowIndex="4">
+        <VBox alignment="TOP_CENTER" GridPane.columnIndex="1" GridPane.rowIndex="7">
            <children>
            <Button fx:id="search_button" onAction="#handleSearchButtonAction" text="Go" />
            </children>
@@ -48,7 +79,7 @@
             <Label fx:id="status"/>
         </HBox>
 
-        <VBox maxHeight="500" minHeight="500" minWidth="260" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.rowSpan="4">
+        <VBox maxHeight="500" minHeight="500" minWidth="260" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.rowSpan="7">
             <ScrollPane fx:id="display_box" hbarPolicy="NEVER" minHeight="500">
             </ScrollPane>
         </VBox>

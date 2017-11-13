@@ -6,9 +6,13 @@ import java.util.*;
 
 public class Driver {
 
-    PositionalInvertedIndex index = new PositionalInvertedIndex();
+    PositionalInvertedIndex pIndex = new PositionalInvertedIndex();
     KGramIndex kGramIndex = new KGramIndex();
-    HashMap<String, String> keys = new HashMap<>();
+    DiskKGIndex diskKGIndex;
+    HashMap<String, String> k = new HashMap<>();
+    ArrayList<Double> documentWeights = new ArrayList<>();
+
+
 
     public boolean indexDirectory(File f) {
         if (f.exists() && f.isDirectory()) {
@@ -16,18 +20,29 @@ public class Driver {
                 String[] fileList = f.list();
                 Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
                 Parser parser = new Parser();
+
                 int i = 1;
                 long begin = System.nanoTime();
+
                 for (String path : fileList) {
+                    DocumentWeight documentWeight = new DocumentWeight();
                     String[] file = parser.parseJSON(f.getPath() + "/" + path);
-                    indexFile(file, index, i, keys);
+                    indexFile(file, pIndex, i, k, documentWeight);
+                    documentWeights.add(documentWeight.calculateWeight());
                     i++;
                 }
                 System.out.println(System.nanoTime()-begin);
                 begin = System.nanoTime();
-                for(String s : keys.keySet()){
-                    kGramIndex.add(s);
-                }
+
+                // creates binary files and saves them
+                // in the same directory that was indexed
+                String dir = f.toString();
+                IndexWriter writer = new IndexWriter(dir);
+                writer.buildIndex(pIndex, documentWeights);
+
+//                for(String s : k.keySet()){
+//                    kGramIndex.add(s);
+//                }
                 System.out.println(System.nanoTime()-begin);
                 return true;
             }
@@ -40,8 +55,8 @@ public class Driver {
     }
 
     public String[] getVocabList() {
-        // returns all dictionary in positional inverted index
-        return index.getDictionary();
+        // returns all dictionary in positional inverted pIndex
+        return pIndex.getDictionary();
 
     }
 
@@ -54,15 +69,23 @@ public class Driver {
         return token + " --stemmed--> " + wordAfterStemmed;  // test
     }
 
-    public List<Integer> search(String query) {
-        BooleanRetrieval search = new BooleanRetrieval(index, kGramIndex, keys);
+    public List<Integer> searchBoolean(String dir, String query) {
+
+        BooleanRetrieval search = new BooleanRetrieval(dir, diskKGIndex, k);
         return search.searchForQuery(query);
         //display.setContent(new Label(results.toString()));
 
     }
 
+    public List<Integer> searchRanked(String query) {
+
+        // TODO: Hook up ranked retrieval code here
+
+        return null;
+    }
+
     private static void indexFile(String[] fileData, PositionalInvertedIndex index,
-                                  int docID, HashMap<String, String> k) {
+                                  int docID, HashMap<String, String> k, DocumentWeight documentWeight) {
 
         try {
             int i = 0;
@@ -71,8 +94,10 @@ public class Driver {
                 String next = stream.nextToken();
                 if (next == null)
                     continue;
-                if(k.containsKey(stream.getOriginal()) == false)
-                    k.put(stream.getOriginal(), next);
+                String original = stream.getOriginal();
+                if(k.containsKey(original) == false)
+                    k.put(original, next);
+                documentWeight.addTerm(original);
                 index.addTerm(next, docID, i);
                 if (stream.getHyphen() != null) {
                     for (String str : stream.getHyphen()) {
