@@ -2,6 +2,11 @@
 import javafx.geometry.Pos;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
@@ -12,6 +17,7 @@ public class DiskEngine {
         HashMap<String, String> k;
         ArrayList<Double> documentWeights;
         KGramIndex kGramIndex = new KGramIndex();
+        RandomAccessFile kIndexDisk;
         Scanner scan = new Scanner(System.in);
 
         System.out.println("Menu:");
@@ -65,6 +71,16 @@ public class DiskEngine {
             case 2:
                 System.out.println("Enter the name of an index to read:");
                 String indexName = scan.nextLine();
+
+                HashMap<String, ArrayList<String>> wildcardIndex;
+                try {
+                    // wildcard index read into and retained in memory
+                    kIndexDisk = new RandomAccessFile(new File(indexName, "kgIndex.bin"), "r");
+                    wildcardIndex = new HashMap<>();
+                    readWildcardIndex(kIndexDisk, wildcardIndex);
+                } catch (FileNotFoundException ex) {
+                    System.out.println(ex.toString());
+                }
 
 //                DiskInvertedIndex index = new DiskInvertedIndex(indexName);
 
@@ -200,5 +216,60 @@ public class DiskEngine {
             e.printStackTrace();
         }
 
+    }
+
+    // #kgrams, kgram, #terms, [terms], kgram, #terms, [terms], etc.
+    private static void readWildcardIndex(RandomAccessFile k, HashMap<String,
+                                            ArrayList<String>> wildcardIndex) {
+        try {
+            // read the 4 bytes for the kgram frequency
+            byte[] buffer = new byte[4];
+            k.read(buffer, 0, buffer.length);
+
+            // use ByteBuffer to convert the 4 bytes into an int.
+            int kFrequency = ByteBuffer.wrap(buffer).getInt();
+            System.out.println("number of kgrams: " + kFrequency);
+
+            for (int j = 0; j < kFrequency; j++) {
+                k.read(buffer, 0, buffer.length);
+                int kLength = ByteBuffer.wrap(buffer).getInt();
+
+                byte[] tBuffer = new byte[kLength];
+                k.read(tBuffer, 0, tBuffer.length);
+                String kgram = new String(tBuffer, StandardCharsets.UTF_8);
+                System.out.println("kgram: " + kgram);
+
+                // read the 4 bytes for the term frequency
+                k.read(buffer, 0, buffer.length);
+
+                // use ByteBuffer to convert the 4 bytes into an int.
+                int termFrequency = ByteBuffer.wrap(buffer).getInt();
+                System.out.print("number of terms: " + termFrequency + "\nterms: ");
+
+                // initialize the array that will hold the terms.
+                ArrayList<String> termsList = new ArrayList<>();
+
+                // reads 4 bytes at a time from file
+                // grabs terms for a key in kgram index
+                for (int i = 0; i < termFrequency; i++) {
+                    k.read(buffer, 0, buffer.length);
+                    int termLength = ByteBuffer.wrap(buffer).getInt();
+
+                    //System.out.println(termLength);
+                    tBuffer = new byte[termLength];
+                    k.read(tBuffer, 0, tBuffer.length);
+
+                    String actualTerm = new String(tBuffer, StandardCharsets.UTF_8);
+                    System.out.print(actualTerm + " ");
+                    termsList.add(actualTerm);
+                }
+                System.out.println();
+                System.out.println();
+                wildcardIndex.put(kgram, termsList);
+            }
+
+        } catch (IOException ex) {
+            System.out.println(ex.toString());
+        }
     }
 }
