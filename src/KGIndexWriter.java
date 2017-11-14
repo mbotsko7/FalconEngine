@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/*** did not use! switched to serializing instead ***/
+
 public class KGIndexWriter {
     private String mFolderPath;
 
@@ -75,6 +77,9 @@ public class KGIndexWriter {
         }
     }
 
+    // for writing kgram on disk across three binary files
+    // creates kgTerms.bin which includes all postings of kgrams
+    // kgVocabTable.bin contains byte location of kgram and postings
     private static void buildTermsFile(String folder, KGramIndex index,
                                        String[] dictionary, long[] vocabPositions) {
         FileOutputStream termsFile = null;
@@ -144,6 +149,8 @@ public class KGIndexWriter {
         }
     }
 
+    // for writing kgram on disk across three binary files
+    // creates kgVocab.bin which includes all the individual kgrams from index
     private static void buildKGVocabFile(String folder, String[] dictionary,
                                        long[] vocabPositions) {
         OutputStreamWriter kgVocabList = null;

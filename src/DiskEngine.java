@@ -36,6 +36,7 @@ public class DiskEngine {
                 documentWeights = new ArrayList<>();
                 File f = new File(folder);
 
+                // creates in memory positional inverted index and kgram index
                 if (f.exists() && f.isDirectory()) {
                     String[] fileList = f.list();
                     Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
@@ -54,6 +55,7 @@ public class DiskEngine {
                     }
                 }
                 kGramIndex.setKeys(k);
+
                 // creates binary files and saves them
                 // in the same directory that was indexed
                 IndexWriter writer = new IndexWriter(folder);
@@ -61,7 +63,6 @@ public class DiskEngine {
                 documentWeights.clear();
 
                 // creates binary files for kgram index
-
                 // serializes kGramIndex object into binary file (kgIndex.bin)
                 try {
                     FileOutputStream fileOut = new FileOutputStream(new File(folder, "kgIndex.bin"));
@@ -186,6 +187,7 @@ public class DiskEngine {
     }
 
     // from driver.java
+    // used to index file and create positional inverted index
     private static void indexFile(String[] fileData, PositionalInvertedIndex index,
                                   int docID, HashMap<String, String> k, DocumentWeight documentWeight) {
 
@@ -218,6 +220,8 @@ public class DiskEngine {
     }
 
     // #kgrams, kgram, #terms, [terms], kgram, #terms, [terms], etc.
+    // to read in binary file and save it to an in memory kgram index
+    // (did not use -- couldn't get to read in properly. switched to serializing)
     private static void readWildcardIndex(RandomAccessFile k, HashMap<String,
                                             ArrayList<String>> wildcardIndex) {
         try {
@@ -258,6 +262,7 @@ public class DiskEngine {
                     tBuffer = new byte[termLength];
                     k.read(tBuffer, 0, tBuffer.length);
 
+                    // converts byte array to readable string
                     String actualTerm = new String(tBuffer, StandardCharsets.UTF_8);
                     System.out.print(actualTerm + " ");
                     termsList.add(actualTerm);

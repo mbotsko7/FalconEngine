@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-/*** still working on ***/
+/*** did not use. switched to serializing ***/
 
 public class DiskKGIndex {
     private String mPath;
@@ -28,6 +28,7 @@ public class DiskKGIndex {
         }
     }
 
+    // pulls terms list for a specific kgram
     private static String[] readTermsFromFile(RandomAccessFile terms, long termsPosition) {
         try {
             // seek to the position in the file where the terms start.
@@ -66,7 +67,7 @@ public class DiskKGIndex {
         return null;
     }
 
-    // Reads and returns a list of disk postings that contain the given term.
+    // Reads and returns a list of disk terms that contain the given kgram
     public ArrayList<String> getTerms(String term) {
         long termsPosition = binarySearchKey(term);
         if (termsPosition >= 0) {
