@@ -7,14 +7,15 @@ import java.util.*;
 public class Driver {
 
     PositionalInvertedIndex pIndex = new PositionalInvertedIndex();
-    KGramIndex kGramIndex = new KGramIndex();
     DiskKGIndex diskKGIndex;
+    KGramIndex kGramIndex = new KGramIndex();
     HashMap<String, String> k = new HashMap<>();
     ArrayList<Double> documentWeights = new ArrayList<>();
 
 
 
-    public boolean indexDirectory(File f) {
+    public boolean indexDirectory(String folder) {
+        File f = new File(folder);
         if (f.exists() && f.isDirectory()) {
             try {
                 String[] fileList = f.list();
@@ -22,8 +23,6 @@ public class Driver {
                 Parser parser = new Parser();
 
                 int i = 1;
-                long begin = System.nanoTime();
-
                 for (String path : fileList) {
                     DocumentWeight documentWeight = new DocumentWeight();
                     String[] file = parser.parseJSON(f.getPath() + "/" + path);
@@ -31,25 +30,23 @@ public class Driver {
                     documentWeights.add(documentWeight.calculateWeight());
                     i++;
                 }
-                System.out.println(System.nanoTime()-begin);
-                begin = System.nanoTime();
 
-                // creates binary files and saves them
-                // in the same directory that was indexed
-                String dir = f.toString();
-                IndexWriter writer = new IndexWriter(dir);
-                writer.buildIndex(pIndex, documentWeights);
-
-//                for(String s : k.keySet()){
-//                    kGramIndex.add(s);
-//                }
-                System.out.println(System.nanoTime()-begin);
-                return true;
+                for (String s:k.keySet()){
+                    kGramIndex.add(s);
+                }
             }
             catch (Exception e) {
                 e.printStackTrace();
                 return false;
             }
+
+            IndexWriter writer = new IndexWriter(folder);
+            writer.buildIndex(pIndex, documentWeights);
+            documentWeights.clear();
+
+            KGIndexWriter kWriter = new KGIndexWriter(folder);
+            kWriter.buildKGIndex(kGramIndex);
+            return true;
         }
         return false;
     }

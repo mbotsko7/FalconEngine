@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import javafx.geometry.Insets;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +42,7 @@ public class Controller {
         directoryChooser.setTitle("Select the directory to index");
         final File dir = directoryChooser.showDialog(node.getScene().getWindow());
         if (dir != null) {
-            path = dir.getAbsolutePath();
-            File f = new File(path);
-            boolean indexed = driver.indexDirectory(f);
+            boolean indexed = driver.indexDirectory(dir.getAbsolutePath());
             if (indexed)
                 status.setText("Indexing complete");
             else
@@ -104,10 +103,7 @@ public class Controller {
             if (term != null && !term.trim().isEmpty()) {
                 List<Integer> booleanResults = driver.searchBoolean(path, term);
                 for (Integer result : booleanResults) {
-                    Gson gson = new Gson();
                     String fileName = "article" + result + ".json";
-                    String title = "";
-
                     try {
                         Button button = new Button(fileName);
                         button.getStyleClass().add("result-button");
@@ -175,7 +171,7 @@ public class Controller {
                         break;
                     }
                     String fileName = "article" + dw.getDocID()+".json";
-                    String text = fileName + " - Score:  " + dw.getDocWeight();
+                    String text = round(dw.getDocWeight()) + "  -  " + fileName;
 
                     try {
                         Button button = new Button(text);
@@ -213,6 +209,7 @@ public class Controller {
 
                 }
                 display_box.setContent(content);
+                status.setText("Search complete");
 
 
             } else {
@@ -225,5 +222,11 @@ public class Controller {
             status.setText("Please select a search mode");
 
         }
+    }
+
+    private static double round(double value) {
+        BigDecimal decimal = new BigDecimal(value);
+        decimal = decimal.setScale(6, BigDecimal.ROUND_HALF_UP);
+        return decimal.doubleValue();
     }
 }
