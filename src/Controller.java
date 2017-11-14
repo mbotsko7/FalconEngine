@@ -93,7 +93,6 @@ public class Controller {
 
     @FXML
     private void handleSearchButtonAction(ActionEvent event) {
-        List<Integer> results = new ArrayList<>();
         path = index_location.getText();
 
         if (boolean_retrieval.isSelected()) {   // boolean retrieval
@@ -103,8 +102,8 @@ public class Controller {
 
 
             if (term != null && !term.trim().isEmpty()) {
-                results = driver.searchBoolean(path, term);
-                for (Integer result : results) {
+                List<Integer> booleanResults = driver.searchBoolean(path, term);
+                for (Integer result : booleanResults) {
                     Gson gson = new Gson();
                     String fileName = "article" + result + ".json";
                     String title = "";
@@ -144,8 +143,8 @@ public class Controller {
                 }
 
                 display_box.setContent(content);
-                if (results.size() > 0) {
-                    String msg = results.size() + " results - Click file to view";
+                if (booleanResults.size() > 0) {
+                    String msg = booleanResults.size() + " results - Click file to view";
                     status.setText(msg);
                 } else {
                     status.setText("No results found");
@@ -155,9 +154,67 @@ public class Controller {
                 display_box.setContent(null);
                 status.setText("Please input search query");
             }
+
+            /*   ranked retrieval    */
         } else if (ranked_retrieval.isSelected()) {
 
-            // TODO: hook up ranked retrieval here
+
+
+            status.setText("Searching...");
+            String query = query_field.getText().trim();
+            VBox content = new VBox();
+            DocWeight[] rankedResults = new DocWeight[10];
+
+
+            if (query != null && !query.isEmpty()) {
+                rankedResults = driver.searchRanked(path, query);
+
+                for (DocWeight dw: rankedResults) {
+                    Gson gson = new Gson();
+                    String fileName = "article" + dw.getDocID() + " - Score:  " + dw.getDocWeight();
+
+                    try {
+                        Button button = new Button(fileName);
+                        button.getStyleClass().add("result-button");
+                        content.getChildren().add(button);
+                        // open file in a new window
+                        button.setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent e) {
+                                Stage stage = new Stage();
+                                stage.setTitle(fileName);
+                                File fileToView = new File(path + "/" + fileName);
+                                Label doc = new Label(Driver.readDocument(fileToView));
+                                doc.setWrapText(true);
+
+                                ScrollPane pane = new ScrollPane(doc);
+                                pane.setPadding(new Insets(45, 10, 20, 10));
+                                pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+                                pane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+                                Scene scene = new Scene(pane, 500, 600);
+                                pane.setMinWidth(scene.getWidth());
+                                doc.setMaxWidth(pane.getWidth() - 60);
+
+                                stage.setScene(scene);
+                                stage.sizeToScene();
+                                stage.show();
+                            }
+                        });
+
+                    } catch (Exception e) {
+                        System.err.println("File doesn't exist");
+                    }
+
+                }
+                display_box.setContent(content);
+
+
+            } else {
+                display_box.setContent(null);
+                status.setText("Please input search query");
+            }
+
 
         } else {
             status.setText("Please select a search mode");
