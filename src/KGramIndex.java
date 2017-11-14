@@ -18,7 +18,10 @@ public class KGramIndex implements Serializable {
 
 
     public ArrayList<String> find(String str) {
-        return kIndex.get(str);
+        if(kIndex.get(str) != null)
+            return kIndex.get(str);
+        else
+            return new ArrayList<>();
     }
 
     public void setKeys(HashMap<String, String> map){
