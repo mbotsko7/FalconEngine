@@ -20,6 +20,24 @@ public class KGramIndex implements Serializable {
         return kIndex.get(str);
     }
 
+    public ArrayList<String> getValues(){
+        ArrayList<String> list = new ArrayList<>();
+        for(String s:kIndex.keySet()){
+            list.addAll(kIndex.get(s));
+        }
+        Collections.sort(list);
+        String prev = list.get(0);
+        for(int i = 1; i < list.size(); i++){
+            String current = list.get(i);
+         if(prev.equals(current)){
+             list.remove(i);
+             i--;
+         }
+         else
+             prev = current;
+        }
+        return list;
+    }
     /*
     Breaks string into all KGRAM tokens
      */

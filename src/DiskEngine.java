@@ -117,7 +117,7 @@ public class DiskEngine {
 //                            DiskKGIndex kIndex = new DiskKGIndex(indexName);
                             SimpleTokenStream stream = new SimpleTokenStream();
                             HashMap<String, String> keys = new HashMap<>();
-                            for(String s : wildcardIndex.getDictionary()){
+                            for(String s : wildcardIndex.getValues()){
                                 keys.put(s, stream.parseAndStem(s));
                             }
                             BooleanRetrieval search = new BooleanRetrieval(indexName, wildcardIndex, keys);
