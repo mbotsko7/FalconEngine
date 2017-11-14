@@ -4,23 +4,14 @@ import java.util.regex.Pattern;
 
 public class BooleanRetrieval {
 
-    private PositionalInvertedIndex index = new PositionalInvertedIndex();
     private SimpleTokenStream stream = new SimpleTokenStream();
-    private KGramIndex kindex = new KGramIndex();
     private KGramIndex diskKGIndex;
     private HashMap<String, String> kGramKeys = new HashMap<>();
-
     private DiskInvertedIndex dIndex;
 
     public BooleanRetrieval(String path, KGramIndex k, HashMap<String, String> map) {
         this.dIndex = new DiskInvertedIndex(path);
         diskKGIndex = k;
-        this.kGramKeys = map;
-    }
-
-    public BooleanRetrieval(PositionalInvertedIndex index, KGramIndex k, HashMap<String, String> map) {
-        this.index = index;
-        this.kindex = k;
         this.kGramKeys = map;
     }
 
@@ -100,6 +91,7 @@ public class BooleanRetrieval {
     }
 
     public List<Integer> searchNearK(String query) {
+        // return a list of docIDs from near/k subquery
         List<Integer> results = new ArrayList<>();
         
         Pattern p = Pattern.compile("([\\w-\']+)\\sNEAR/(\\d+)\\s([\\w-\']+)");

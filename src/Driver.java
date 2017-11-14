@@ -9,11 +9,9 @@ import java.util.*;
 public class Driver {
 
     PositionalInvertedIndex pIndex = new PositionalInvertedIndex();
-    DiskKGIndex diskKGIndex;
     KGramIndex kGramIndex = new KGramIndex();
     HashMap<String, String> k = new HashMap<>();
     ArrayList<Double> documentWeights = new ArrayList<>();
-    RandomAccessFile kIndexDisk;
     KGramIndex wildcardIndex = new KGramIndex();
 
     private String correction = "";
@@ -22,6 +20,7 @@ public class Driver {
         return correction;
     }
 
+    // index files in giving directory
     public boolean indexDirectory(String folder) {
         File f = new File(folder);
         if (f.exists() && f.isDirectory()) {
@@ -52,11 +51,6 @@ public class Driver {
             IndexWriter writer = new IndexWriter(folder);
             writer.buildIndex(pIndex, documentWeights);
             documentWeights.clear();
-
-            // creates binary files from kgram index
-//            KGIndexWriter kWriter = new KGIndexWriter(folder);
-//            kWriter.buildKGIndex(kGramIndex);
-
             // serializes kGramIndex object into binary file (kgIndex.bin)
             try {
                 FileOutputStream fileOut = new FileOutputStream(new File(folder, "kgIndex.bin"));
@@ -75,7 +69,6 @@ public class Driver {
     public String[] getVocabList() {
         // returns all dictionary in positional inverted pIndex
         return pIndex.getDictionary();
-
     }
 
     public String stemToken(String token) {
@@ -84,11 +77,10 @@ public class Driver {
         stemmer.setCurrent(token);
         stemmer.stem();
         String wordAfterStemmed = stemmer.getCurrent();
-        return token + " --stemmed--> " + wordAfterStemmed;  // test
+        return token + " --stemmed--> " + wordAfterStemmed;
     }
 
     public void readWildcardIndex(String indexName) {
-//        HashMap<String, ArrayList<String>> wildcardIndex;
         // deserialize index written to binary
         // saves in memory to wildcardIndex
         try {
@@ -104,6 +96,7 @@ public class Driver {
         }
     }
 
+    // perform boolean retrieval
     public List<Integer> searchBoolean(String dir, String query) {
         SimpleTokenStream stream = new SimpleTokenStream();
         HashMap<String, String> keys = wildcardIndex.getKeys();
@@ -124,12 +117,10 @@ public class Driver {
         return search.searchForQuery(query);
     }
 
-
-
+    // perform ranked retrieval
     public DocWeight[] searchRanked(String indexName, String query) {
 
         DiskInvertedIndex index = new DiskInvertedIndex(indexName);
-//        DiskKGIndex kgIndex = new DiskKGIndex(indexName);
         SimpleTokenStream s = new SimpleTokenStream(query);
         ArrayList<String> queryList = new ArrayList<>();
         ArrayList<String> natQuery = new ArrayList<>();
@@ -165,13 +156,12 @@ public class Driver {
             System.out.println((i++) +". Doc"+ dw.getDocID()+" "+dw.getDocWeight());
 
         }
-
         return rankedRetrieval.rank();
     }
 
+    // index file and calculate document weight
     private static void indexFile(String[] fileData, PositionalInvertedIndex index,
                                   int docID, HashMap<String, String> k, DocumentWeight documentWeight) {
-
         try {
             int i = 0;
             SimpleTokenStream stream = new SimpleTokenStream(fileData[0] + " " + fileData[1]); //currently not including url in the indexing
@@ -195,9 +185,9 @@ public class Driver {
         catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
+    // read text from file
     public static String readDocument(File file) {
         String text = "";
         try {

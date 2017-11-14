@@ -94,13 +94,14 @@ public class Controller {
             return;
         }
 
-        if (boolean_retrieval.isSelected()) {   // boolean retrieval
+        /*   boolean retrieval  */
+        if (boolean_retrieval.isSelected()) {
             status.setText("Searching...");
             String term = query_field.getText();
             VBox content = new VBox();
 
-
             if (term != null && !term.trim().isEmpty()) {
+                // perform search and generate button for each result
                 List<Integer> booleanResults = driver.searchBoolean(path, term);
                 for (Integer result : booleanResults) {
                     String fileName = "article" + result + ".json";
@@ -143,6 +144,7 @@ public class Controller {
                     String msg = booleanResults.size() + " results - Click file to view";
                     status.setText(msg);
                 } else {
+                    // offer spelling correction if terms not found
                     correction = driver.getCorrection();
                     status.setText("Did you mean " + correction + "?");
                 }
@@ -154,20 +156,19 @@ public class Controller {
 
             /*   ranked retrieval    */
         } else if (ranked_retrieval.isSelected()) {
-
-
-
             status.setText("Searching...");
             String query = query_field.getText().trim();
             VBox content = new VBox();
             DocWeight[] rankedResults = new DocWeight[10];
 
-
             if (query != null && !query.isEmpty()) {
                 rankedResults = driver.searchRanked(path, query);
-
+                // search query and generate button for each result
                 for (DocWeight dw: rankedResults) {
                     if (dw == null) {
+                        // offer spelling correction if null result
+                        correction = driver.getCorrection();
+                        status.setText("Did you mean " + correction + "?");
                         break;
                     }
                     String fileName = "article" + dw.getDocID()+".json";
@@ -203,25 +204,17 @@ public class Controller {
                         });
 
                     } catch (Exception e) {
-
                         System.err.println("File doesn't exist");
                     }
-
                 }
                 display_box.setContent(content);
                 correction = "";
-                if (driver.getCorrection() != "")
-                    correction = driver.getCorrection();
-                    status.setText("Did you mean " + correction + "?");
-
-
-
             } else {
                 display_box.setContent(null);
                 status.setText("Please input search query");
             }
 
-
+         // no search mode selected
         } else {
             status.setText("Please select a search mode");
 
