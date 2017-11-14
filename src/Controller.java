@@ -13,6 +13,7 @@ import javafx.geometry.Insets;
 import java.io.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Controller {
@@ -84,6 +85,7 @@ public class Controller {
             path = directory.getAbsolutePath();
             index_location.setText(path);
         }
+        driver.readWildcardIndex(path);
     }
 
     @FXML
