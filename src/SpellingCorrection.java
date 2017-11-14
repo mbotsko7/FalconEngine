@@ -51,8 +51,9 @@ public class SpellingCorrection {
                 newQuery += " "+correctSpelling(term);
                 changed = true;
             }
-            else
-                newQuery += " "+term;
+            else {
+                newQuery += " " + term;
+            }
         }
         if(changed)
             return newQuery;
@@ -65,14 +66,10 @@ public class SpellingCorrection {
         ArrayList<String> kGramSet = kGramIndex.kGramify(term);
         ArrayList<String> possible =  new ArrayList<>();
         //for every term in possible
-        int pos = 0, neg = 0;
         for(String s : kGramSet){
-            System.out.println(s);
             for(String s2 : kGramIndex.find(s)) {
-//                System.out.println("made it");
                 //make it a KGRAM
                 if(s2.charAt(0) != term.charAt(0)){
-                    neg++;
                     continue;
                 }
 
@@ -81,25 +78,24 @@ public class SpellingCorrection {
                 double value = jaccard(kGramSet, kGramPossible);
                 if (value >= JACCARD_WEIGHT) {
                     possible.add(s2);
-                    pos++;
+
                 }
-                else
-                    neg++;
+
             }
         }
-        System.out.println("Pos"+pos+"Neg"+neg);
 
         int min = Integer.MAX_VALUE;
         String closest = "";
         for(String s : possible){
-            int distance = dist(term, s);//dist(term.toCharArray(), term.length(), s.toCharArray(), s.length());
+            int distance = dist(term, s);
             if(distance < min){
                 min = distance;
                 closest = s;
             }
             else if(distance == min){
 
-                if(index.getPostingsWithPositions(SimpleTokenStream.parseAndStem(s)).length > index.getPostingsWithPositions(SimpleTokenStream.parseAndStem(closest)).length){
+                if(index.getPostingsWithPositions(SimpleTokenStream.parseAndStem(s)).length
+                        > index.getPostingsWithPositions(SimpleTokenStream.parseAndStem(closest)).length){
                     min = distance;
                     closest = s;
                 }
@@ -114,10 +110,12 @@ public class SpellingCorrection {
 
     private int dist(String a, String b) {
         int len1 = a.length(), len2 = b.length();
-        if (len1 == 0)
+        if (len1 == 0) {
             return len2;
-        else if (len2 == 0)
+        }
+        else if (len2 == 0) {
             return len1;
+        }
         //set up initial edit dist matrix
         int matrix[][] = new int[len1+1][len2+1];
         for (int i = 0; i <= len1; i++) {
@@ -130,22 +128,27 @@ public class SpellingCorrection {
         for (int i = 1; i <= len1; i++) {
             char val = a.charAt(i - 1);
             for (int j = 1; j <= len2; j++) {
-                if (val == b.charAt(j-1))
-                    matrix[i][j] = min(matrix[i-1][j]+1, matrix[i][j-1]+1, matrix[i-1][j-1]);
-                else
-                    matrix[i][j] = min(matrix[i-1][j]+1, matrix[i][j-1]+1, matrix[i-1][j-1] + 1);
+                if (val == b.charAt(j-1)) {
+                    matrix[i][j] = min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1]);
+                }
+                else {
+                    matrix[i][j] = min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j - 1] + 1);
+                }
             }
         }
         return matrix[len1][len2];
     }
 
     private int min(int a, int b, int c) {
-        if(a < b && a < c)
+        if(a < b && a < c) {
             return a;
-        else if(b < a && b < c)
+        }
+        else if(b < a && b < c) {
             return b;
-        else
+        }
+        else {
             return c;
+        }
     }
 
 

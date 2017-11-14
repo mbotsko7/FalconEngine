@@ -16,7 +16,8 @@ public class PositionalInvertedIndex {
                 postings.get(postings.size() - 1).addPosition(position);
 
             }
-            else { //add doc and position to the index
+            else {
+                //add doc and position to the index
 
                 ArrayList<Integer> posList = new ArrayList<>();
                 posList.add(position);
@@ -25,7 +26,8 @@ public class PositionalInvertedIndex {
             }
 
         }
-        else { //if new term
+        else {
+            //if new term
             ArrayList<PositionalIndex> l = new ArrayList<>();
             ArrayList<Integer> posList = new ArrayList<>();
             posList.add(position);
@@ -56,8 +58,9 @@ public class PositionalInvertedIndex {
         // retrieve a term's postings list from a specified document
         List<PositionalIndex> postings = mIndex.get(term);
         for (int i = 0; i < postings.size(); i++) {
-            if (postings.get(i).getDocID() == docID)
+            if (postings.get(i).getDocID() == docID) {
                 return postings.get(i).getPositions();
+            }
         }
         return new ArrayList<>();
     }

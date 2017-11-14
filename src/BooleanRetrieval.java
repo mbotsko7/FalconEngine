@@ -24,9 +24,10 @@ public class BooleanRetrieval {
         this.kGramKeys = map;
     }
 
+    // perform an AND intersection on two lists of docIDs
+    // return a list of docIDs for documents that contain both terms
     public List<Integer> intersectLists(List<Integer> listA, List<Integer> listB) {
-        // perform an AND intersection on two lists of docIDs
-        // return a list of docIDs for documents that contain both terms
+
         List<Integer> results = new ArrayList<>();
         if (!listA.isEmpty() && !listB.isEmpty()) {
             int i = 0, j = 0;
@@ -48,9 +49,10 @@ public class BooleanRetrieval {
         return results;
     }
 
+    // perform an OR operation on two lists of docIDs
+    // return a list of docIDs that appear in either list
     public List<Integer> unionLists(List<Integer> listA, List<Integer> listB) {
-        // perform an OR operation on two lists of docIDs
-        // return a list of docIDs that appear in either list
+
         List<Integer> results = new ArrayList<>();
         if (listA.isEmpty() && listB.isEmpty())
             return results;
@@ -89,8 +91,8 @@ public class BooleanRetrieval {
         }
     }
 
+    // get list of documents that contain the given term
     public List<Integer> getDocIDList(String term) {
-        // get list of documents that contain the given term
         DiskPosting[] postings = dIndex.getPostingsWithPositions(term);
         List<Integer> docList = new ArrayList<>();
         for (DiskPosting posting: postings) {
@@ -99,6 +101,7 @@ public class BooleanRetrieval {
         return docList;
     }
 
+    //search for near k
     public List<Integer> searchNearK(String query) {
         List<Integer> results = new ArrayList<>();
         
@@ -120,7 +123,9 @@ public class BooleanRetrieval {
                         // loop through first's positions in the current doc and compare with second's positions
                         int j = 0;
                         for (Integer firstPos: positionsOfFirst) {
-                            if (positionsOfSecond.size() == 0) continue searchDoc;
+                            if (positionsOfSecond.size() == 0) {
+                                continue searchDoc;
+                            }
                             while (j < positionsOfSecond.size()-1 && positionsOfSecond.get(j) < firstPos) {
                                j++;
                                int a = positionsOfSecond.get(j);
@@ -136,8 +141,8 @@ public class BooleanRetrieval {
         return results;
     }
 
+    // returns a list of docIDs that contain the entire phrase
     public List<Integer> searchPhraseLiteral(String phrase) {
-        // returns a list of docIDs that contain the entire phrase
         List<Integer> results = new ArrayList<>();
 
         // separate phrase into individual stemmed tokens
@@ -156,28 +161,35 @@ public class BooleanRetrieval {
                     // get position list of each phrase term in the current document
                     for (int i = 0; i < terms.length; i++) {
                         List<Integer> termPostingsInDoc = dIndex.getPositionsInDoc(terms[i], docID);
-                        if (termPostingsInDoc.isEmpty())
-                            continue searchCurrentDoc; // phrase is not in current doc, skip to next doc
+                        if (termPostingsInDoc.isEmpty()) {
+                            // phrase is not in current doc, skip to next doc
+                            continue searchCurrentDoc;
+                        }
                         termPositionsLists.add(termPostingsInDoc);
                     }
 
                     // loop through first term's positions and check if other tokens are adjacent
                     boolean matched;
                     List<Integer> first = termPositionsLists.get(0);
-                    int[] seekPos = new int[terms.length]; // array of seek positions for all terms in phrase
-                    for (int i = 0; i < seekPos.length; i++)      // initialize all seek positions as 0
+                    int[] seekPos = new int[terms.length];
+                    // array of seek positions for all terms in phrase
+                    for (int i = 0; i < seekPos.length; i++) {
+                        // initialize all seek positions as 0
                         seekPos[i] = 0;
+                    }
 
                     for (int i = 0; i < first.size(); i++) {
                         matched = true;
                         int start = first.get(i);
-                        for (int j = 1; j < termPositionsLists.size(); j++) { // look at jth adjacent word from first term in phrase
+                        // look at jth adjacent word from first term in phrase
+                        for (int j = 1; j < termPositionsLists.size(); j++) {
                             int pos = seekPos[j];
                             int listSize = termPositionsLists.get(j).size();
                             while (pos < listSize - 1 && termPositionsLists.get(j).get(pos) < start + j) {
                                 pos++;
                             }
-                            seekPos[j] = pos;   // update position in seekPos array
+                            seekPos[j] = pos;
+                            // update position in seekPos array
                             if (!termPositionsLists.get(j).get(pos).equals(start + j)) {
                                 matched = false;
                                 break;
@@ -194,9 +206,8 @@ public class BooleanRetrieval {
         return results;
     }
 
+    // search the document for the query
     public List<Integer> searchForQuery(String query) {
-        // search the document for the query
-
         List<List<Integer>> subqueryResults = new ArrayList<List<Integer>>();
         List<Integer> finalResults = new ArrayList<>();
 
@@ -207,7 +218,8 @@ public class BooleanRetrieval {
             List<String> literals = Query.getQueryLiterals(subquery);
             // get list of docs for each literal
             for (String literal : literals) {
-                if (literal.startsWith("\"")) {  // for phrases
+                // for phrases
+                if (literal.startsWith("\"")) {
                     literalsPostings.add(searchPhraseLiteral(literal));
                 }
                 else if (literal.contains("*")) {

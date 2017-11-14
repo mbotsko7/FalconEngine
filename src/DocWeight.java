@@ -11,9 +11,7 @@ public class DocWeight implements Comparable {
         docWeight = weight;
     }
 
-    public double getDocWeight() {
-        return docWeight;
-    }
+    public double getDocWeight() { return docWeight; }
 
     public int getDocID() {
         return docID;
@@ -26,7 +24,6 @@ public class DocWeight implements Comparable {
     public int compareTo(Object o){
         DocWeight obj = (DocWeight) o;
         Double x = new Double(docWeight), y = new Double(obj.docWeight);
-//        return x.compareTo(obj.docWeight);
         return y.compareTo(x);
     }
 }

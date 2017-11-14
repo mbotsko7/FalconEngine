@@ -18,10 +18,12 @@ public class KGramIndex implements Serializable {
 
 
     public ArrayList<String> find(String str) {
-        if(kIndex.get(str) != null)
+        if(kIndex.get(str) != null) {
             return kIndex.get(str);
-        else
+        }
+        else {
             return new ArrayList<>();
+        }
     }
 
     public void setKeys(HashMap<String, String> map){
@@ -45,8 +47,9 @@ public class KGramIndex implements Serializable {
              list.remove(i);
              i--;
          }
-         else
+         else {
              prev = current;
+         }
         }
         return list;
     }
@@ -98,13 +101,6 @@ public class KGramIndex implements Serializable {
                 temp.add(str);
                 kIndex.put(c+"", temp);
             }
-//            if(kIndex.containsKey(c+""))
-//                kIndex.get(c + "").add(str);
-//            else{
-//                ArrayList<String> temp = new ArrayList<>();
-//                temp.add(str);
-//                kIndex.put(c+"", temp);
-//            }
 
         }
 

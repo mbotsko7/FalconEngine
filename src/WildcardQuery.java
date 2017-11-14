@@ -56,8 +56,9 @@ public class WildcardQuery {
 
             }
             else {
-                if(p == pattern.length)
+                if(p == pattern.length) {
                     return false;
+                }
                 if(pattern[p] == '*'){ //if there is a wildcard, set it up
                     f = p;
                     p++;
@@ -95,8 +96,9 @@ public class WildcardQuery {
         for(int c = 2; c < 4; c++) {
             for (int i = 0; i <= token.length() - c; i++) {
                 String s = token.substring(i, i+c);
-                if(!s.contains("*"))
+                if(!s.contains("*")) {
                     parseList.add(s);
+                }
 
             }
         }

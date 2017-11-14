@@ -61,8 +61,6 @@ public class DiskEngine {
                 documentWeights.clear();
 
                 // creates binary files for kgram index
-//                KGIndexWriter kWriter = new KGIndexWriter(folder);
-//                kWriter.buildKGIndex(kGramIndex);
 
                 // serializes kGramIndex object into binary file (kgIndex.bin)
                 try {
@@ -71,7 +69,8 @@ public class DiskEngine {
                     out.writeObject(kGramIndex);
                     out.close();
                     fileOut.close();
-                } catch (IOException i) {
+                }
+                catch (IOException i) {
                     i.printStackTrace();
                 }
                 break;
@@ -95,7 +94,6 @@ public class DiskEngine {
                     c.printStackTrace();
                 }
 
-//                DiskInvertedIndex index = new DiskInvertedIndex(indexName);
 
                 System.out.println("Enter query mode:");
                 System.out.println("1) boolean retrieval");
@@ -113,13 +111,9 @@ public class DiskEngine {
                             if (input.equals("EXIT")) {
                                 break;
                             }
-
-//                            DiskKGIndex kIndex = new DiskKGIndex(indexName);
                             SimpleTokenStream stream = new SimpleTokenStream();
                             HashMap<String, String> keys = new HashMap<>();
-//                            for(String s : wildcardIndex.getValues()){
-//                                keys.put(s, stream.parseAndStem(s));
-//                            }
+
                             keys = wildcardIndex.getKeys();
                             ArrayList<String> natQuery = new ArrayList<>();
 
@@ -138,33 +132,11 @@ public class DiskEngine {
                             for (Integer result: results) {
                                 System.out.println("Doc# " + result);
                             }
-
-//                            DiskPosting[] postingsList = index.getPostings(input.toLowerCase());
-//
-//                            if (postingsList == null) {
-//                                System.out.println("Term not found");
-//                            } else {
-//                                System.out.print("\nDocs: \n");
-//                                for (DiskPosting d : postingsList) {
-//                                    int docID = d.getDocID();
-//                                    System.out.print("Doc# " + docID + "-- Positions: ");
-//                                    for (int i = 0; i < d.getTermFrequency(); i++) {
-//                                        System.out.print(d.getPositions().get(i) + " ");
-//                                    }
-//                                    System.out.println();
-//                                }
-//                                System.out.println();
-//                                System.out.println();
-//                            }
                         }
                         break;
                     case 2:
                         /*** ranked retrieval code ***/
-                        System.out.println("Welcome! Ranked Retrieval is in testing...\n" +
-                                "W_dt calculations are tested to be correct\n" +
-                                "testing ranking...");
                         DiskInvertedIndex index = new DiskInvertedIndex(indexName);
-//                        DiskKGIndex kgIndex = new DiskKGIndex(indexName);
                         System.out.println("Query: ");
                         try{
                             Scanner in = new Scanner(System.in);
@@ -191,13 +163,14 @@ public class DiskEngine {
                             }
                             SpellingCorrection spellingCorrection = new SpellingCorrection(natQuery, wildcardIndex, index);
                             String spellcorrect = spellingCorrection.result();
-                            if(spellcorrect.isEmpty() == false)
-                                spellcorrect = "Did you mean: "+spellcorrect+"?";
+                            if(spellcorrect.isEmpty() == false) {
+                                spellcorrect = "Did you mean: " + spellcorrect + "?";
+                            }
                             System.out.println(spellcorrect);
                             RankedRetrieval rankedRetrieval = new RankedRetrieval(queryList, index);
 
                             int i = 1;
-                            for(DocWeight dw : rankedRetrieval.rank()){
+                            for(DocWeight dw : rankedRetrieval.rank()) {
                                 if(dw == null) {
                                     System.out.println("No other documents scored for query");
                                     break;
@@ -218,14 +191,16 @@ public class DiskEngine {
 
         try {
             int i = 0;
-            SimpleTokenStream stream = new SimpleTokenStream(fileData[1]); //currently not including url in the indexing
+            SimpleTokenStream stream = new SimpleTokenStream(fileData[1]);
             while (stream.hasNextToken()) {
                 String next = stream.nextToken();
-                if (next == null)
+                if (next == null) {
                     continue;
+                }
                 String original = stream.getOriginal();
-                if(k.containsKey(original) == false)
+                if(k.containsKey(original) == false) {
                     k.put(original, next);
+                }
                 documentWeight.addTerm(original);
                 index.addTerm(next, docID, i);
                 if (stream.getHyphen() != null) {

@@ -32,7 +32,8 @@ public class DiskInvertedIndex {
             mVocabTable = readVocabTable(path);
             mWeights = readDocWeights(path);
             //mFileNames = readFileNames(path);       ??
-        } catch (FileNotFoundException ex) {
+        }
+        catch (FileNotFoundException ex) {
             System.out.println(ex.toString());
         }
     }
@@ -82,7 +83,8 @@ public class DiskInvertedIndex {
                         previousPosition = position;
                     }
 
-                } else {
+                }
+                else {
                     postings.read(buffer, 0, buffer.length);
                     for (int j = 0; j < positionFrequency; j++) {
                         postings.read(buffer, 0, buffer.length);        // skips through all positions
@@ -93,7 +95,8 @@ public class DiskInvertedIndex {
             }
 
             return dPostings;
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             System.out.println(ex.toString());
         }
         return null;
@@ -119,8 +122,9 @@ public class DiskInvertedIndex {
     public List<Integer> getPositionsInDoc(String term, int docID) {
         DiskPosting[] postings = getPostingsWithPositions(term);
         DiskPosting posting = binarySearchPostings(postings, docID);
-        if (posting != null)
+        if (posting != null) {
             return posting.getPositions();
+        }
         return new ArrayList<>();
     }
 
@@ -128,12 +132,15 @@ public class DiskInvertedIndex {
         int i = 0, j = p.length -1;
         while(j >= i) {
             int m = (i + j) / 2;
-            if (p[m].getDocID() == docID)
+            if (p[m].getDocID() == docID) {
                 return p[m];
-            if (p[m].getDocID() < docID)
+            }
+            if (p[m].getDocID() < docID) {
                 i = m + 1;
-            if (p[m].getDocID() > docID)
+            }
+            if (p[m].getDocID() > docID) {
                 j = m - 1;
+            }
         }
         return null;
     }
@@ -149,7 +156,8 @@ public class DiskInvertedIndex {
                 int termLength;
                 if (m == mVocabTable.length / 2 - 1) {
                     termLength = (int) (mVocabList.length() - mVocabTable[m * 2]);
-                } else {
+                }
+                else {
                     termLength = (int) (mVocabTable[(m + 1) * 2] - vListPosition);
                 }
 
@@ -163,12 +171,15 @@ public class DiskInvertedIndex {
                 if (compareValue == 0) {
                     // found it!
                     return mVocabTable[m * 2 + 1];
-                } else if (compareValue < 0) {
+                }
+                else if (compareValue < 0) {
                     j = m - 1;
-                } else {
+                }
+                else {
                     i = m + 1;
                 }
-            } catch (IOException ex) {
+            }
+            catch (IOException ex) {
                 System.out.println(ex.toString());
             }
         }
@@ -184,21 +195,22 @@ public class DiskInvertedIndex {
                     "r");
 
             byte[] byteBuffer = new byte[4];
-//            tableFile.read(byteBuffer, 0, byteBuffer.length);
-
             int tableIndex = 0;
             docWeights = new double[36803];
             byteBuffer = new byte[8];
 
-            while (tableFile.read(byteBuffer, 0, byteBuffer.length) > 0) { // while we keep reading 4 bytes
+            while (tableFile.read(byteBuffer, 0, byteBuffer.length) > 0) {
+                // while we keep reading 4 bytes
                 docWeights[tableIndex] = ByteBuffer.wrap(byteBuffer).getDouble();
                 tableIndex++;
             }
             tableFile.close();
             return docWeights;
-        } catch (FileNotFoundException ex) {
+        }
+        catch (FileNotFoundException ex) {
             System.out.println(ex.toString());
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             System.out.println(ex.toString());
         }
         return null;
@@ -220,15 +232,18 @@ public class DiskInvertedIndex {
             vocabTable = new long[ByteBuffer.wrap(byteBuffer).getInt() * 2];
             byteBuffer = new byte[8];
 
-            while (tableFile.read(byteBuffer, 0, byteBuffer.length) > 0) { // while we keep reading 4 bytes
+            while (tableFile.read(byteBuffer, 0, byteBuffer.length) > 0) {
+                // while we keep reading 4 bytes
                 vocabTable[tableIndex] = ByteBuffer.wrap(byteBuffer).getLong();
                 tableIndex++;
             }
             tableFile.close();
             return vocabTable;
-        } catch (FileNotFoundException ex) {
+        }
+        catch (FileNotFoundException ex) {
             System.out.println(ex.toString());
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             System.out.println(ex.toString());
         }
         return null;

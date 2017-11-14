@@ -54,9 +54,6 @@ public class Driver {
             documentWeights.clear();
 
             // creates binary files from kgram index
-//            KGIndexWriter kWriter = new KGIndexWriter(folder);
-//            kWriter.buildKGIndex(kGramIndex);
-
             // serializes kGramIndex object into binary file (kgIndex.bin)
             try {
                 FileOutputStream fileOut = new FileOutputStream(new File(folder, "kgIndex.bin"));
@@ -64,7 +61,8 @@ public class Driver {
                 out.writeObject(kGramIndex);
                 out.close();
                 fileOut.close();
-            } catch (IOException i) {
+            }
+            catch (IOException i) {
                 i.printStackTrace();
             }
             return true;
@@ -88,7 +86,6 @@ public class Driver {
     }
 
     public void readWildcardIndex(String indexName) {
-//        HashMap<String, ArrayList<String>> wildcardIndex;
         // deserialize index written to binary
         // saves in memory to wildcardIndex
         try {
@@ -96,9 +93,11 @@ public class Driver {
             ObjectInputStream in = new ObjectInputStream(fileIn);
             wildcardIndex = null;
             wildcardIndex = (KGramIndex) in.readObject();
-        } catch (IOException i) {
+        }
+        catch (IOException i) {
             i.printStackTrace();
-        } catch (ClassNotFoundException c) {
+        }
+        catch (ClassNotFoundException c) {
             System.out.println("class not found");
             c.printStackTrace();
         }
@@ -115,11 +114,12 @@ public class Driver {
         }
         SpellingCorrection spellingCorrection = new SpellingCorrection(natQuery, wildcardIndex, new DiskInvertedIndex(dir));
         String spellcorrect = spellingCorrection.result();
-        if(spellcorrect.isEmpty() == false)
+        if(spellcorrect.isEmpty() == false) {
             correction = spellcorrect;
-        else
+        }
+        else {
             correction = "";
-
+        }
         System.out.println(spellcorrect);
         return search.searchForQuery(query);
     }
@@ -129,7 +129,6 @@ public class Driver {
     public DocWeight[] searchRanked(String indexName, String query) {
 
         DiskInvertedIndex index = new DiskInvertedIndex(indexName);
-//        DiskKGIndex kgIndex = new DiskKGIndex(indexName);
         SimpleTokenStream s = new SimpleTokenStream(query);
         ArrayList<String> queryList = new ArrayList<>();
         ArrayList<String> natQuery = new ArrayList<>();
@@ -137,8 +136,9 @@ public class Driver {
             String token = s.nextToken();
             if(token.isEmpty() == false){
                 natQuery.add(s.getOriginal());
-                if(token.contains("*") == false)
+                if(token.contains("*") == false) {
                     queryList.add(token);
+                }
                 else{
                     WildcardQuery q = new WildcardQuery(token);
                     HashMap<String, String> val = wildcardIndex.getKeys();
@@ -150,10 +150,12 @@ public class Driver {
         }
         SpellingCorrection spellingCorrection = new SpellingCorrection(natQuery, wildcardIndex, index);
         String spellcorrect = spellingCorrection.result();
-        if(spellcorrect.isEmpty() == false)
+        if(spellcorrect.isEmpty() == false) {
             correction = spellcorrect;
-        else
+        }
+        else {
             correction = "";
+        }
         System.out.println(spellcorrect);
         RankedRetrieval rankedRetrieval = new RankedRetrieval(queryList, index);
         int i = 1;
@@ -177,11 +179,13 @@ public class Driver {
             SimpleTokenStream stream = new SimpleTokenStream(fileData[0] + " " + fileData[1]); //currently not including url in the indexing
             while (stream.hasNextToken()) {
                 String next = stream.nextToken();
-                if (next == null)
+                if (next == null) {
                     continue;
+                }
                 String original = stream.getOriginal();
-                if(k.containsKey(original) == false)
+                if(k.containsKey(original) == false) {
                     k.put(original, next);
+                }
                 documentWeight.addTerm(original);
                 index.addTerm(next, docID, i);
                 if (stream.getHyphen() != null) {

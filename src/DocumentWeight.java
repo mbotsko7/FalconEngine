@@ -11,10 +11,12 @@ public class DocumentWeight {
 
     public void addTerm(String s){
         Integer val = map.get(s);
-        if(val != null)
+        if(val != null) {
             map.put(s, val.intValue() + 1);
-        else
+        }
+        else {
             map.put(s, 1);
+        }
     }
 
     public double calculateWeight(){
