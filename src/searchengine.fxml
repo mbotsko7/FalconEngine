@@ -39,9 +39,6 @@
             </children>
         </VBox>
 
-        <!--<Label text="Set index location:" GridPane.columnIndex="0" GridPane.rowIndex="5" />-->
-        <!--<TextField fx:id="index_location" onMouseClicked="#handleIndexButtonAction" GridPane.rowIndex="6" />-->
-
         <VBox GridPane.columnIndex="0" GridPane.rowIndex="5">
             <children>
                 <Label text="Select index location:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
@@ -50,7 +47,7 @@
         </VBox>
         <VBox alignment="TOP_CENTER" GridPane.columnIndex="1" GridPane.rowIndex="5">
             <children>
-                <Button fx:id="directory_button" onAction="#handleIndexLocationAction" text="Go" />
+                <Button fx:id="directory_button" onAction="#handleIndexLocationAction" text="SET" />
             </children>
             <padding>
                 <Insets top="15.0" />
@@ -76,7 +73,7 @@
         </VBox>
 
         <HBox fx:id="container" GridPane.fillWidth="true" GridPane.columnIndex="2" GridPane.rowIndex="0">
-            <Label fx:id="status"/>
+            <Button fx:id="status"/>
         </HBox>
 
         <VBox maxHeight="500" minHeight="500" minWidth="260" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.rowSpan="7">

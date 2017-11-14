@@ -16,6 +16,11 @@ public class Driver {
     RandomAccessFile kIndexDisk;
     KGramIndex wildcardIndex = new KGramIndex();
 
+    private String correction = "";
+
+    public String getCorrection() {
+        return correction;
+    }
 
     public boolean indexDirectory(String folder) {
         File f = new File(folder);
@@ -111,7 +116,10 @@ public class Driver {
         SpellingCorrection spellingCorrection = new SpellingCorrection(natQuery, wildcardIndex, new DiskInvertedIndex(dir));
         String spellcorrect = spellingCorrection.result();
         if(spellcorrect.isEmpty() == false)
-            spellcorrect = "Did you mean: "+spellcorrect+"?";
+            correction = spellcorrect;
+        else
+            correction = "";
+
         System.out.println(spellcorrect);
         return search.searchForQuery(query);
     }
@@ -143,7 +151,9 @@ public class Driver {
         SpellingCorrection spellingCorrection = new SpellingCorrection(natQuery, wildcardIndex, index);
         String spellcorrect = spellingCorrection.result();
         if(spellcorrect.isEmpty() == false)
-            spellcorrect = "Did you mean: "+spellcorrect+"?";
+            correction = spellcorrect;
+        else
+            correction = "";
         System.out.println(spellcorrect);
         RankedRetrieval rankedRetrieval = new RankedRetrieval(queryList, index);
         int i = 1;

@@ -21,7 +21,7 @@ public class Controller {
     @FXML
     private ScrollPane display_box;
     @FXML
-    private Label status;
+    private Button status;
     @FXML
     private RadioButton boolean_retrieval;
     @FXML
@@ -31,6 +31,7 @@ public class Controller {
 
     Driver driver = new Driver();
     String path = "";
+    String correction = "";
 
     public void handleIndexButtonAction(ActionEvent event) {
         status.setText("Indexing...");
@@ -142,7 +143,8 @@ public class Controller {
                     String msg = booleanResults.size() + " results - Click file to view";
                     status.setText(msg);
                 } else {
-                    status.setText("No results found");
+                    correction = driver.getCorrection();
+                    status.setText("Did you mean " + correction + "?");
                 }
 
             } else {
@@ -166,7 +168,6 @@ public class Controller {
 
                 for (DocWeight dw: rankedResults) {
                     if (dw == null) {
-                        status.setText("No docs scored for query");
                         break;
                     }
                     String fileName = "article" + dw.getDocID()+".json";
@@ -208,7 +209,11 @@ public class Controller {
 
                 }
                 display_box.setContent(content);
-                status.setText("Search complete");
+                correction = "";
+                if (driver.getCorrection() != "")
+                    correction = driver.getCorrection();
+                    status.setText("Did you mean " + correction + "?");
+
 
 
             } else {

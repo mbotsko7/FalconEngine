@@ -2,7 +2,7 @@
     -fx-background-color: white;
 }
 
-.result-button {
+.result-button, #status {
     -fx-border-color: transparent, white;
     -fx-background-color: transparent;
 }
@@ -27,5 +27,7 @@
 .text-area .content, .text-field {
     -fx-background-color: #fff7cc;
 }
+
+
 
 
