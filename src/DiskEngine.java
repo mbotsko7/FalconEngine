@@ -1,10 +1,7 @@
 
 import javafx.geometry.Pos;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -64,22 +61,37 @@ public class DiskEngine {
                 documentWeights.clear();
 
                 // creates binary files for kgram index
-                KGIndexWriter kWriter = new KGIndexWriter(folder);
-                kWriter.buildKGIndex(kGramIndex);
+//                KGIndexWriter kWriter = new KGIndexWriter(folder);
+//                kWriter.buildKGIndex(kGramIndex);
+
+                // serializes kGramIndex object into binary file (kgIndex.bin)
+                try {
+                    FileOutputStream fileOut = new FileOutputStream(new File(folder, "kgIndex.bin"));
+                    ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                    out.writeObject(kGramIndex);
+                    out.close();
+                    fileOut.close();
+                } catch (IOException i) {
+                    i.printStackTrace();
+                }
                 break;
 
             case 2:
                 System.out.println("Enter the name of an index to read:");
                 String indexName = scan.nextLine();
 
-                HashMap<String, ArrayList<String>> wildcardIndex;
+                // deserialize index written to binary
+                // saves in memory to wildcardIndex
+                KGramIndex wildcardIndex;
                 try {
-                    // wildcard index read into and retained in memory
-                    kIndexDisk = new RandomAccessFile(new File(indexName, "kgIndex.bin"), "r");
-                    wildcardIndex = new HashMap<>();
-                    readWildcardIndex(kIndexDisk, wildcardIndex);
-                } catch (FileNotFoundException ex) {
-                    System.out.println(ex.toString());
+                    FileInputStream fileIn = new FileInputStream(indexName + "/kgIndex.bin");
+                    ObjectInputStream in = new ObjectInputStream(fileIn);
+                    wildcardIndex = (KGramIndex) in.readObject();
+                } catch (IOException i) {
+                    i.printStackTrace();
+                } catch (ClassNotFoundException c) {
+                    System.out.println("class not found");
+                    c.printStackTrace();
                 }
 
 //                DiskInvertedIndex index = new DiskInvertedIndex(indexName);

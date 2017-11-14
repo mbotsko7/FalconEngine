@@ -1,9 +1,10 @@
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Created by bardsko on 9/22/17.
  */
-public class KGramIndex {
+public class KGramIndex implements Serializable {
     private TreeMap<String, ArrayList<String>> kIndex;
 
     public KGramIndex() {
