@@ -104,6 +104,15 @@ public class Driver {
         HashMap<String, String> keys = wildcardIndex.getKeys();
 
         BooleanRetrieval search = new BooleanRetrieval(dir, wildcardIndex, keys);
+        ArrayList<String> natQuery = new ArrayList<>();
+        for(String s: query.split(" ")){
+            natQuery.add(s);
+        }
+        SpellingCorrection spellingCorrection = new SpellingCorrection(natQuery, wildcardIndex, new DiskInvertedIndex(dir));
+        String spellcorrect = spellingCorrection.result();
+        if(spellcorrect.isEmpty() == false)
+            spellcorrect = "Did you mean: "+spellcorrect+"?";
+        System.out.println(spellcorrect);
         return search.searchForQuery(query);
     }
 
@@ -115,9 +124,11 @@ public class Driver {
 //        DiskKGIndex kgIndex = new DiskKGIndex(indexName);
         SimpleTokenStream s = new SimpleTokenStream(query);
         ArrayList<String> queryList = new ArrayList<>();
+        ArrayList<String> natQuery = new ArrayList<>();
         while (s.hasNextToken()){
             String token = s.nextToken();
             if(token.isEmpty() == false){
+                natQuery.add(s.getOriginal());
                 if(token.contains("*") == false)
                     queryList.add(token);
                 else{
@@ -129,6 +140,11 @@ public class Driver {
                 }
             }
         }
+        SpellingCorrection spellingCorrection = new SpellingCorrection(natQuery, wildcardIndex, index);
+        String spellcorrect = spellingCorrection.result();
+        if(spellcorrect.isEmpty() == false)
+            spellcorrect = "Did you mean: "+spellcorrect+"?";
+        System.out.println(spellcorrect);
         RankedRetrieval rankedRetrieval = new RankedRetrieval(queryList, index);
         int i = 1;
         for(DocWeight dw : rankedRetrieval.rank()){
