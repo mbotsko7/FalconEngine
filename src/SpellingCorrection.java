@@ -9,14 +9,40 @@ public class SpellingCorrection {
     public SpellingCorrection(ArrayList<String> q, KGramIndex k, DiskInvertedIndex i){
         kGramIndex = k;
         query = q;
+        processPhrases(q);
         index = i;
+    }
+
+    public void processPhrases(ArrayList<String> list){
+        boolean phrase = false;
+        String capture = "";
+        for(int i = 0; i < list.size(); i++){
+            String current = list.get(i);
+            if(current.contains("\"")){
+                if(phrase){
+                    capture += current;
+                    list.set(i, capture);
+                    capture = "";
+                    phrase = false;
+                }
+                else {
+                    phrase = true;
+                    capture += list.remove(i);
+                    i--;
+                }
+            }
+            else if(phrase){
+                capture += list.remove(i);
+                i--;
+            }
+        }
     }
 
     public String result(){
         String newQuery = "";
         boolean changed = false;
         for(String term : query){
-            if(term.contains("*")){
+            if(term.contains("*") || term.contains("\"")){
                 newQuery += " "+term;
                 continue;
             }

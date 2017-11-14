@@ -121,6 +121,16 @@ public class DiskEngine {
 //                                keys.put(s, stream.parseAndStem(s));
 //                            }
                             keys = wildcardIndex.getKeys();
+                            ArrayList<String> natQuery = new ArrayList<>();
+
+                            for(String s: input.split(" ")){
+                                natQuery.add(s);
+                            }
+                            SpellingCorrection spellingCorrection = new SpellingCorrection(natQuery, wildcardIndex, new DiskInvertedIndex(indexName));
+                            String spellcorrect = spellingCorrection.result();
+                            if(spellcorrect.isEmpty() == false)
+                                spellcorrect = "Did you mean: "+spellcorrect+"?";
+                            System.out.println(spellcorrect);
                             BooleanRetrieval search = new BooleanRetrieval(indexName, wildcardIndex, keys);
 
                             List<Integer> results = search.searchForQuery(input);
@@ -183,8 +193,9 @@ public class DiskEngine {
                             String spellcorrect = spellingCorrection.result();
                             if(spellcorrect.isEmpty() == false)
                                 spellcorrect = "Did you mean: "+spellcorrect+"?";
-                            RankedRetrieval rankedRetrieval = new RankedRetrieval(queryList, index);
                             System.out.println(spellcorrect);
+                            RankedRetrieval rankedRetrieval = new RankedRetrieval(queryList, index);
+
                             int i = 1;
                             for(DocWeight dw : rankedRetrieval.rank()){
                                 if(dw == null) {
