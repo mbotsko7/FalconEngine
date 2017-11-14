@@ -175,10 +175,9 @@ public class Controller {
                     String text = fileName + " - Score:  " + dw.getDocWeight();
 
                     try {
-                        Button button = new Button(fileName);
+                        Button button = new Button(text);
                         button.getStyleClass().add("result-button");
                         content.getChildren().add(button);
-                        System.out.println(path + "/" + fileName);
                         // open file in a new window
                         button.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
