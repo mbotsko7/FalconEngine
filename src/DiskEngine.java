@@ -161,41 +161,30 @@ public class DiskEngine {
                             String line = in.nextLine().trim();
                             SimpleTokenStream s = new SimpleTokenStream(line);
                             ArrayList<String> queryList = new ArrayList<>();
+                            ArrayList<String> natQuery = new ArrayList<>();
                             while (s.hasNextToken()){
                                 String token = s.nextToken();
                                 if(token.isEmpty() == false){
-                                    if(token.contains("*") == false)
+                                    natQuery.add(s.getOriginal());
+                                    if(token.contains("*") == false){
                                         queryList.add(token);
+
+                                    }
                                     else{
                                         WildcardQuery q = new WildcardQuery(token);
-//                                        queryList.addAll(q.queryResult(wildcardIndex));
                                         HashMap<String,String> val = wildcardIndex.getKeys();
                                         for(String str : q.queryResult(wildcardIndex)){
                                             queryList.add(val.get(str));
                                         }
-//                                        ArrayList<String> wildTerms = new ArrayList<>();
-//                                        for(String str : KGramIndex.kGramify(s.getOriginal())){
-//                                            for(String str2:wildcardIndex.find(str))
-//                                                wildTerms.add(str2);
-//
-//
-//                                        }
-//                                        Collections.sort(wildTerms);
-//                                        String prev = wildTerms.get(0);
-//                                        for(int i = 0; i < wildTerms.size(); i++){
-//                                            String current = wildTerms.get(i);
-//                                            if(prev.equals(current)){
-//                                                wildTerms.remove(i);
-//                                                i--;
-//                                            }
-//                                            else
-//                                                prev = current;
-//                                        }
-//                                        queryList.addAll(wildTerms);
                                     }
                                 }
                             }
+                            SpellingCorrection spellingCorrection = new SpellingCorrection(natQuery, wildcardIndex, index);
+                            String spellcorrect = spellingCorrection.result();
+                            if(spellcorrect.isEmpty() == false)
+                                spellcorrect = "Did you mean: "+spellcorrect+"?";
                             RankedRetrieval rankedRetrieval = new RankedRetrieval(queryList, index);
+                            System.out.println(spellcorrect);
                             int i = 1;
                             for(DocWeight dw : rankedRetrieval.rank()){
                                 if(dw == null) {

@@ -2,14 +2,35 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class SpellingCorrection {
-    private String query;
+    private ArrayList<String> query;
     private KGramIndex kGramIndex;
-    private final double JACCARD_WEIGHT = .99;
+    private final double JACCARD_WEIGHT = .80;
     private DiskInvertedIndex index;
-    public SpellingCorrection(String q, KGramIndex k, DiskInvertedIndex i){
+    public SpellingCorrection(ArrayList<String> q, KGramIndex k, DiskInvertedIndex i){
         kGramIndex = k;
         query = q;
         index = i;
+    }
+
+    public String result(){
+        String newQuery = "";
+        boolean changed = false;
+        for(String term : query){
+            if(term.contains("*")){
+                newQuery += " "+term;
+                continue;
+            }
+            DiskPosting[] postings = index.getPostings(SimpleTokenStream.parseAndStem(term));
+            if(postings.length == 0 || postings.length < 100){
+                newQuery += " "+correctSpelling(term);
+                changed = true;
+            }
+            else
+                newQuery += " "+term;
+        }
+        if(changed)
+            return newQuery;
+        return "";
     }
 
     public String correctSpelling(String term){
@@ -22,7 +43,7 @@ public class SpellingCorrection {
         for(String s : kGramSet){
             for(String s2 : kGramIndex.find(s)) {
                 //make it a KGRAM
-                if(s2.charAt(0) != 'w'){
+                if(s2.charAt(0) != term.charAt(0)){
                     neg++;
                     continue;
                 }
@@ -39,17 +60,18 @@ public class SpellingCorrection {
             }
         }
         System.out.println("Pos"+pos+"Neg"+neg);
-//        System.out.println(possible);
+
         int min = Integer.MAX_VALUE;
         String closest = "";
         for(String s : possible){
-            int distance = dist(term.toCharArray(), term.length(), s.toCharArray(), s.length());
+            int distance = dist(term, s);//dist(term.toCharArray(), term.length(), s.toCharArray(), s.length());
             if(distance < min){
                 min = distance;
                 closest = s;
             }
             else if(distance == min){
-                if(index.getPostingsWithPositions(s).length > index.getPostingsWithPositions(closest).length){
+
+                if(index.getPostingsWithPositions(SimpleTokenStream.parseAndStem(s)).length > index.getPostingsWithPositions(SimpleTokenStream.parseAndStem(closest)).length){
                     min = distance;
                     closest = s;
                 }
@@ -57,34 +79,52 @@ public class SpellingCorrection {
             }
         }
 
-        return closest;
+        return SimpleTokenStream.parse(closest);
     }
 
-    // edit distance
-    private int dist(char[] a, int lenA, char[] b, int lenB){
-        int cost = 0;
-        if(lenA == 0)
-            return lenA;
-        else if(lenB == 0)
-            return lenB;
-        else if(a[lenA-1] == b[lenB-1])
-            cost++;
 
-        int one = dist(a, lenA-1, b, lenB)+1;
-        int two = dist(a, lenA, b, lenB-1)+1;
-        int third = dist(a, lenA-1, b, lenB-1) + cost;
-        if(one < two && one < third)
-            return one;
-        else if(two < one && two < third)
-            return two;
+
+    private int dist(String a, String b) {
+        int len1 = a.length(), len2 = b.length();
+        if (len1 == 0)
+            return len2;
+        else if (len2 == 0)
+            return len1;
+        //set up initial edit dist matrix
+        int matrix[][] = new int[len1+1][len2+1];
+        for (int i = 0; i <= len1; i++) {
+            matrix[i][0] = i;
+        }
+        for (int j = 0; j <= len2; j++) {
+            matrix[0][j] = j;
+        }
+        //run through matrix
+        for (int i = 1; i <= len1; i++) {
+            char val = a.charAt(i - 1);
+            for (int j = 1; j <= len2; j++) {
+                if (val == b.charAt(j-1))
+                    matrix[i][j] = min(matrix[i-1][j]+1, matrix[i][j-1]+1, matrix[i-1][j-1]);
+                else
+                    matrix[i][j] = min(matrix[i-1][j]+1, matrix[i][j-1]+1, matrix[i-1][j-1] + 1);
+            }
+        }
+        return matrix[len1][len2];
+    }
+
+    private int min(int a, int b, int c) {
+        if(a < b && a < c)
+            return a;
+        else if(b < a && b < c)
+            return b;
         else
-            return third;
+            return c;
     }
+
+
 
     private double jaccard(ArrayList<String> a, ArrayList<String> b){
         ArrayList<String> c = mergeList(a,b);
         return (double)c.size()/(a.size()+b.size()-c.size());
-
     }
 
     private ArrayList<String> mergeList(ArrayList<String> listA, ArrayList<String> listB){

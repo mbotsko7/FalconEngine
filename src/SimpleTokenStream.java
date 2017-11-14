@@ -48,7 +48,7 @@ public class SimpleTokenStream implements TokenStream {
         return mReader.hasNext();
     }
 
-    public String stem(String next) {
+    public static String stem(String next) {
         //String next = str.replaceAll("\\W", "").toLowerCase();
         //String next = str.replaceAll("^[^a-zA-Z0-9\\\\s]+|[^a-zA-Z0-9\\\\s]+$", "").toLowerCase();
 
@@ -66,7 +66,12 @@ public class SimpleTokenStream implements TokenStream {
         return next;
     }
 
-    public String parseAndStem(String str){
+    public static String parse(String str){
+        String next = str.replaceAll("^\\W+|\\W+$", "").toLowerCase();
+        return next.replaceAll("_", "");
+    }
+
+    public static String parseAndStem(String str){
         String next = str.replaceAll("^\\W+|\\W+$", "").toLowerCase();
         next = next.replaceAll("_", "");
         return stem(next);

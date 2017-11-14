@@ -30,7 +30,7 @@ public class RankedRetrieval {
             //calculate Wqt = ln(1+ (number of doc in collection/docs containing the term)
 
             double weightQueryTerm = Math.log(1+DOC_COUNT/postings.length);
-            System.out.println("Wqt of "+token+ ": "+weightQueryTerm);
+//            System.out.println("Wqt of "+token+ ": "+weightQueryTerm);
             //for each doc in term posting list
             for(DiskPosting diskPosting : postings){
                 //access accumulator the value
@@ -42,10 +42,10 @@ public class RankedRetrieval {
 
                 double weightDocumentTerm = 1.0 + Math.log(diskPosting.getTermFrequency());
 
-                if(acc.getDocID() == 24927)
-                    System.out.println("WDT!!!!!!!!!!"+weightDocumentTerm);
+//                if(acc.getDocID() == 24927)
+//                    System.out.println("WDT!!!!!!!!!!"+weightDocumentTerm);
                 acc.setDocWeight(acc.getDocWeight() + weightDocumentTerm * weightQueryTerm);
-                System.out.println(acc.getDocID()+" "+acc.getDocWeight());
+//                System.out.println(acc.getDocID()+" "+acc.getDocWeight());
                 accumulator.set(diskPosting.getDocID()-1, acc);
             }
         }
@@ -54,8 +54,8 @@ public class RankedRetrieval {
         for(DocWeight dw : accumulator){
             if(dw != null && dw.getDocWeight() > 0){
 
-                if(dw.getDocID() == 24927)
-                    System.out.println("!!!!!!!!!!!!!!"+weightsFromDisk[dw.getDocID()-1]);
+//                if(dw.getDocID() == 24927)
+//                    System.out.println("!!!!!!!!!!!!!!"+weightsFromDisk[dw.getDocID()-1]);
                 dw.setDocWeight(dw.getDocWeight() / weightsFromDisk[dw.getDocID()-1]); // the Ld of docweights.bin
                 pq.add(dw);
             }
@@ -74,6 +74,3 @@ public class RankedRetrieval {
 
 }
 
-/*
-TERM -> ArrayList {DOCUMENT, WEIGHT}
- */
