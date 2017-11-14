@@ -77,11 +77,51 @@ public class Driver {
 
     }
 
-    public List<Integer> searchRanked(String query) {
 
-        // TODO: Hook up ranked retrieval code here
+    public DocWeight[] searchRanked(String indexName, String query) {
 
-        return null;
+        DiskInvertedIndex index = new DiskInvertedIndex(indexName);
+        DiskKGIndex kgIndex = new DiskKGIndex(indexName);
+            SimpleTokenStream s = new SimpleTokenStream(query);
+            ArrayList<String> queryList = new ArrayList<>();
+            while (s.hasNextToken()){
+                String token = s.nextToken();
+                if(token.isEmpty() == false){
+                    if(token.contains("*") == false)
+                        queryList.add(token);
+                    else{
+                        ArrayList<String> wildTerms = new ArrayList<>();
+                        for(String str : KGramIndex.kGramify(s.getOriginal())){
+                            for(String str2:kgIndex.getTerms(str))
+                                wildTerms.add(str2);
+                        }
+                        Collections.sort(wildTerms);
+                        String prev = wildTerms.get(0);
+                        for(int i = 0; i < wildTerms.size(); i++){
+                            String current = wildTerms.get(i);
+                            if(prev.equals(current)){
+                                wildTerms.remove(i);
+                                i--;
+                            }
+                            else
+                                prev = current;
+                        }
+                        queryList.addAll(wildTerms);
+                    }
+                }
+            }
+        RankedRetrieval rankedRetrieval = new RankedRetrieval(queryList, index);
+        int i = 1;
+        for(DocWeight dw : rankedRetrieval.rank()){
+            if(dw == null) {
+                System.out.println("No other documents scored for query");
+                break;
+            }
+            System.out.println((i++) +". Doc"+ dw.getDocID()+" "+dw.getDocWeight());
+
+        }
+
+        return rankedRetrieval.rank();
     }
 
     private static void indexFile(String[] fileData, PositionalInvertedIndex index,
