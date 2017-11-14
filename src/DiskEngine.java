@@ -82,10 +82,11 @@ public class DiskEngine {
 
                 // deserialize index written to binary
                 // saves in memory to wildcardIndex
-                KGramIndex wildcardIndex;
+                KGramIndex wildcardIndex = new KGramIndex();
                 try {
                     FileInputStream fileIn = new FileInputStream(indexName + "/kgIndex.bin");
                     ObjectInputStream in = new ObjectInputStream(fileIn);
+                    wildcardIndex = null;
                     wildcardIndex = (KGramIndex) in.readObject();
                 } catch (IOException i) {
                     i.printStackTrace();
@@ -113,9 +114,13 @@ public class DiskEngine {
                                 break;
                             }
 
-                            DiskKGIndex kIndex = new DiskKGIndex(indexName);
+//                            DiskKGIndex kIndex = new DiskKGIndex(indexName);
+                            SimpleTokenStream stream = new SimpleTokenStream();
                             HashMap<String, String> keys = new HashMap<>();
-                            BooleanRetrieval search = new BooleanRetrieval(indexName, kIndex, keys);
+                            for(String s : wildcardIndex.getDictionary()){
+                                keys.put(s, stream.parseAndStem(s));
+                            }
+                            BooleanRetrieval search = new BooleanRetrieval(indexName, wildcardIndex, keys);
 
                             List<Integer> results = search.searchForQuery(input);
 
@@ -148,7 +153,7 @@ public class DiskEngine {
                                 "W_dt calculations are tested to be correct\n" +
                                 "testing ranking...");
                         DiskInvertedIndex index = new DiskInvertedIndex(indexName);
-                        DiskKGIndex kgIndex = new DiskKGIndex(indexName);
+//                        DiskKGIndex kgIndex = new DiskKGIndex(indexName);
                         System.out.println("Query: ");
                         try{
                             Scanner in = new Scanner(System.in);
@@ -163,7 +168,7 @@ public class DiskEngine {
                                     else{
                                         ArrayList<String> wildTerms = new ArrayList<>();
                                         for(String str : KGramIndex.kGramify(s.getOriginal())){
-                                            for(String str2:kgIndex.getTerms(str))
+                                            for(String str2:wildcardIndex.find(str))
                                                 wildTerms.add(str2);
 
 

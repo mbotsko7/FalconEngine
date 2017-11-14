@@ -17,7 +17,7 @@ public class WildcardQuery {
     }
 
     // goes through postings and removes non-candidate terms
-    public ArrayList<String> queryResult(DiskKGIndex kIndex){
+    public ArrayList<String> queryResult(KGramIndex kIndex){
         ArrayList<String> possible = mergePostings(kIndex);
         for(int i = 0; i < possible.size(); i++){
             String str = possible.get(i);
@@ -80,26 +80,7 @@ public class WildcardQuery {
         return false;
     }
 
-    // edit distance
-    public int dist(char[] a, int lenA, char[] b, int lenB){
-        int cost = 0;
-        if(lenA == 0)
-            return lenA;
-        else if(lenB == 0)
-            return lenB;
-        else if(a[lenA-1] == b[lenB-1])
-            cost++;
 
-        int one = dist(a, lenA-1, b, lenB)+1;
-        int two = dist(a, lenA, b, lenB-1)+1;
-        int third = dist(a, lenA-1, b, lenB-1) + cost;
-        if(one < two && one < third)
-            return one;
-        else if(two < one && two < third)
-            return two;
-        else
-            return third;
-    }
 
     // takes term and parses it into 1, 2, and 3 kgram indexes
     private void parse(String str){
@@ -163,18 +144,18 @@ public class WildcardQuery {
     }
 
 
-    public ArrayList<String> mergePostings(DiskKGIndex kIndex){
+    public ArrayList<String> mergePostings(KGramIndex kIndex){
         int size = parseList.size();
         ArrayList<String> merged = new ArrayList<String>();
         if(size >= 2){
-            merged.addAll(mergeList(kIndex.getTerms(parseList.get(0)), kIndex.getTerms(parseList.get(1))));
+            merged.addAll(mergeList(kIndex.find(parseList.get(0)), kIndex.find(parseList.get(1))));
             for(int i = 2; i < size; i++) {
-                merged = mergeList(merged, kIndex.getTerms(parseList.get(i)));
+                merged = mergeList(merged, kIndex.find(parseList.get(i)));
             }
             Collections.sort(merged);
         }
         else if(size == 1){
-            merged = kIndex.getTerms(parseList.get(0));
+            merged = kIndex.find(parseList.get(0));
         }
          return merged;
     }

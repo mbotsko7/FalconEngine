@@ -53,9 +53,11 @@ public class DiskKGIndex {
                 byte[] tBuffer = new byte[termLength];
                 terms.read(tBuffer, 0, tBuffer.length);
 
+
                 String actualTerm = new String(tBuffer, StandardCharsets.UTF_8);
+
                 termsList[i] = actualTerm;
-//                termsList.add(actualTerm);
+//                termsList.add(actualTerm); característica
             }
 
             return termsList;

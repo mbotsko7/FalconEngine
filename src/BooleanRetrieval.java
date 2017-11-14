@@ -7,12 +7,12 @@ public class BooleanRetrieval {
     private PositionalInvertedIndex index = new PositionalInvertedIndex();
     private SimpleTokenStream stream = new SimpleTokenStream();
     private KGramIndex kindex = new KGramIndex();
-    private DiskKGIndex diskKGIndex;
+    private KGramIndex diskKGIndex;
     private HashMap<String, String> kGramKeys = new HashMap<>();
 
     private DiskInvertedIndex dIndex;
 
-    public BooleanRetrieval(String path, DiskKGIndex k, HashMap<String, String> map) {
+    public BooleanRetrieval(String path, KGramIndex k, HashMap<String, String> map) {
         this.dIndex = new DiskInvertedIndex(path);
         diskKGIndex = k;
         this.kGramKeys = map;
@@ -217,6 +217,7 @@ public class BooleanRetrieval {
 
                     for (String wild : q.queryResult(diskKGIndex)) {
                         wild = kGramKeys.get(wild);
+                        System.out.println(wild);
                         ArrayList<Integer> t = (ArrayList<Integer>) getDocIDList(wild);
                         wildcardListing.add(t);
                     }

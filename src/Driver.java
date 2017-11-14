@@ -68,7 +68,7 @@ public class Driver {
 
     public List<Integer> searchBoolean(String dir, String query) {
 
-        BooleanRetrieval search = new BooleanRetrieval(dir, diskKGIndex, k);
+        BooleanRetrieval search = new BooleanRetrieval(dir, kGramIndex, k);
         return search.searchForQuery(query);
         //display.setContent(new Label(results.toString()));
 
