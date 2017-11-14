@@ -14,7 +14,7 @@ public class Driver {
     HashMap<String, String> k = new HashMap<>();
     ArrayList<Double> documentWeights = new ArrayList<>();
     RandomAccessFile kIndexDisk;
-
+    KGramIndex wildcardIndex = new KGramIndex();
 
 
     public boolean indexDirectory(String folder) {
@@ -43,6 +43,7 @@ public class Driver {
                 return false;
             }
 
+            kGramIndex.setKeys(k);
             IndexWriter writer = new IndexWriter(folder);
             writer.buildIndex(pIndex, documentWeights);
             documentWeights.clear();
@@ -85,10 +86,10 @@ public class Driver {
 //        HashMap<String, ArrayList<String>> wildcardIndex;
         // deserialize index written to binary
         // saves in memory to wildcardIndex
-        KGramIndex wildcardIndex;
         try {
             FileInputStream fileIn = new FileInputStream(indexName + "/kgIndex.bin");
             ObjectInputStream in = new ObjectInputStream(fileIn);
+            wildcardIndex = null;
             wildcardIndex = (KGramIndex) in.readObject();
         } catch (IOException i) {
             i.printStackTrace();
@@ -99,11 +100,11 @@ public class Driver {
     }
 
     public List<Integer> searchBoolean(String dir, String query) {
+        SimpleTokenStream stream = new SimpleTokenStream();
+        HashMap<String, String> keys = wildcardIndex.getKeys();
 
-        BooleanRetrieval search = new BooleanRetrieval(dir, kGramIndex, k);
+        BooleanRetrieval search = new BooleanRetrieval(dir, wildcardIndex, keys);
         return search.searchForQuery(query);
-        //display.setContent(new Label(results.toString()));
-
     }
 
 
@@ -111,35 +112,23 @@ public class Driver {
     public DocWeight[] searchRanked(String indexName, String query) {
 
         DiskInvertedIndex index = new DiskInvertedIndex(indexName);
-        DiskKGIndex kgIndex = new DiskKGIndex(indexName);
-            SimpleTokenStream s = new SimpleTokenStream(query);
-            ArrayList<String> queryList = new ArrayList<>();
-            while (s.hasNextToken()){
-                String token = s.nextToken();
-                if(token.isEmpty() == false){
-                    if(token.contains("*") == false)
-                        queryList.add(token);
-                    else{
-                        ArrayList<String> wildTerms = new ArrayList<>();
-                        for(String str : KGramIndex.kGramify(s.getOriginal())){
-                            for(String str2:kgIndex.getTerms(str))
-                                wildTerms.add(str2);
-                        }
-                        Collections.sort(wildTerms);
-                        String prev = wildTerms.get(0);
-                        for(int i = 0; i < wildTerms.size(); i++){
-                            String current = wildTerms.get(i);
-                            if(prev.equals(current)){
-                                wildTerms.remove(i);
-                                i--;
-                            }
-                            else
-                                prev = current;
-                        }
-                        queryList.addAll(wildTerms);
+//        DiskKGIndex kgIndex = new DiskKGIndex(indexName);
+        SimpleTokenStream s = new SimpleTokenStream(query);
+        ArrayList<String> queryList = new ArrayList<>();
+        while (s.hasNextToken()){
+            String token = s.nextToken();
+            if(token.isEmpty() == false){
+                if(token.contains("*") == false)
+                    queryList.add(token);
+                else{
+                    WildcardQuery q = new WildcardQuery(token);
+                    HashMap<String, String> val = wildcardIndex.getKeys();
+                    for(String str : q.queryResult(wildcardIndex)){
+                        queryList.add(val.get(str));
                     }
                 }
             }
+        }
         RankedRetrieval rankedRetrieval = new RankedRetrieval(queryList, index);
         int i = 1;
         for(DocWeight dw : rankedRetrieval.rank()){
