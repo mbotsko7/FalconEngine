@@ -1,6 +1,8 @@
 
 import org.tartarus.snowball.ext.englishStemmer;
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
@@ -11,6 +13,7 @@ public class Driver {
     KGramIndex kGramIndex = new KGramIndex();
     HashMap<String, String> k = new HashMap<>();
     ArrayList<Double> documentWeights = new ArrayList<>();
+    RandomAccessFile kIndexDisk;
 
 
 
@@ -44,8 +47,20 @@ public class Driver {
             writer.buildIndex(pIndex, documentWeights);
             documentWeights.clear();
 
-            KGIndexWriter kWriter = new KGIndexWriter(folder);
-            kWriter.buildKGIndex(kGramIndex);
+            // creates binary files from kgram index
+//            KGIndexWriter kWriter = new KGIndexWriter(folder);
+//            kWriter.buildKGIndex(kGramIndex);
+
+            // serializes kGramIndex object into binary file (kgIndex.bin)
+            try {
+                FileOutputStream fileOut = new FileOutputStream(new File(folder, "kgIndex.bin"));
+                ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                out.writeObject(kGramIndex);
+                out.close();
+                fileOut.close();
+            } catch (IOException i) {
+                i.printStackTrace();
+            }
             return true;
         }
         return false;
@@ -66,6 +81,23 @@ public class Driver {
         return token + " --stemmed--> " + wordAfterStemmed;  // test
     }
 
+    public void readWildcardIndex(String indexName) {
+//        HashMap<String, ArrayList<String>> wildcardIndex;
+        // deserialize index written to binary
+        // saves in memory to wildcardIndex
+        KGramIndex wildcardIndex;
+        try {
+            FileInputStream fileIn = new FileInputStream(indexName + "/kgIndex.bin");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            wildcardIndex = (KGramIndex) in.readObject();
+        } catch (IOException i) {
+            i.printStackTrace();
+        } catch (ClassNotFoundException c) {
+            System.out.println("class not found");
+            c.printStackTrace();
+        }
+    }
+
     public List<Integer> searchBoolean(String dir, String query) {
 
         BooleanRetrieval search = new BooleanRetrieval(dir, diskKGIndex, k);
@@ -73,6 +105,7 @@ public class Driver {
         //display.setContent(new Label(results.toString()));
 
     }
+
 
 
     public DocWeight[] searchRanked(String indexName, String query) {
@@ -168,5 +201,60 @@ public class Driver {
         }
 
         return text;
+    }
+
+    // #kgrams, kgram, #terms, [terms], kgram, #terms, [terms], etc.
+    private static void readWildcardIndex(RandomAccessFile k, HashMap<String,
+            ArrayList<String>> wildcardIndex) {
+        try {
+            // read the 4 bytes for the kgram frequency
+            byte[] buffer = new byte[4];
+            k.read(buffer, 0, buffer.length);
+
+            // use ByteBuffer to convert the 4 bytes into an int.
+            int kFrequency = ByteBuffer.wrap(buffer).getInt();
+            System.out.println("number of kgrams: " + kFrequency);
+
+            for (int j = 0; j < kFrequency; j++) {
+                k.read(buffer, 0, buffer.length);
+                int kLength = ByteBuffer.wrap(buffer).getInt();
+
+                byte[] tBuffer = new byte[kLength];
+                k.read(tBuffer, 0, tBuffer.length);
+                String kgram = new String(tBuffer, StandardCharsets.UTF_8);
+                System.out.println("kgram: " + kgram);
+
+                // read the 4 bytes for the term frequency
+                k.read(buffer, 0, buffer.length);
+
+                // use ByteBuffer to convert the 4 bytes into an int.
+                int termFrequency = ByteBuffer.wrap(buffer).getInt();
+                System.out.print("number of terms: " + termFrequency + "\nterms: ");
+
+                // initialize the array that will hold the terms.
+                ArrayList<String> termsList = new ArrayList<>();
+
+                // reads 4 bytes at a time from file
+                // grabs terms for a key in kgram index
+                for (int i = 0; i < termFrequency; i++) {
+                    k.read(buffer, 0, buffer.length);
+                    int termLength = ByteBuffer.wrap(buffer).getInt();
+
+                    //System.out.println(termLength);
+                    tBuffer = new byte[termLength];
+                    k.read(tBuffer, 0, tBuffer.length);
+
+                    String actualTerm = new String(tBuffer, StandardCharsets.UTF_8);
+                    System.out.print(actualTerm + " ");
+                    termsList.add(actualTerm);
+                }
+                System.out.println();
+                System.out.println();
+                wildcardIndex.put(kgram, termsList);
+            }
+
+        } catch (IOException ex) {
+            System.out.println(ex.toString());
+        }
     }
 }
