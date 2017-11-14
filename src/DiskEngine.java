@@ -167,25 +167,31 @@ public class DiskEngine {
                                     if(token.contains("*") == false)
                                         queryList.add(token);
                                     else{
-                                        ArrayList<String> wildTerms = new ArrayList<>();
-                                        for(String str : KGramIndex.kGramify(s.getOriginal())){
-                                            for(String str2:wildcardIndex.find(str))
-                                                wildTerms.add(str2);
-
-
+                                        WildcardQuery q = new WildcardQuery(token);
+//                                        queryList.addAll(q.queryResult(wildcardIndex));
+                                        HashMap<String,String> val = wildcardIndex.getKeys();
+                                        for(String str : q.queryResult(wildcardIndex)){
+                                            queryList.add(val.get(str));
                                         }
-                                        Collections.sort(wildTerms);
-                                        String prev = wildTerms.get(0);
-                                        for(int i = 0; i < wildTerms.size(); i++){
-                                            String current = wildTerms.get(i);
-                                            if(prev.equals(current)){
-                                                wildTerms.remove(i);
-                                                i--;
-                                            }
-                                            else
-                                                prev = current;
-                                        }
-                                        queryList.addAll(wildTerms);
+//                                        ArrayList<String> wildTerms = new ArrayList<>();
+//                                        for(String str : KGramIndex.kGramify(s.getOriginal())){
+//                                            for(String str2:wildcardIndex.find(str))
+//                                                wildTerms.add(str2);
+//
+//
+//                                        }
+//                                        Collections.sort(wildTerms);
+//                                        String prev = wildTerms.get(0);
+//                                        for(int i = 0; i < wildTerms.size(); i++){
+//                                            String current = wildTerms.get(i);
+//                                            if(prev.equals(current)){
+//                                                wildTerms.remove(i);
+//                                                i--;
+//                                            }
+//                                            else
+//                                                prev = current;
+//                                        }
+//                                        queryList.addAll(wildTerms);
                                     }
                                 }
                             }
