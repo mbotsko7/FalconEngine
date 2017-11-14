@@ -67,7 +67,9 @@ public class SpellingCorrection {
         //for every term in possible
         int pos = 0, neg = 0;
         for(String s : kGramSet){
+            System.out.println(s);
             for(String s2 : kGramIndex.find(s)) {
+//                System.out.println("made it");
                 //make it a KGRAM
                 if(s2.charAt(0) != term.charAt(0)){
                     neg++;
