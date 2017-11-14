@@ -53,7 +53,7 @@ public class DiskEngine {
                         kGramIndex.add(s);
                     }
                 }
-
+                kGramIndex.setKeys(k);
                 // creates binary files and saves them
                 // in the same directory that was indexed
                 IndexWriter writer = new IndexWriter(folder);
@@ -117,9 +117,10 @@ public class DiskEngine {
 //                            DiskKGIndex kIndex = new DiskKGIndex(indexName);
                             SimpleTokenStream stream = new SimpleTokenStream();
                             HashMap<String, String> keys = new HashMap<>();
-                            for(String s : wildcardIndex.getValues()){
-                                keys.put(s, stream.parseAndStem(s));
-                            }
+//                            for(String s : wildcardIndex.getValues()){
+//                                keys.put(s, stream.parseAndStem(s));
+//                            }
+                            keys = wildcardIndex.getKeys();
                             BooleanRetrieval search = new BooleanRetrieval(indexName, wildcardIndex, keys);
 
                             List<Integer> results = search.searchForQuery(input);

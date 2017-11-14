@@ -217,7 +217,6 @@ public class BooleanRetrieval {
 
                     for (String wild : q.queryResult(diskKGIndex)) {
                         wild = kGramKeys.get(wild);
-                        System.out.println(wild);
                         ArrayList<Integer> t = (ArrayList<Integer>) getDocIDList(wild);
                         wildcardListing.add(t);
                     }

@@ -5,8 +5,9 @@ import java.util.*;
  * Created by bardsko on 9/22/17.
  */
 public class KGramIndex implements Serializable {
+    private static final long serialVersionUID = 6529685098267757690L;
     private TreeMap<String, ArrayList<String>> kIndex;
-
+    private HashMap<String, String> keys;
     public KGramIndex() {
         kIndex = new TreeMap<>();
         for(int i = 0; i < 256; i++){
@@ -18,6 +19,14 @@ public class KGramIndex implements Serializable {
 
     public ArrayList<String> find(String str) {
         return kIndex.get(str);
+    }
+
+    public void setKeys(HashMap<String, String> map){
+        keys = map;
+    }
+
+    public HashMap<String, String> getKeys() {
+        return keys;
     }
 
     public ArrayList<String> getValues(){
