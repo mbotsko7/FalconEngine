@@ -24,15 +24,11 @@ public class Controller {
     @FXML
     private Label status;
     @FXML
-     private ToggleGroup search_mode;
-    @FXML
     private RadioButton boolean_retrieval;
     @FXML
     private RadioButton ranked_retrieval;
     @FXML
     private TextField index_location;
-    @FXML
-    private Button directory_button;
 
     Driver driver = new Driver();
     String path = "";
@@ -94,6 +90,10 @@ public class Controller {
     @FXML
     private void handleSearchButtonAction(ActionEvent event) {
         path = index_location.getText();
+        if (path == null || path.trim().isEmpty()) {
+            status.setText("Please select a directory");
+            return;
+        }
 
         if (boolean_retrieval.isSelected()) {   // boolean retrieval
             status.setText("Searching...");
@@ -171,12 +171,14 @@ public class Controller {
 
                 for (DocWeight dw: rankedResults) {
                     Gson gson = new Gson();
-                    String fileName = "article" + dw.getDocID() + " - Score:  " + dw.getDocWeight();
+                    String fileName = "article" + dw.getDocID()+".json";
+                    String text = fileName + " - Score:  " + dw.getDocWeight();
 
                     try {
                         Button button = new Button(fileName);
                         button.getStyleClass().add("result-button");
                         content.getChildren().add(button);
+                        System.out.println(path + "/" + fileName);
                         // open file in a new window
                         button.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
@@ -203,6 +205,7 @@ public class Controller {
                         });
 
                     } catch (Exception e) {
+
                         System.err.println("File doesn't exist");
                     }
 

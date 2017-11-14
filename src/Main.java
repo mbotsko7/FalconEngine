@@ -9,7 +9,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("searchengine.fxml"));
-        primaryStage.setTitle("Search Engine Milestone 1");
+        primaryStage.setTitle("Search Engine Milestone 2");
         primaryStage.setScene(new Scene(root, 600, 650));
         primaryStage.show();
     }
