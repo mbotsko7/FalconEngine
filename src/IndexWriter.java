@@ -98,7 +98,8 @@ public class IndexWriter {
                 int lastDocId = 0;
                 for (PositionalIndex pIndex : postings) {
                     byte[] docIdBytes = ByteBuffer.allocate(4)
-                            .putInt(pIndex.getDocID() - lastDocId).array(); // encode a gap, not a doc ID
+                            .putInt(pIndex.getDocID() - lastDocId).array();
+                    // encode a gap, not a doc ID
 
                     postingsFile.write(docIdBytes, 0, docIdBytes.length);
                     lastDocId = pIndex.getDocID();
@@ -121,25 +122,29 @@ public class IndexWriter {
             }
             vocabTable.close();
             postingsFile.close();
-        } catch (FileNotFoundException ex) {
-        } catch (IOException ex) {
-        } finally {
+        }
+        catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        finally {
             try {
                 postingsFile.close();
-            } catch (IOException ex) {
+            }
+            catch (IOException ex) {
+                ex.printStackTrace();
             }
         }
     }
 
     private static void buildDocumentWeightsFile(ArrayList<Double> docWeights, String folder){
         long[] docPositions = new long[docWeights.size()];
-        //OutputStreamWriter weightList = null;
+
         FileOutputStream weightList = null;
         try{
             int docI = 0;
-//            weightList = new OutputStreamWriter(
-//                    new FileOutputStream(new File(folder, "docWeights.bin")), "ASCII"
-//            );
             weightList = new FileOutputStream(new File(folder, "docWeights.bin"));
             int docPos = 0;
             for(Double weight : docWeights){
@@ -155,14 +160,18 @@ public class IndexWriter {
         }
         catch (FileNotFoundException ex) {
             System.out.println(ex.toString());
-        } catch (UnsupportedEncodingException ex) {
+        }
+        catch (UnsupportedEncodingException ex) {
             System.out.println(ex.toString());
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             System.out.println(ex.toString());
-        } finally {
+        }
+        finally {
             try {
                 weightList.close();
-            } catch (IOException ex) {
+            }
+            catch (IOException ex) {
                 System.out.println(ex.toString());
             }
         }
@@ -183,20 +192,26 @@ public class IndexWriter {
             for (String vocabWord : dictionary) {
                 // for each String in dictionary, save the byte position where that term will start in the vocab file.
                 vocabPositions[vocabI] = vocabPos;
-                vocabList.write(vocabWord); // then write the String
+                vocabList.write(vocabWord);
+                // then write the String
                 vocabI++;
                 vocabPos += vocabWord.length();
             }
-        } catch (FileNotFoundException ex) {
+        }
+        catch (FileNotFoundException ex) {
             System.out.println(ex.toString());
-        } catch (UnsupportedEncodingException ex) {
+        }
+        catch (UnsupportedEncodingException ex) {
             System.out.println(ex.toString());
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             System.out.println(ex.toString());
-        } finally {
+        }
+        finally {
             try {
                 vocabList.close();
-            } catch (IOException ex) {
+            }
+            catch (IOException ex) {
                 System.out.println(ex.toString());
             }
         }

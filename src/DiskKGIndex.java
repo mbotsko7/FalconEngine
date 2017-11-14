@@ -22,7 +22,8 @@ public class DiskKGIndex {
             mKeyList = new RandomAccessFile(new File(path, "kgVocab.bin"), "r");
             mTerms = new RandomAccessFile(new File(path, "kgTerms.bin"), "r");
             mKeyTable = readVocabTable(path);
-        } catch (FileNotFoundException ex) {
+        }
+        catch (FileNotFoundException ex) {
             System.out.println(ex.toString());
         }
     }
@@ -42,14 +43,12 @@ public class DiskKGIndex {
 
             // initialize the array that will hold the terms.
             String[] termsList = new String[termFrequency];
-//            ArrayList<String> termsList = new ArrayList<>();
 
             // reads 4 bytes at a time from file
             // grabs terms for a key in kgram index
             for (int i = 0; i < termFrequency; i++) {
                 terms.read(buffer, 0, buffer.length);
                 int termLength = ByteBuffer.wrap(buffer).getInt();
-                System.out.println(termLength);
                 byte[] tBuffer = new byte[termLength];
                 terms.read(tBuffer, 0, tBuffer.length);
 
@@ -57,11 +56,11 @@ public class DiskKGIndex {
                 String actualTerm = new String(tBuffer, StandardCharsets.UTF_8);
 
                 termsList[i] = actualTerm;
-//                termsList.add(actualTerm); característica
             }
 
             return termsList;
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             System.out.println(ex.toString());
         }
         return null;
@@ -69,7 +68,6 @@ public class DiskKGIndex {
 
     // Reads and returns a list of disk postings that contain the given term.
     public ArrayList<String> getTerms(String term) {
-        System.out.println(term);
         long termsPosition = binarySearchKey(term);
         if (termsPosition >= 0) {
             ArrayList<String> l = new ArrayList<>();
@@ -85,12 +83,15 @@ public class DiskKGIndex {
         int i = 0, j = p.length -1;
         while(j >= i) {
             int m = (i + j) / 2;
-            if (p[m].getDocID() == docID)
+            if (p[m].getDocID() == docID) {
                 return p[m];
-            if (p[m].getDocID() < docID)
+            }
+            if (p[m].getDocID() < docID) {
                 i = m + 1;
-            if (p[m].getDocID() > docID)
+            }
+            if (p[m].getDocID() > docID) {
                 j = m - 1;
+            }
         }
         return null;
     }
@@ -106,7 +107,8 @@ public class DiskKGIndex {
                 int termLength;
                 if (m == mKeyTable.length / 2 - 1) {
                     termLength = (int) (mKeyList.length() - mKeyTable[m * 2]);
-                } else {
+                }
+                else {
                     termLength = (int) (mKeyTable[(m + 1) * 2] - vListPosition);
                 }
 
@@ -120,12 +122,15 @@ public class DiskKGIndex {
                 if (compareValue == 0) {
                     // found it!
                     return mKeyTable[m * 2 + 1];
-                } else if (compareValue < 0) {
+                }
+                else if (compareValue < 0) {
                     j = m - 1;
-                } else {
+                }
+                else {
                     i = m + 1;
                 }
-            } catch (IOException ex) {
+            }
+            catch (IOException ex) {
                 System.out.println(ex.toString());
             }
         }
@@ -148,15 +153,18 @@ public class DiskKGIndex {
             vocabTable = new long[ByteBuffer.wrap(byteBuffer).getInt() * 2];
             byteBuffer = new byte[8];
 
-            while (tableFile.read(byteBuffer, 0, byteBuffer.length) > 0) { // while we keep reading 4 bytes
+            while (tableFile.read(byteBuffer, 0, byteBuffer.length) > 0) {
+                // while we keep reading 4 bytes
                 vocabTable[tableIndex] = ByteBuffer.wrap(byteBuffer).getLong();
                 tableIndex++;
             }
             tableFile.close();
             return vocabTable;
-        } catch (FileNotFoundException ex) {
+        }
+        catch (FileNotFoundException ex) {
             System.out.println(ex.toString());
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             System.out.println(ex.toString());
         }
         return null;

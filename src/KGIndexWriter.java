@@ -16,20 +16,6 @@ public class KGIndexWriter {
         buildKGIndexForDirectory(index, mFolderPath);
     }
 
-//    private static void buildKGIndexForDirectory(KGramIndex index, String folder) {
-//        // "index" contains the in-memory k-gram index
-//        // now we save the index to disk, building three files: the terms index,
-//        // the vocabulary list, and the vocabulary table.
-//
-//        // the array of terms
-//        String[] dictionary = index.getDictionary();
-//        // an array of positions in the vocabulary file
-//        long[] vocabPositions = new long[dictionary.length];
-//
-//        buildKGVocabFile(folder, dictionary, vocabPositions);
-//        buildTermsFile(folder, index, dictionary, vocabPositions);
-//    }
-
     // creates one binary file: kgIndex.bin
     // #kgrams, kgram, #terms, [terms], kgram, #terms, [terms], etc.
     private static void buildKGIndexForDirectory(KGramIndex index, String folder) {
@@ -73,12 +59,18 @@ public class KGIndexWriter {
                 }
             }
             kgIndex.close();
-        } catch (FileNotFoundException ex) {
-        } catch (IOException ex) {
-        } finally {
+        }
+        catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        finally {
             try {
                 kgIndex.close();
             } catch (IOException ex) {
+                ex.printStackTrace();
             }
         }
     }
@@ -135,12 +127,19 @@ public class KGIndexWriter {
             }
             kgVocabTable.close();
             termsFile.close();
-        } catch (FileNotFoundException ex) {
-        } catch (IOException ex) {
-        } finally {
+        }
+        catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        finally {
             try {
                 termsFile.close();
-            } catch (IOException ex) {
+            }
+            catch (IOException ex) {
+                ex.printStackTrace();
             }
         }
     }
@@ -160,20 +159,26 @@ public class KGIndexWriter {
             for (String key : dictionary) {
                 // for each String in dictionary, save the byte position where that term will start in the vocab file.
                 vocabPositions[vocabI] = vocabPos;
-                kgVocabList.write(key); // then write the String
+                kgVocabList.write(key);
+                // then write the String
                 vocabI++;
                 vocabPos += key.length();
             }
-        } catch (FileNotFoundException ex) {
+        }
+        catch (FileNotFoundException ex) {
             System.out.println(ex.toString());
-        } catch (UnsupportedEncodingException ex) {
+        }
+        catch (UnsupportedEncodingException ex) {
             System.out.println(ex.toString());
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             System.out.println(ex.toString());
-        } finally {
+        }
+        finally {
             try {
                 kgVocabList.close();
-            } catch (IOException ex) {
+            }
+            catch (IOException ex) {
                 System.out.println(ex.toString());
             }
         }

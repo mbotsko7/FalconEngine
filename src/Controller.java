@@ -155,7 +155,8 @@ public class Controller {
             }
 
             /*   ranked retrieval    */
-        } else if (ranked_retrieval.isSelected()) {
+        }
+        else if (ranked_retrieval.isSelected()) {
             status.setText("Searching...");
             String query = query_field.getText().trim();
             VBox content = new VBox();
