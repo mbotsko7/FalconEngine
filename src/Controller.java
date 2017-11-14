@@ -170,7 +170,10 @@ public class Controller {
                 rankedResults = driver.searchRanked(path, query);
 
                 for (DocWeight dw: rankedResults) {
-                    Gson gson = new Gson();
+                    if (dw == null) {
+                        status.setText("No docs scored for query");
+                        break;
+                    }
                     String fileName = "article" + dw.getDocID()+".json";
                     String text = fileName + " - Score:  " + dw.getDocWeight();
 
