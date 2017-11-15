@@ -13,6 +13,8 @@ public class SpellingCorrection {
         index = i;
     }
 
+    //identifies phrases in the query, consolidates them
+    //to a single string in the query list for simplicity
     public void processPhrases(ArrayList<String> list){
         boolean phrase = false;
         String capture = "";
@@ -38,6 +40,8 @@ public class SpellingCorrection {
         }
     }
 
+    //returns the spell corrected query if an individual term
+    //has no postings or less than 100 documents
     public String result(){
         String newQuery = "";
         boolean changed = false;
@@ -60,6 +64,7 @@ public class SpellingCorrection {
         return "";
     }
 
+    //corrects the spelling of an individual term
     public String correctSpelling(String term){
         //given a term
         //break it into it's KGRAMS
@@ -106,8 +111,7 @@ public class SpellingCorrection {
         return SimpleTokenStream.parse(closest);
     }
 
-
-
+    //levenshtein difference
     private int dist(String a, String b) {
         int len1 = a.length(), len2 = b.length();
         if (len1 == 0) {
@@ -139,6 +143,7 @@ public class SpellingCorrection {
         return matrix[len1][len2];
     }
 
+    //min of 3 method, used in distance calculation
     private int min(int a, int b, int c) {
         if(a < b && a < c) {
             return a;
@@ -152,12 +157,13 @@ public class SpellingCorrection {
     }
 
 
-
+    //jaccard coefficient calculation
     private double jaccard(ArrayList<String> a, ArrayList<String> b){
         ArrayList<String> c = mergeList(a,b);
         return (double)c.size()/(a.size()+b.size()-c.size());
     }
 
+    //list intersection
     private ArrayList<String> mergeList(ArrayList<String> listA, ArrayList<String> listB){
         ArrayList<String> results = new ArrayList<>();
 

@@ -8,6 +8,7 @@ public class RankedRetrieval {
     private DiskInvertedIndex diskInvertedIndex;
     private ArrayList<DocWeight> accumulator;
     private final double DOC_COUNT = 36803.0;
+
     public RankedRetrieval(ArrayList<String> q, DiskInvertedIndex index){
         query = q;
         diskInvertedIndex = index;
@@ -19,7 +20,7 @@ public class RankedRetrieval {
 
 
 
-    //same word multiple times in a query?
+    //retunrs the top then scoring documents for a particular query
     public DocWeight[] rank(){
         DocWeight[] ret = new DocWeight[10];
 
