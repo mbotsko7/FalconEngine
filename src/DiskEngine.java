@@ -186,7 +186,6 @@ public class DiskEngine {
         }
     }
 
-    // from driver.java
     // used to index file and create positional inverted index
     private static void indexFile(String[] fileData, PositionalInvertedIndex index,
                                   int docID, HashMap<String, String> k, DocumentWeight documentWeight) {
@@ -218,6 +217,9 @@ public class DiskEngine {
         }
 
     }
+
+    // from driver.java
+
 
     // #kgrams, kgram, #terms, [terms], kgram, #terms, [terms], etc.
     // to read in binary file and save it to an in memory kgram index

@@ -15,6 +15,16 @@ import java.util.Scanner;
  */
 public class Parser {
 
+    public String[] parseRawText(String path){
+        try{
+            String fileData = new String(Files.readAllBytes(Paths.get(path)));
+            return new String[]{"",fileData, ""};
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
     /*
        Accepts individual JSON files, returns the Title, Body as a String array
      */
