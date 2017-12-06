@@ -6,20 +6,12 @@ public class FederalDriver {
         FederalistIndex hIndex = new FederalistIndex();         // hamilton index
         FederalistIndex jIndex = new FederalistIndex();         // jay index
         FederalistIndex mIndex = new FederalistIndex();         // madison index
+        FederalistIndex uIndex = new FederalistIndex();         //unknown ("disputed") index
 
+        indexDirectory(uIndex, "DISPLUTED");
         indexDirectory(hIndex, "HAMILTON");     // indexes hamilton papers
         indexDirectory(jIndex, "JAY");         // indexes jay papers
         indexDirectory(mIndex, "MADISON");      // indexes madison papers
-
-        // calculates I(t,c) for terms in hamilton
-        // created discriminating set (different values for 'k')
-
-//        PriorityQueue<MutualInfo> maxHeap = new PriorityQueue<>(1, new Comparator<MutualInfo>() {
-//            @Override
-//            public int compare(MutualInfo a, MutualInfo b) {
-//                return Double.compare(a.getValue(), b.getValue());
-//            }
-//        });
 
         PriorityQueue<Double> maxHeapHamilton = new PriorityQueue<>(1, Collections.reverseOrder());
         HashMap<Double, String> hamiltonValues = new HashMap<>();
