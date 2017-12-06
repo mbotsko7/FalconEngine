@@ -19,6 +19,10 @@ public class DocumentWeight {
         }
     }
 
+    public HashMap<String, Integer> getMap() {
+        return map;
+    }
+
     public double calculateWeight(){
         Set<String> keyset = map.keySet();
         double sum = 0.0;

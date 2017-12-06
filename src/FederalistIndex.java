@@ -6,6 +6,7 @@ import java.util.*;
 public class FederalistIndex {
     // maps a vocab term to the term frequency
     private HashMap<String, Integer> tIndex;
+    private ArrayList<DocumentWeight> docWeights;
 
     // maps vocab term to the documents that contain term
     // for bayesian part (a). might need to make separate class for this?
@@ -17,7 +18,12 @@ public class FederalistIndex {
     public FederalistIndex() {
         tIndex = new HashMap<>();
         dIndex = new HashMap<>();
+        docWeights = new ArrayList<>();
         totalDocuments = 0;
+    }
+
+    public ArrayList<DocumentWeight> getDocWeights() {
+        return docWeights;
     }
 
     public void setNumberOfDocuments(int n) {
@@ -52,6 +58,13 @@ public class FederalistIndex {
     }
 
     public void addTerm(String term, int i) {
+        //if document hasn't been added yet, add it
+        if(docWeights.size() < i){
+            docWeights.add(new DocumentWeight());
+        }
+        //access document, add term
+        docWeights.get(i).addTerm(term);
+
         if (tIndex.containsKey(term)) {
             // increments the term frequency by one if
             // the term is already in the tIndex
