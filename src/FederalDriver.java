@@ -21,8 +21,8 @@ public class FederalDriver {
 //            }
 //        });
 
-        PriorityQueue<Double> maxHeap = new PriorityQueue<>(1, Collections.reverseOrder());
-        HashMap<Double, String> t = new HashMap<>();
+        PriorityQueue<Double> maxHeapHamilton = new PriorityQueue<>(1, Collections.reverseOrder());
+        HashMap<Double, String> hamiltonValues = new HashMap<>();
         for (String term : hIndex.getDictionary()) {
             double N = hIndex.getTotalDocuments() + jIndex.getTotalDocuments() + mIndex.getTotalDocuments();
             double N11 = hIndex.getDocumentFrequency(term);
@@ -36,20 +36,67 @@ public class FederalDriver {
                        (N00/N)*Math.log((N*N00)/((N00+N01)*(N00+N10)));
             // MutualInfo m = new MutualInfo(term, I);
             if (!Double.isNaN(I)) {
-                maxHeap.add(I);
+                maxHeapHamilton.add(I);
             }
-            t.put(I, term);
+            hamiltonValues.put(I, term);
+        }
+
+        // calculates I(t,c) for terms in jay
+        // created discriminating set (different values for 'k')
+        PriorityQueue<Double> maxHeapJay = new PriorityQueue<>(1, Collections.reverseOrder());
+        HashMap<Double, String> jayValues = new HashMap<>();
+        for (String term : jIndex.getDictionary()) {
+            double N = hIndex.getTotalDocuments() + jIndex.getTotalDocuments() + mIndex.getTotalDocuments();
+            double N11 = jIndex.getDocumentFrequency(term);
+            double N10 = hIndex.getDocumentFrequency(term) + mIndex.getDocumentFrequency(term);
+            double N01 = jIndex.getTotalDocuments() - N11;
+            double N00 = N - (N11 + N10 + N01);
+
+            double I = (N11/N)*Math.log((N*N11)/((N11+N10)*(N11+N01))) +
+                    (N01/N)*Math.log((N*N01)/((N01+N00)*(N11+N01))) +
+                    (N10/N)*Math.log((N*N10)/((N11+N10)*(N00+N10))) +
+                    (N00/N)*Math.log((N*N00)/((N00+N01)*(N00+N10)));
+            // MutualInfo m = new MutualInfo(term, I);
+            if (!Double.isNaN(I)) {
+                maxHeapJay.add(I);
+            }
+            jayValues.put(I, term);
+        }
+
+        // calculates I(t,c) for terms in madison
+        // created discriminating set (different values for 'k')
+        PriorityQueue<Double> maxHeapMadison = new PriorityQueue<>(1, Collections.reverseOrder());
+        HashMap<Double, String> madisonValues = new HashMap<>();
+        for (String term : mIndex.getDictionary()) {
+            double N = hIndex.getTotalDocuments() + jIndex.getTotalDocuments() + mIndex.getTotalDocuments();
+            double N11 = mIndex.getDocumentFrequency(term);
+            double N10 = hIndex.getDocumentFrequency(term) + jIndex.getDocumentFrequency(term);
+            double N01 = mIndex.getTotalDocuments() - N11;
+            double N00 = N - (N11 + N10 + N01);
+
+            double I = (N11/N)*Math.log((N*N11)/((N11+N10)*(N11+N01))) +
+                    (N01/N)*Math.log((N*N01)/((N01+N00)*(N11+N01))) +
+                    (N10/N)*Math.log((N*N10)/((N11+N10)*(N00+N10))) +
+                    (N00/N)*Math.log((N*N00)/((N00+N01)*(N00+N10)));
+            // MutualInfo m = new MutualInfo(term, I);
+            if (!Double.isNaN(I)) {
+                maxHeapMadison.add(I);
+            }
+            madisonValues.put(I, term);
         }
 
         // for testing
-        for (int i = 0; i < 50; i++) {
-            System.out.println(maxHeap.poll() + ". term = " + t.get(maxHeap.poll()));
+        for (int i = 0; i < 10; i++) {
+            System.out.println(maxHeapHamilton.poll() + ". term = " + hamiltonValues.get(maxHeapHamilton.poll()));
         }
-
-        // MI = (N11/N)log(N*N11/N1.*N.1) + (N01/N)log(N*N01/N0.*N.1)
-        //    + (N10/N)log(N*N10/N1.*N.0) + (N00/N)log(N*N00/N0.*N.0)
-        // N11 = has term and is in class, N11 = has term but not in class
-        // N01 = doesnt have term & is in class, N00 = doesnt have term & not in class
+        System.out.println();
+        for (int i = 0; i < 10; i++) {
+            System.out.println(maxHeapJay.poll() + ". term = " + jayValues.get(maxHeapJay.poll()));
+        }
+        System.out.println();
+        for (int i = 0; i < 10; i++) {
+            System.out.println(maxHeapMadison.poll() + ". term = " + madisonValues.get(maxHeapMadison.poll()));
+        }
 
         System.out.println("++ FINISH PROGRAM");
     }
