@@ -14,6 +14,11 @@ public class FederalDriver {
         indexDirectory(jIndex, "JAY");         // indexes jay papers
         indexDirectory(mIndex, "MADISON");      // indexes madison papers
 
+        // MI = (N11/N)log(N*N11/N1.*N.1) + (N01/N)log(N*N01/N0.*N.1)
+        //    + (N10/N)log(N*N10/N1.*N.0) + (N00/N)log(N*N00/N0.*N.0)
+        // N11 = has term and is in class, N11 = has term but not in class
+        // N01 = doesnt have term & is in class, N00 = doesnt have term & not in class
+
         System.out.println("++ FINISH PROGRAM");
     }
 
@@ -28,17 +33,19 @@ public class FederalDriver {
             int i = 1;
             for (String path : fileList) {
                 String[] file = parser.parseRawText(f.getPath() + "/" + path);
-                indexFile(file, index);
+                indexFile(file, index, i);
                 i++;
+                // docIDs are going to be a little off but
+                // I dont think we need to know exact docIDs?
             }
             index.setNumberOfDocuments(i - 1);
-            System.out.println("number of documents: " + index.getNumberOfDocuments());
+            System.out.println("number of documents: " + index.getTotalDocuments());
             System.out.println("finished " + folderName + " indexing.\n");
         }
     }
 
     // used to index individual files
-    private static void indexFile(String[] fileData, FederalistIndex index) {
+    private static void indexFile(String[] fileData, FederalistIndex index, int docID) {
         try {
             SimpleTokenStream stream = new SimpleTokenStream(fileData[1]);
             while (stream.hasNextToken()) {
@@ -47,10 +54,10 @@ public class FederalDriver {
                     continue;
                 }
 
-                index.addTerm(next);
+                index.addTerm(next, docID);
                 if (stream.getHyphen() != null) {
                     for (String str : stream.getHyphen()) {
-                        index.addTerm(str);
+                        index.addTerm(str, docID);
                     }
                 }
             }
