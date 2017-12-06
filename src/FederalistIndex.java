@@ -1,8 +1,6 @@
 import org.tartarus.snowball.ext.englishStemmer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 // need to build separate index for each of the three classes
 public class FederalistIndex {
@@ -45,6 +43,14 @@ public class FederalistIndex {
         return tIndex.get(termAfterStemmed);
     }
 
+    public int getDocumentFrequency(String term) {
+        if (dIndex.get(term) == null) {
+            return 0;
+        }
+
+        return dIndex.get(term).size();
+    }
+
     public void addTerm(String term, int i) {
         if (tIndex.containsKey(term)) {
             // increments the term frequency by one if
@@ -63,5 +69,17 @@ public class FederalistIndex {
             // adds document id to dIndex
             dIndex.get(term).add(i);
         }
+    }
+
+    // returns all keys in index
+    // used to calculate mutual information after index is complete
+    public String[] getDictionary() {
+        Iterator<String> itr = tIndex.keySet().iterator();
+        ArrayList<String> list = new ArrayList<>();
+        while (itr.hasNext()) {
+            list.add(itr.next());
+        }
+        Collections.sort(list);
+        return list.toArray(new String[list.size()]);
     }
 }
