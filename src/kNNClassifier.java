@@ -16,28 +16,45 @@ public class kNNClassifier {
         this.unclassified = unclassified;
         this.indexArr = indexArr;
         terms = unclassified.getDictionary();
+        process();
     }
 
-    public void preprocess(){
+    public void process(){
         //for each string in the unclassified document
         double min = Double.MAX_VALUE;
-        ArrayList<ArrayList<Double>> hamilton = new ArrayList<>(), madison = new ArrayList<>(), jay = new ArrayList<>(),
-            unknown = new ArrayList<>();
-        hamilton.add(getVector(indexArr[0]));
-        madison.add(getVector(indexArr[1]));
-        jay.add(getVector(indexArr[2]));
-        unknown.add(getVector(unclassified));
-
+        ArrayList<ArrayList<Double>> hamilton = getVector(indexArr[0]), madison = getVector(indexArr[1]), jay = getVector(indexArr[2]),
+            unknown = getVector(unclassified);
+//        hamilton.add(getVector(indexArr[0]));
+//        madison.add(getVector(indexArr[1]));
+//        jay.add(getVector(indexArr[2]));
+//        unknown.add(getVector(unclassified));
+        int h = 0, m = 0, j2 = 0;
         for(ArrayList<Double> vector : unknown){
-            getAverageClassDistance(vector, hamilton, 5);
+            double ham = getAverageClassDistance(vector, hamilton, 5);
+            double mad = getAverageClassDistance(vector, madison, 5);
+            double j =  getAverageClassDistance(vector, jay, 5);
+            switch (whodunnit(ham, mad, j)){
+                case "Hamilton":
+                    h++;
+                    break;
+                case "Madison":
+                    m++;
+                    break;
+                case "Jay":
+                    j2++;
+                    break;
+            }
         }
-        //NEED INDIVIDUAL DOCS
+        System.out.println("Hamilton: "+h);
+        System.out.println("Jay: "+j2);
+        System.out.println("Madison"+m);
     }
 
-    public ArrayList<Double> getVector(FederalistIndex federalistIndex){
+    public ArrayList<ArrayList<Double>> getVector(FederalistIndex federalistIndex){
         ArrayList<DocumentWeight> documentWeights = federalistIndex.getDocWeights();
-        ArrayList<Double> weights = new ArrayList<>();
+        ArrayList<ArrayList<Double>> list = new ArrayList<>();
         for(DocumentWeight doc : documentWeights){
+            ArrayList<Double> weights = new ArrayList<>();
             HashMap<String, Integer> map = doc.getMap();
             for(String s : terms) {
                 if (map.containsKey(s)){
@@ -46,8 +63,18 @@ public class kNNClassifier {
                 else
                     weights.add(1.0);
             }
+            list.add(weights);
         }
-        return weights;
+        return list;
+    }
+
+    public String whodunnit(double ham, double mad, double jay){
+        if(ham < mad && ham < jay)
+            return "Hamilton";
+        else if(mad < ham && mad < jay)
+            return "Madison";
+        else
+            return "Jay";
     }
 
     //given a list of classified document vectors, calculate the distance of each

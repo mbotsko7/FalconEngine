@@ -63,7 +63,7 @@ public class FederalistIndex {
             docWeights.add(new DocumentWeight());
         }
         //access document, add term
-        docWeights.get(i).addTerm(term);
+        docWeights.get(i-1).addTerm(term);
 
         if (tIndex.containsKey(term)) {
             // increments the term frequency by one if

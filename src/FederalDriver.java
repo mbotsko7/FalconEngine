@@ -8,7 +8,7 @@ public class FederalDriver {
         FederalistIndex mIndex = new FederalistIndex();         // madison index
         FederalistIndex uIndex = new FederalistIndex();         //unknown ("disputed") index
 
-        indexDirectory(uIndex, "DISPLUTED");
+        indexDirectory(uIndex, "DISPUTED");
         indexDirectory(hIndex, "HAMILTON");     // indexes hamilton papers
         indexDirectory(jIndex, "JAY");         // indexes jay papers
         indexDirectory(mIndex, "MADISON");      // indexes madison papers
@@ -96,7 +96,7 @@ public class FederalDriver {
     // used to index entire directory
     private static void indexDirectory(FederalistIndex index, String folderName) {
         System.out.println("starting " + folderName + " indexing...");
-        File f = new File("FederalistPapers/" + folderName);
+        File f = new File("/home/bardsko/FederalistPapers/" + folderName);
         if (f.exists() && f.isDirectory()) {
             String[] fileList = f.list();
             Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
