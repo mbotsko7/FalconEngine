@@ -91,12 +91,14 @@ public class FederalDriver {
         }
 
         System.out.println("++ FINISH PROGRAM");
+
+        kNNClassifier classify = new kNNClassifier(uIndex, new FederalistIndex[]{hIndex, mIndex, jIndex});
     }
 
     // used to index entire directory
     private static void indexDirectory(FederalistIndex index, String folderName) {
         System.out.println("starting " + folderName + " indexing...");
-        File f = new File("/home/bardsko/FederalistPapers/" + folderName);
+        File f = new File("FederalistPapers/" + folderName);
         if (f.exists() && f.isDirectory()) {
             String[] fileList = f.list();
             Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
