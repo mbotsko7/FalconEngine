@@ -1,5 +1,8 @@
 import java.util.Map;
 
+// represents key-value pair between a term and
+// it's mutual information (I) for a certain class.
+// used as an entry for the priority queue
 public class MIEntry implements Map.Entry<String, Double>, Comparable<MIEntry> {
     private final String key;
     private Double value;
@@ -26,6 +29,7 @@ public class MIEntry implements Map.Entry<String, Double>, Comparable<MIEntry> {
         return old;
     }
 
+    // priority queue comparison (max heap)
     public int compareTo(MIEntry x) {
         if (x.getValue() < value) {
             return 1;

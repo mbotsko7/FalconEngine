@@ -8,6 +8,13 @@ public class FederalDriver {
         FederalistIndex mIndex = new FederalistIndex();         // madison index
         FederalistIndex uIndex = new FederalistIndex();         //unknown ("disputed") index
 
+        // for discriminating set of vocab terms
+        // change 'k' as you see fit. 500 seemed okay?
+        int k = 500;
+        String[] tHamilton = new String[k];
+        String[] tJay = new String[k];
+        String[] tMadison = new String[k];
+
         indexDirectory(uIndex, "DISPUTED");
         indexDirectory(hIndex, "HAMILTON");     // indexes hamilton papers
         indexDirectory(jIndex, "JAY");         // indexes jay papers
@@ -31,6 +38,11 @@ public class FederalDriver {
             }
         }
 
+        // created discriminating set of vocab terms for hamilton
+        for (int i = 0; i < k; i++) {
+            tHamilton[i] = maxHeapHamilton.poll().getKey();
+        }
+
         // calculates I(t,c) for terms in jay
         // created discriminating set (different values for 'k')
         PriorityQueue<MIEntry> maxHeapJay = new PriorityQueue<>(1, Collections.reverseOrder());
@@ -49,6 +61,11 @@ public class FederalDriver {
             if (!Double.isNaN(I)) {
                 maxHeapJay.add(new MIEntry(term, I));
             }
+        }
+
+        // created discriminating set of vocab terms for jay
+        for (int i = 0; i < k; i++) {
+            tJay[i] = maxHeapJay.poll().getKey();
         }
 
         // calculates I(t,c) for terms in madison
@@ -71,21 +88,26 @@ public class FederalDriver {
             }
         }
 
+        // created discriminating set of vocab terms for madison
+        for (int i = 0; i < k; i++) {
+            tMadison[i] = maxHeapMadison.poll().getKey();
+        }
+
         // for testing
-        for (int i = 0; i < 50; i++) {
-            MIEntry x = maxHeapHamilton.poll();
-            System.out.println(x.getValue() + ". term " + i + " = " + x.getKey());
-        }
-        System.out.println();
-        for (int i = 0; i < 50; i++) {
-            MIEntry x = maxHeapJay.poll();
-            System.out.println(x.getValue() + ". term = " +x.getKey());
-        }
-        System.out.println();
-        for (int i = 0; i < 50; i++) {
-            MIEntry x = maxHeapMadison.poll();
-            System.out.println(x.getValue() + ". term = " + x.getKey());
-        }
+//        for (int i = 0; i < 500; i++) {
+//            MIEntry x = maxHeapHamilton.poll();
+//            System.out.println(x.getValue() + ". term " + i + " = " + x.getKey());
+//        }
+//        System.out.println();
+//        for (int i = 0; i < 50; i++) {
+//            MIEntry x = maxHeapJay.poll();
+//            System.out.println(x.getValue() + ". term = " + x.getKey());
+//        }
+//        System.out.println();
+//        for (int i = 0; i < 50; i++) {
+//            MIEntry x = maxHeapMadison.poll();
+//            System.out.println(x.getValue() + ". term = " + x.getKey());
+//        }
 
         System.out.println("++ FINISH PROGRAM");
     }
