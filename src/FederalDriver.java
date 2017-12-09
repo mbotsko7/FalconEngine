@@ -13,8 +13,7 @@ public class FederalDriver {
         indexDirectory(jIndex, "JAY");         // indexes jay papers
         indexDirectory(mIndex, "MADISON");      // indexes madison papers
 
-        PriorityQueue<Double> maxHeapHamilton = new PriorityQueue<>(1, Collections.reverseOrder());
-        HashMap<Double, String> hamiltonValues = new HashMap<>();
+        PriorityQueue<MIEntry> maxHeapHamilton = new PriorityQueue<>(1, Collections.reverseOrder());
         for (String term : hIndex.getDictionary()) {
             double N = hIndex.getTotalDocuments() + jIndex.getTotalDocuments() + mIndex.getTotalDocuments();
             double N11 = hIndex.getDocumentFrequency(term);
@@ -26,17 +25,15 @@ public class FederalDriver {
                        (N01/N)*Math.log((N*N01)/((N01+N00)*(N11+N01))) +
                        (N10/N)*Math.log((N*N10)/((N11+N10)*(N00+N10))) +
                        (N00/N)*Math.log((N*N00)/((N00+N01)*(N00+N10)));
-            // MutualInfo m = new MutualInfo(term, I);
+
             if (!Double.isNaN(I)) {
-                maxHeapHamilton.add(I);
+                maxHeapHamilton.add(new MIEntry(term, I));
             }
-            hamiltonValues.put(I, term);
         }
 
         // calculates I(t,c) for terms in jay
         // created discriminating set (different values for 'k')
-        PriorityQueue<Double> maxHeapJay = new PriorityQueue<>(1, Collections.reverseOrder());
-        HashMap<Double, String> jayValues = new HashMap<>();
+        PriorityQueue<MIEntry> maxHeapJay = new PriorityQueue<>(1, Collections.reverseOrder());
         for (String term : jIndex.getDictionary()) {
             double N = hIndex.getTotalDocuments() + jIndex.getTotalDocuments() + mIndex.getTotalDocuments();
             double N11 = jIndex.getDocumentFrequency(term);
@@ -48,17 +45,15 @@ public class FederalDriver {
                     (N01/N)*Math.log((N*N01)/((N01+N00)*(N11+N01))) +
                     (N10/N)*Math.log((N*N10)/((N11+N10)*(N00+N10))) +
                     (N00/N)*Math.log((N*N00)/((N00+N01)*(N00+N10)));
-            // MutualInfo m = new MutualInfo(term, I);
+
             if (!Double.isNaN(I)) {
-                maxHeapJay.add(I);
+                maxHeapJay.add(new MIEntry(term, I));
             }
-            jayValues.put(I, term);
         }
 
         // calculates I(t,c) for terms in madison
         // created discriminating set (different values for 'k')
-        PriorityQueue<Double> maxHeapMadison = new PriorityQueue<>(1, Collections.reverseOrder());
-        HashMap<Double, String> madisonValues = new HashMap<>();
+        PriorityQueue<MIEntry> maxHeapMadison = new PriorityQueue<>(1, Collections.reverseOrder());
         for (String term : mIndex.getDictionary()) {
             double N = hIndex.getTotalDocuments() + jIndex.getTotalDocuments() + mIndex.getTotalDocuments();
             double N11 = mIndex.getDocumentFrequency(term);
@@ -70,24 +65,26 @@ public class FederalDriver {
                     (N01/N)*Math.log((N*N01)/((N01+N00)*(N11+N01))) +
                     (N10/N)*Math.log((N*N10)/((N11+N10)*(N00+N10))) +
                     (N00/N)*Math.log((N*N00)/((N00+N01)*(N00+N10)));
-            // MutualInfo m = new MutualInfo(term, I);
+
             if (!Double.isNaN(I)) {
-                maxHeapMadison.add(I);
+                maxHeapMadison.add(new MIEntry(term, I));
             }
-            madisonValues.put(I, term);
         }
 
         // for testing
-        for (int i = 0; i < 10; i++) {
-            System.out.println(maxHeapHamilton.poll() + ". term = " + hamiltonValues.get(maxHeapHamilton.poll()));
+        for (int i = 0; i < 50; i++) {
+            MIEntry x = maxHeapHamilton.poll();
+            System.out.println(x.getValue() + ". term " + i + " = " + x.getKey());
         }
         System.out.println();
-        for (int i = 0; i < 10; i++) {
-            System.out.println(maxHeapJay.poll() + ". term = " + jayValues.get(maxHeapJay.poll()));
+        for (int i = 0; i < 50; i++) {
+            MIEntry x = maxHeapJay.poll();
+            System.out.println(x.getValue() + ". term = " +x.getKey());
         }
         System.out.println();
-        for (int i = 0; i < 10; i++) {
-            System.out.println(maxHeapMadison.poll() + ". term = " + madisonValues.get(maxHeapMadison.poll()));
+        for (int i = 0; i < 50; i++) {
+            MIEntry x = maxHeapMadison.poll();
+            System.out.println(x.getValue() + ". term = " + x.getKey());
         }
 
         System.out.println("++ FINISH PROGRAM");
@@ -96,7 +93,7 @@ public class FederalDriver {
     // used to index entire directory
     private static void indexDirectory(FederalistIndex index, String folderName) {
         System.out.println("starting " + folderName + " indexing...");
-        File f = new File("/home/bardsko/FederalistPapers/" + folderName);
+        File f = new File("FederalistPapers/" + folderName);
         if (f.exists() && f.isDirectory()) {
             String[] fileList = f.list();
             Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
