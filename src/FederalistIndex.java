@@ -42,13 +42,11 @@ public class FederalistIndex {
     }
 
     public int getTermFrequency(String term) {
-        System.out.println(term);
-
-        englishStemmer stemmer = new englishStemmer();
-        stemmer.setCurrent(term);
-        stemmer.stem();
-        String termAfterStemmed = stemmer.getCurrent();
-        return tIndex.get(termAfterStemmed);
+//        englishStemmer stemmer = new englishStemmer();
+//        stemmer.setCurrent(term);
+//        stemmer.stem();
+//        String termAfterStemmed = stemmer.getCurrent();
+        return tIndex.get(term);
     }
 
 

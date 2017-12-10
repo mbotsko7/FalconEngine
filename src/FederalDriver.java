@@ -97,7 +97,7 @@ public class FederalDriver {
         }
 
         /********* Naive Bayes part b **********/
-        // build discriminating set of vocab terms
+//         build discriminating set of vocab terms
         int n = 0;
         for (int i = 0; i < k; i++) {
             T[i] = tHamilton[i];
@@ -123,29 +123,35 @@ public class FederalDriver {
             scores.add(getTrainingScore(t, vocabSize, mLength, mIndex));
             trainingScores.put(t, scores);
         }
-
         System.out.println(trainingScores.toString());
 
-        // for testing
+//         for testing
+//        System.out.println("Hamilton");
 //        for (int i = 0; i < 500; i++) {
-//            MIEntry x = maxHeapHamilton.poll();
-//            System.out.println(x.getValue() + ". term " + i + " = " + x.getKey());
+////            MIEntry x = maxHeapHamilton.poll();
+////            System.out.println(x.getValue() + ". term " + i + " = " + x.getKey());
+//            System.out.println((i+1) + ". " + tHamilton[i]);
 //        }
 //        System.out.println();
-//        for (int i = 0; i < 50; i++) {
-//            MIEntry x = maxHeapJay.poll();
-//            System.out.println(x.getValue() + ". term = " + x.getKey());
+//        System.out.println("Jay");
+//        for (int i = 0; i < 500; i++) {
+////            MIEntry x = maxHeapJay.poll();
+////            System.out.println(x.getValue() + ". term = " + x.getKey());
+//            System.out.println((i+1) + ". " + tJay[i]);
 //        }
 //        System.out.println();
-//        for (int i = 0; i < 50; i++) {
-//            MIEntry x = maxHeapMadison.poll();
-//            System.out.println(x.getValue() + ". term = " + x.getKey());
+//        System.out.println("Madison");
+//        System.out.println();
+//        for (int i = 0; i < 500; i++) {
+////            MIEntry x = maxHeapMadison.poll();
+////            System.out.println(x.getValue() + ". term = " + x.getKey());
+//            System.out.println((i+1) + ". " + tMadison[i]);
 //        }
 
         System.out.println("++ FINISH PROGRAM");
 
         /************ Rocchio Classification ***********/
-//        kNNClassifier classify = new kNNClassifier(uIndex, new FederalistIndex[]{hIndex, mIndex, jIndex});
+        kNNClassifier classify = new kNNClassifier(uIndex, new FederalistIndex[]{hIndex, mIndex, jIndex});
     }
 
     // used to index entire directory
@@ -210,4 +216,5 @@ public class FederalDriver {
         }
         return count;
     }
+
 }
