@@ -42,6 +42,8 @@ public class FederalistIndex {
     }
 
     public int getTermFrequency(String term) {
+        System.out.println(term);
+
         englishStemmer stemmer = new englishStemmer();
         stemmer.setCurrent(term);
         stemmer.stem();
@@ -49,12 +51,17 @@ public class FederalistIndex {
         return tIndex.get(termAfterStemmed);
     }
 
+
     public int getDocumentFrequency(String term) {
         if (dIndex.get(term) == null) {
             return 0;
         }
 
         return dIndex.get(term).size();
+    }
+
+    public boolean contains(String term) {
+        return getDocumentFrequency(term) > 0;
     }
 
     public void addTerm(String term, int i) {
