@@ -11,16 +11,16 @@ public class FederalDriver {
         // for discriminating set of vocab terms
         // change 'k' as you see fit. 500 seemed okay?
         int k = 500;
-        String[] tHamilton = new String[k];
-        String[] tJay = new String[k];
-        String[] tMadison = new String[k];
+        ArrayList<String> discrimatingSet = new ArrayList<>();
 
         indexDirectory(uIndex, "DISPUTED");
         indexDirectory(hIndex, "HAMILTON");     // indexes hamilton papers
         indexDirectory(jIndex, "JAY");         // indexes jay papers
         indexDirectory(mIndex, "MADISON");      // indexes madison papers
 
-        PriorityQueue<MIEntry> maxHeapHamilton = new PriorityQueue<>(1, Collections.reverseOrder());
+        PriorityQueue<MIEntry> maxHeap = new PriorityQueue<>(1, Collections.reverseOrder());
+
+        // calculates I(t,c) for terms in hamilton
         for (String term : hIndex.getDictionary()) {
             double N = hIndex.getTotalDocuments() + jIndex.getTotalDocuments() + mIndex.getTotalDocuments();
             double N11 = hIndex.getDocumentFrequency(term);
@@ -34,18 +34,11 @@ public class FederalDriver {
                        (N00/N)*Math.log((N*N00)/((N00+N01)*(N00+N10)));
 
             if (!Double.isNaN(I)) {
-                maxHeapHamilton.add(new MIEntry(term, I));
+                maxHeap.add(new MIEntry(term, I));
             }
         }
 
-        // created discriminating set of vocab terms for hamilton
-        for (int i = 0; i < k; i++) {
-            tHamilton[i] = maxHeapHamilton.poll().getKey();
-        }
-
         // calculates I(t,c) for terms in jay
-        // created discriminating set (different values for 'k')
-        PriorityQueue<MIEntry> maxHeapJay = new PriorityQueue<>(1, Collections.reverseOrder());
         for (String term : jIndex.getDictionary()) {
             double N = hIndex.getTotalDocuments() + jIndex.getTotalDocuments() + mIndex.getTotalDocuments();
             double N11 = jIndex.getDocumentFrequency(term);
@@ -59,18 +52,11 @@ public class FederalDriver {
                     (N00/N)*Math.log((N*N00)/((N00+N01)*(N00+N10)));
 
             if (!Double.isNaN(I)) {
-                maxHeapJay.add(new MIEntry(term, I));
+                maxHeap.add(new MIEntry(term, I));
             }
         }
 
-        // created discriminating set of vocab terms for jay
-        for (int i = 0; i < k; i++) {
-            tJay[i] = maxHeapJay.poll().getKey();
-        }
-
         // calculates I(t,c) for terms in madison
-        // created discriminating set (different values for 'k')
-        PriorityQueue<MIEntry> maxHeapMadison = new PriorityQueue<>(1, Collections.reverseOrder());
         for (String term : mIndex.getDictionary()) {
             double N = hIndex.getTotalDocuments() + jIndex.getTotalDocuments() + mIndex.getTotalDocuments();
             double N11 = mIndex.getDocumentFrequency(term);
@@ -84,13 +70,18 @@ public class FederalDriver {
                     (N00/N)*Math.log((N*N00)/((N00+N01)*(N00+N10)));
 
             if (!Double.isNaN(I)) {
-                maxHeapMadison.add(new MIEntry(term, I));
+                maxHeap.add(new MIEntry(term, I));
             }
         }
 
-        // created discriminating set of vocab terms for madison
-        for (int i = 0; i < k; i++) {
-            tMadison[i] = maxHeapMadison.poll().getKey();
+        // created discriminating set of vocab terms
+        int i = 0;
+        while (i < k) {
+            String s = maxHeap.poll().getKey();
+            if (!discrimatingSet.contains(s)) {
+                discrimatingSet.add(s);
+                i++;
+            }
         }
 
         // for testing
