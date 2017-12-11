@@ -46,7 +46,9 @@ public class FederalistIndex {
 //        stemmer.setCurrent(term);
 //        stemmer.stem();
 //        String termAfterStemmed = stemmer.getCurrent();
-        return tIndex.get(term);
+        if (contains(term))
+            return tIndex.get(term);
+        return 0;
     }
 
 
