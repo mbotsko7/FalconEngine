@@ -13,7 +13,7 @@ public class kNNClassifier {
     vector of document, where each value is a Wdt
      */
 
-    public kNNClassifier(FederalistIndex unclassified, FederalistIndex[] indexArr){
+    public kNNClassifier(FederalistIndex unclassified, FederalistIndex[] indexArr, ArrayList<String> l){
         this.unclassified = unclassified;
         this.indexArr = indexArr;
         terms = new ArrayList<>();
@@ -33,6 +33,7 @@ public class kNNClassifier {
             else
                 prev = terms.get(i);
         }
+//        terms = l;
         process();
     }
 
@@ -49,7 +50,7 @@ public class kNNClassifier {
 //        unknown.add(getVector(unclassified));
         int h = 0, m = 0, j2 = 0, a = 0, b = 0, c = 0;
         for(ArrayList<Double> vector : unknown){
-            int n = 3;
+            int n = 1;
             double[] ham = getClosest(vector, hamilton,n);
             double[] mad = getClosest(vector, madison, n);
             double[] j = getClosest(vector, jay, n);
@@ -57,6 +58,10 @@ public class kNNClassifier {
             System.out.println();
             for(Double d : mad) System.out.print(d+" ");
             System.out.println();
+
+//            double ham = getAverageClassDistance(vector, hamilton,n);
+//            double mad = getAverageClassDistance(vector, madison, n);
+//            double j = getAverageClassDistance(vector, jay, n);
             switch (whodunnit2(ham, mad, j, n)){
                 case "Hamilton":
                     h++;
@@ -68,6 +73,7 @@ public class kNNClassifier {
                     j2++;
                     break;
             }
+
         }
         /*
         for(ArrayList<Double> vector : unknown){
@@ -182,7 +188,7 @@ public class kNNClassifier {
                 else
                     weights.add(1.0);
             }
-            double len =  1;//length(weights);
+            double len =  length(weights);
             for(int i = 0; i < weights.size(); i++){
                 weights.set(i, weights.get(i)/len);
             }
