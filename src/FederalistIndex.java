@@ -46,23 +46,17 @@ public class FederalistIndex {
 //        stemmer.setCurrent(term);
 //        stemmer.stem();
 //        String termAfterStemmed = stemmer.getCurrent();
-        if (contains(term))
+        if (getDocumentFrequency(term) > 0)
             return tIndex.get(term);
         return 0;
     }
 
-
     public int getDocumentFrequency(String term) {
-        if (dIndex.get(term) == null) {
+        if (dIndex.get(term) == null)
             return 0;
-        }
-
         return dIndex.get(term).size();
     }
 
-    public boolean contains(String term) {
-        return getDocumentFrequency(term) > 0;
-    }
 
     public void addTerm(String term, int i) {
         //if document hasn't been added yet, add it

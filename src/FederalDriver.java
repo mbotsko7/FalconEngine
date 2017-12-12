@@ -83,11 +83,11 @@ public class FederalDriver {
             }
         }
 
-        int j = 1;
-        for (String term: discriminatingSet) {
-            System.out.println(j + ". " + term);
-            j++;
-        }
+//        int j = 1;
+//        for (String term: discriminatingSet) {
+//            System.out.println(j + ". " + term);
+//            j++;
+//        }
 
         // calculate lengths of the text for each class in the training set
         int hLength = getTextLength(hIndex, discriminatingSet);
@@ -99,13 +99,13 @@ public class FederalDriver {
         Map<String, List<Double>> trainingScores = new HashMap<>(k);
         for (String term:discriminatingSet) {
             List<Double> scores = new ArrayList<>(3);
-            scores.add(getTrainingScore(term, k, hLength, hIndex));
-            scores.add(getTrainingScore(term, k, jLength, jIndex));
-            scores.add(getTrainingScore(term, k, mLength, mIndex));
+            scores.add(getTrainingScore(term, hLength, k, hIndex));
+            scores.add(getTrainingScore(term, jLength, k, jIndex));
+            scores.add(getTrainingScore(term, mLength, k, mIndex));
             trainingScores.put(term, scores);
         }
 
-        // testing
+        // print results of part b
 //        for (String term: trainingScores.keySet()) {
 //            System.out.println(term);
 //            System.out.println(trainingScores.get(term).get(0));
@@ -113,6 +113,65 @@ public class FederalDriver {
 //            System.out.println(trainingScores.get(term).get(2));
 //            System.out.println();
 //        }
+
+        int hSize = hIndex.getTotalDocuments();
+        int jSize = jIndex.getTotalDocuments();
+        int mSize = mIndex.getTotalDocuments();
+        int uSize = uIndex.getTotalDocuments();
+        int N = hSize + jSize + mSize;
+
+        // a list of docs that each contain running totals for Hamilton, Jay, and Madison
+        List<List<Double>> disputedDocList = new ArrayList<>(uSize);
+        // initialize scores with relative frequency of each class (Nc/N)
+        for (int n = 0; n < uSize; n++) {
+            // list that holds the three scores for each doc
+            List<Double> doc = new ArrayList<>(3);
+            double relFreq = Math.log(((double) hSize)/N);
+            doc.add(relFreq);
+            relFreq = Math.log(((double) jSize)/N);
+            doc.add(relFreq);
+            relFreq = Math.log(((double) mSize)/N);
+            doc.add(relFreq);
+            disputedDocList.add(doc);
+        }
+
+        Map<String, List<Integer>> dIndex = uIndex.getDocIndex();
+        for (String term: discriminatingSet) {
+            // get list of p(t|c) for term and log them
+            List<Double> termScores = trainingScores.get(term);
+            for (int a = 0; a < termScores.size(); a++) {
+                termScores.set(a, Math.log(termScores.get(a)));
+            }
+
+            // get list of docIDs for the term and add scores to their running totals
+            List<Integer> docList = dIndex.get(term);
+            if (docList == null) continue;
+            for (int docID: docList) {
+                List<Double> currScores = disputedDocList.get(docID-1);    // bc docIDs start at 1
+                for (int x = 0; x < 3; x++) {
+                    double updatedScore = currScores.get(x) + termScores.get(x);
+                    currScores.set(x, updatedScore);
+                }
+                disputedDocList.set(docID-1, currScores);
+            }
+        }
+
+        // calculate argmax for each doc to determine final result
+        int count = 1;
+        String author;
+        for (List<Double> docScores: disputedDocList) {
+            double maxScore = Collections.max(docScores);
+            if (maxScore == docScores.get(0))
+                author = "Hamilton";
+            else if (maxScore == docScores.get(1))
+                author = "Jay";
+            else if (maxScore == docScores.get(2))
+                author = "Madison";
+            else
+                author = "WTF";
+            System.out.println("Doc " + count + ": " + author + ", max score = " + maxScore);
+            count++;
+        }
 
 
         System.out.println("++ FINISH PROGRAM");
@@ -123,7 +182,7 @@ public class FederalDriver {
     // used to index entire directory
     private static void indexDirectory(FederalistIndex index, String folderName) {
         System.out.println("starting " + folderName + " indexing...");
-        File f = new File("/home/bardsko/FederalistPapers/" + folderName);
+        File f = new File("FederalistPapers/" + folderName);
         if (f.exists() && f.isDirectory()) {
             String[] fileList = f.list();
             Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
