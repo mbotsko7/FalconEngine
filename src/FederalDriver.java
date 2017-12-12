@@ -8,7 +8,6 @@ public class FederalDriver {
         FederalistIndex mIndex = new FederalistIndex();         // madison index
         FederalistIndex uIndex = new FederalistIndex();         //unknown ("disputed") index
 
-        // for discriminating set of vocab terms
         // change 'k' as you see fit. 500 seemed okay?
         int k = 500;
         ArrayList<String> discriminatingSet = new ArrayList<>();
@@ -118,7 +117,7 @@ public class FederalDriver {
 
         System.out.println("++ FINISH PROGRAM");
         ArrayList<String> list = new ArrayList<>();
-//        kNNClassifier classify = new kNNClassifier(uIndex, new FederalistIndex[]{hIndex, mIndex, jIndex}, discriminatingSet);
+        kNNClassifier classify = new kNNClassifier(uIndex, new FederalistIndex[]{hIndex, mIndex, jIndex}, discriminatingSet);
     }
 
     // used to index entire directory
