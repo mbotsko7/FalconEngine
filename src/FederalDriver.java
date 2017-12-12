@@ -78,12 +78,11 @@ public class FederalDriver {
         int i = 0;
         while (i < k) {
             String s = maxHeap.poll().getKey();
-            if (!discriminatingSet.contains(s)) {
+            if (!discriminatingSet.contains(s) && !s.equals("")) {
                 discriminatingSet.add(s);
                 i++;
             }
         }
-
 
         int j = 1;
         for (String term: discriminatingSet) {
@@ -119,7 +118,7 @@ public class FederalDriver {
 
         System.out.println("++ FINISH PROGRAM");
         ArrayList<String> list = new ArrayList<>();
-        kNNClassifier classify = new kNNClassifier(uIndex, new FederalistIndex[]{hIndex, mIndex, jIndex}, discriminatingSet);
+//        kNNClassifier classify = new kNNClassifier(uIndex, new FederalistIndex[]{hIndex, mIndex, jIndex}, discriminatingSet);
     }
 
     // used to index entire directory
