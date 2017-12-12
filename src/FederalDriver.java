@@ -11,16 +11,16 @@ public class FederalDriver {
         // for discriminating set of vocab terms
         // change 'k' as you see fit. 500 seemed okay?
         int k = 500;
-        String[] tHamilton = new String[k];
-        String[] tJay = new String[k];
-        String[] tMadison = new String[k];
+        ArrayList<String> discriminatingSet = new ArrayList<>();
 
         indexDirectory(uIndex, "DISPUTED");
         indexDirectory(hIndex, "HAMILTON");     // indexes hamilton papers
         indexDirectory(jIndex, "JAY");         // indexes jay papers
         indexDirectory(mIndex, "MADISON");      // indexes madison papers
 
-        PriorityQueue<MIEntry> maxHeapHamilton = new PriorityQueue<>(1, Collections.reverseOrder());
+        PriorityQueue<MIEntry> maxHeap = new PriorityQueue<>(1, Collections.reverseOrder());
+
+        // calculates I(t,c) for terms in hamilton
         for (String term : hIndex.getDictionary()) {
             double N = hIndex.getTotalDocuments() + jIndex.getTotalDocuments() + mIndex.getTotalDocuments();
             double N11 = hIndex.getDocumentFrequency(term);
@@ -29,23 +29,16 @@ public class FederalDriver {
             double N00 = N - (N11 + N10 + N01);
 
             double I = (N11/N)*Math.log((N*N11)/((N11+N10)*(N11+N01))) +
-                       (N01/N)*Math.log((N*N01)/((N01+N00)*(N11+N01))) +
-                       (N10/N)*Math.log((N*N10)/((N11+N10)*(N00+N10))) +
-                       (N00/N)*Math.log((N*N00)/((N00+N01)*(N00+N10)));
+                    (N01/N)*Math.log((N*N01)/((N01+N00)*(N11+N01))) +
+                    (N10/N)*Math.log((N*N10)/((N11+N10)*(N00+N10))) +
+                    (N00/N)*Math.log((N*N00)/((N00+N01)*(N00+N10)));
 
             if (!Double.isNaN(I)) {
-                maxHeapHamilton.add(new MIEntry(term, I));
+                maxHeap.add(new MIEntry(term, I));
             }
         }
 
-        // created discriminating set of vocab terms for hamilton
-        for (int i = 0; i < k; i++) {
-            tHamilton[i] = maxHeapHamilton.poll().getKey();
-        }
-
         // calculates I(t,c) for terms in jay
-        // created discriminating set (different values for 'k')
-        PriorityQueue<MIEntry> maxHeapJay = new PriorityQueue<>(1, Collections.reverseOrder());
         for (String term : jIndex.getDictionary()) {
             double N = hIndex.getTotalDocuments() + jIndex.getTotalDocuments() + mIndex.getTotalDocuments();
             double N11 = jIndex.getDocumentFrequency(term);
@@ -59,18 +52,11 @@ public class FederalDriver {
                     (N00/N)*Math.log((N*N00)/((N00+N01)*(N00+N10)));
 
             if (!Double.isNaN(I)) {
-                maxHeapJay.add(new MIEntry(term, I));
+                maxHeap.add(new MIEntry(term, I));
             }
         }
 
-        // created discriminating set of vocab terms for jay
-        for (int i = 0; i < k; i++) {
-            tJay[i] = maxHeapJay.poll().getKey();
-        }
-
         // calculates I(t,c) for terms in madison
-        // created discriminating set (different values for 'k')
-        PriorityQueue<MIEntry> maxHeapMadison = new PriorityQueue<>(1, Collections.reverseOrder());
         for (String term : mIndex.getDictionary()) {
             double N = hIndex.getTotalDocuments() + jIndex.getTotalDocuments() + mIndex.getTotalDocuments();
             double N11 = mIndex.getDocumentFrequency(term);
@@ -84,37 +70,55 @@ public class FederalDriver {
                     (N00/N)*Math.log((N*N00)/((N00+N01)*(N00+N10)));
 
             if (!Double.isNaN(I)) {
-                maxHeapMadison.add(new MIEntry(term, I));
+                maxHeap.add(new MIEntry(term, I));
             }
         }
 
-        // created discriminating set of vocab terms for madison
-        for (int i = 0; i < k; i++) {
-            tMadison[i] = maxHeapMadison.poll().getKey();
+        // created discriminating set of vocab terms
+        int i = 0;
+        while (i < k) {
+            String s = maxHeap.poll().getKey();
+            if (!discriminatingSet.contains(s)) {
+                discriminatingSet.add(s);
+                i++;
+            }
         }
-        HashSet<String> hashSet = new HashSet<>();
-        // for testing
-        for (int i = 0; i < 500; i++) {
-            MIEntry x = maxHeapHamilton.poll();
-            System.out.println(x.getValue() + ". term " + i + " = " + x.getKey());
-            hashSet.add(x.getKey());
+
+
+        int j = 1;
+        for (String term: discriminatingSet) {
+            System.out.println(j + ". " + term);
+            j++;
         }
-        System.out.println();
-        for (int i = 0; i < 50; i++) {
-            MIEntry x = maxHeapJay.poll();
-            System.out.println(x.getValue() + ". term = " + x.getKey());
-            hashSet.add(x.getKey());
+
+        // calculate lengths of the text for each class in the training set
+        int hLength = getTextLength(hIndex, discriminatingSet);
+        int jLength = getTextLength(jIndex, discriminatingSet);
+        int mLength = getTextLength(mIndex, discriminatingSet);
+
+        // create hashmap with term as key and list containing
+        // ptHamilton, ptJay, ptMadison as value
+        Map<String, List<Double>> trainingScores = new HashMap<>(k);
+        for (String term:discriminatingSet) {
+            List<Double> scores = new ArrayList<>(3);
+            scores.add(getTrainingScore(term, k, hLength, hIndex));
+            scores.add(getTrainingScore(term, k, jLength, jIndex));
+            scores.add(getTrainingScore(term, k, mLength, mIndex));
+            trainingScores.put(term, scores);
         }
-        System.out.println();
-        for (int i = 0; i < 50; i++) {
-            MIEntry x = maxHeapMadison.poll();
-            System.out.println(x.getValue() + ". term = " + x.getKey());
-            hashSet.add(x.getKey());
-        }
+
+        // testing
+//        for (String term: trainingScores.keySet()) {
+//            System.out.println(term);
+//            System.out.println(trainingScores.get(term).get(0));
+//            System.out.println(trainingScores.get(term).get(1));
+//            System.out.println(trainingScores.get(term).get(2));
+//            System.out.println();
+//        }
+
 
         System.out.println("++ FINISH PROGRAM");
         ArrayList<String> list = new ArrayList<>();
-        list.addAll(hashSet);
         kNNClassifier classify = new kNNClassifier(uIndex, new FederalistIndex[]{hIndex, mIndex, jIndex}, list);
     }
 
@@ -161,5 +165,18 @@ public class FederalDriver {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static double getTrainingScore(String term, int classTextLength, int vocabSize, FederalistIndex index) {
+        int termFreqInClass = index.getTermFrequency(term);
+        return (termFreqInClass + 1.0) / (classTextLength + vocabSize);
+    }
+
+    private static int getTextLength(FederalistIndex index, ArrayList<String> vocabList) {
+        int count = 0;
+        for (String term: vocabList) {
+            count += index.getTermFrequency(term);
+        }
+        return count;
     }
 }
