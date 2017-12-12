@@ -92,32 +92,36 @@ public class FederalDriver {
         for (int i = 0; i < k; i++) {
             tMadison[i] = maxHeapMadison.poll().getKey();
         }
-
+        HashSet<String> hashSet = new HashSet<>();
         // for testing
-//        for (int i = 0; i < 500; i++) {
-//            MIEntry x = maxHeapHamilton.poll();
-//            System.out.println(x.getValue() + ". term " + i + " = " + x.getKey());
-//        }
-//        System.out.println();
-//        for (int i = 0; i < 50; i++) {
-//            MIEntry x = maxHeapJay.poll();
-//            System.out.println(x.getValue() + ". term = " + x.getKey());
-//        }
-//        System.out.println();
-//        for (int i = 0; i < 50; i++) {
-//            MIEntry x = maxHeapMadison.poll();
-//            System.out.println(x.getValue() + ". term = " + x.getKey());
-//        }
+        for (int i = 0; i < 500; i++) {
+            MIEntry x = maxHeapHamilton.poll();
+            System.out.println(x.getValue() + ". term " + i + " = " + x.getKey());
+            hashSet.add(x.getKey());
+        }
+        System.out.println();
+        for (int i = 0; i < 50; i++) {
+            MIEntry x = maxHeapJay.poll();
+            System.out.println(x.getValue() + ". term = " + x.getKey());
+            hashSet.add(x.getKey());
+        }
+        System.out.println();
+        for (int i = 0; i < 50; i++) {
+            MIEntry x = maxHeapMadison.poll();
+            System.out.println(x.getValue() + ". term = " + x.getKey());
+            hashSet.add(x.getKey());
+        }
 
         System.out.println("++ FINISH PROGRAM");
-
-        kNNClassifier classify = new kNNClassifier(uIndex, new FederalistIndex[]{hIndex, mIndex, jIndex});
+        ArrayList<String> list = new ArrayList<>();
+        list.addAll(hashSet);
+        kNNClassifier classify = new kNNClassifier(uIndex, new FederalistIndex[]{hIndex, mIndex, jIndex}, list);
     }
 
     // used to index entire directory
     private static void indexDirectory(FederalistIndex index, String folderName) {
         System.out.println("starting " + folderName + " indexing...");
-        File f = new File("FederalistPapers/" + folderName);
+        File f = new File("/home/bardsko/FederalistPapers/" + folderName);
         if (f.exists() && f.isDirectory()) {
             String[] fileList = f.list();
             Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
