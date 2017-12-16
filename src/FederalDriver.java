@@ -169,7 +169,9 @@ public class FederalDriver {
                 author = "Madison";
             else
                 author = "WTF";
-            System.out.println(uIndex.getDocTitle(count) + ": " + author + ", max score = " + maxScore);
+            System.out.println(uIndex.getDocTitle(count));
+            System.out.format("Scores:%n Hamilton: %.5f   Jay: %.5f  Madison:  %.5f %n", docScores.get(0), docScores.get(1), docScores.get(2));
+            System.out.println(author + ", max score = " + maxScore);
             count++;
         }
 
