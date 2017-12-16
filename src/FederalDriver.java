@@ -157,7 +157,7 @@ public class FederalDriver {
         }
 
         // calculate argmax for each doc to determine final result
-        int count = 0;
+        int count = 1;
         String author;
         for (List<Double> docScores: disputedDocList) {
             double maxScore = Collections.max(docScores);
@@ -169,14 +169,15 @@ public class FederalDriver {
                 author = "Madison";
             else
                 author = "WTF";
-            System.out.println(uIndex.getDocTitle(count));
-            System.out.format("Scores:%n Hamilton: %.5f   Jay: %.5f  Madison:  %.5f %n", docScores.get(0), docScores.get(1), docScores.get(2));
+            System.out.println(uIndex.getDocTitle(count) + " scores:");
+            System.out.format("Hamilton: %.5f   Jay: %.5f  Madison:  %.5f %n", docScores.get(0), docScores.get(1), docScores.get(2));
             System.out.println(author + ", max score = " + maxScore);
+            System.out.println();
             count++;
         }
 
 
-        System.out.println("++ FINISH PROGRAM");
+        System.out.println("++ FINISH PROGRAM \n");
         ArrayList<String> list = new ArrayList<>();
         kNNClassifier classify = new kNNClassifier(uIndex, new FederalistIndex[]{hIndex, mIndex, jIndex}, discriminatingSet);
     }
