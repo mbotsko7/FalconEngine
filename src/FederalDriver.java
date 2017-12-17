@@ -169,12 +169,15 @@ public class FederalDriver {
                 author = "Madison";
             else
                 author = "WTF";
-            System.out.println("Doc " + count + ": " + author + ", max score = " + maxScore);
+            System.out.println(uIndex.getDocTitle(count) + " scores:");
+            System.out.format("Hamilton: %.5f   Jay: %.5f  Madison:  %.5f %n", docScores.get(0), docScores.get(1), docScores.get(2));
+            System.out.println(author + ", max score = " + maxScore);
+            System.out.println();
             count++;
         }
 
 
-        System.out.println("++ FINISH PROGRAM");
+        System.out.println("++ FINISH PROGRAM \n");
         ArrayList<String> list = new ArrayList<>();
         kNNClassifier classify = new kNNClassifier(uIndex, new FederalistIndex[]{hIndex, mIndex, jIndex}, discriminatingSet);
     }
@@ -183,6 +186,7 @@ public class FederalDriver {
     private static void indexDirectory(FederalistIndex index, String folderName) {
         System.out.println("starting " + folderName + " indexing...");
         File f = new File("FederalistPapers/" + folderName);
+        HashMap<Integer, String> docTitles = new HashMap<>();
         if (f.exists() && f.isDirectory()) {
             String[] fileList = f.list();
             Arrays.sort(fileList, new FileComparator());    // sorts files before assigning docID
@@ -191,11 +195,13 @@ public class FederalDriver {
             for (String path : fileList) {
                 String[] file = parser.parseRawText(f.getPath() + "/" + path);
                 indexFile(file, index, i);
+                docTitles.put(i,path);
                 i++;
                 // docIDs are going to be a little off but
                 // I dont think we need to know exact docIDs?
             }
             index.setNumberOfDocuments(i - 1);
+            index.setDocIDTable(docTitles);
             System.out.println("number of documents: " + index.getTotalDocuments());
             System.out.println("finished " + folderName + " indexing.\n");
         }

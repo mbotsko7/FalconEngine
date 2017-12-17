@@ -12,6 +12,9 @@ public class FederalistIndex {
     // for bayesian part (a). might need to make separate class for this?
     private HashMap<String, List<Integer>> dIndex;
 
+    // map assigned doc ID to actual paper name
+    private HashMap<Integer, String> docTitles;
+
     // total number of documents in the indexed folder
     private int totalDocuments;
 
@@ -95,5 +98,13 @@ public class FederalistIndex {
         }
         Collections.sort(list);
         return list.toArray(new String[list.size()]);
+    }
+
+    public void setDocIDTable(HashMap<Integer,String> docTitles) {
+        this.docTitles = docTitles;
+    }
+
+    public String getDocTitle(int docID) {
+        return docTitles.get(docID);
     }
 }
